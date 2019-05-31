@@ -1,0 +1,18 @@
+# Eclipse IDE
+/.settings
+/.classpath
+/.project
+
+# JetBrains Intellij/PyCharm
+/*.eml
+/*.iml
+/.idea/
+
+# MacOS metadata
+.DS_Store
+
+# terraform
+/.terraform/
+/terraform.tfstate*
+/build/
+/.crash.log
