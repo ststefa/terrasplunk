@@ -1,6 +1,8 @@
-This module is about creating and maintaining the splunk platform
+# Overview
 
-It is the next evolutionary step after cehwing on terraform for a while. See the splunkprod project for that.
+This module is about creating and maintaining the splunk platform.
+
+It is the next evolutionary step after chewing on terraform for a while. See the `splunkprod` project for that.
 
 There is a superb talk recorded on Hashiconf which elaborates on the phases of terraform code. See
 
@@ -10,7 +12,8 @@ which leads to
 
 https://www.youtube.com/watch?v=wgzgVm7Sqlk&t=1s
 
-While the `splunkprod` uses a *multi terralith* structure this project restructures it to a *terramod* setup.
+While the `splunkprod` has a *multi terralith* structure this project restructures it to a *terramod* setup which 
+seems to be an appropriate setup for the planned level of collaboration and complexity.
 
 # Provisioning
 
