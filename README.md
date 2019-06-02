@@ -4,7 +4,7 @@ This module is about creating and maintaining the splunk platform.
 
 It is the next evolutionary step after chewing on terraform for a while. See the `splunkprod` project for that.
 
-There is a superb talk recorded on Hashiconf which elaborates on the phases of terraform code. See
+There is a superb talk by Nicki Watt recorded on Hashiconf which elaborates on the phases of terraform code. See
 
 https://learn.hashicorp.com/terraform/operations/maintaining-multiple-environments
 
