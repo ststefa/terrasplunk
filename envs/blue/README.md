@@ -1,1 +1,2 @@
-The **blue** line of the splunk production environment (searchhead and indexer clusters, maybe more). Essentially all splunk parts that provide the service.
+The **blue** line of the splunk production environment (searchhead and indexer
+clusters, maybe more). Essentially all splunk parts that provide the service.

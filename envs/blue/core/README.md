@@ -1,1 +1,0 @@
-Core parts of the terraform infrastructure like the network zones.

@@ -12,7 +12,7 @@
 .DS_Store
 
 # terraform
-/.terraform/
-/terraform.tfstate*
-/build/
-/.crash.log
+.terraform/
+terraform.tfstate*
+build/
+.crash.log
