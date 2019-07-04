@@ -11,7 +11,8 @@ data "openstack_networking_router_v2" "AppSvc_T_vpc01" {
   router_id = "b1ae5055-780b-45ad-b77e-f45339cd3aac"
 }
 
-# How to reference existing interfaces?? Theres no datasource
+# How to reference existing interfaces?? Theres no datasource and a
+# resource will inappropriately try to manage the resource
 #resource "openstack_networking_router_interface_v2" "AppSvc_T_net_AZ1" {
 #  router_id = data.openstack_networking_router_v2.AppSvc_T_vpc01.id
 #  subnet_id = data.openstack_networking_subnet_v2.AppSvc_T_subnet_AZ1.id
@@ -38,7 +39,7 @@ data "openstack_networking_subnet_v2" "AppSvc_T_subnet_AZ2" {
   subnet_id = "b97e7c7d-d7a6-4170-8064-ef1ab2846bea"
 }
 
-# use resources to properly manage our nets
+# use resources to manage our nets
 resource "openstack_networking_router_v2" "core" {
   name                = "${local.project}-${var.stage}-router"
   admin_state_up      = "true"
@@ -57,6 +58,7 @@ resource "openstack_networking_router_interface_v2" "core2" {
 
 resource "openstack_networking_network_v2" "core1" {
   name                    = "${local.project}-${var.stage}-network"
+  # Error: Error creating openstack_networking_network_v2: Bad request with: [POST https://vpc.eu-ch.o13bb.otc.t-systems.com/v2.0/networks], error message: {"NeutronError":{"message":"Attribute 'availability_zone_hints' not allowed in POST","type":"HTTPBadRequest","detail":""}}
   #availability_zone_hints = ["AZ1"]
   admin_state_up          = true
 }
@@ -81,11 +83,6 @@ resource "openstack_networking_subnet_v2" "core2" {
   cidr            = var.subnet_cidr2
   ip_version      = 4
   dns_nameservers = var.dns_servers
-}
-
-resource "openstack_compute_keypair_v2" "keypair" {
-  name       = "${local.project}-${var.stage}-key"
-  public_key = file("${path.module}/tsch-appl_rsa.pub")
 }
 
 resource "openstack_compute_secgroup_v2" "indexer-secgrp" {
@@ -115,3 +112,9 @@ resource "openstack_compute_secgroup_v2" "indexer-secgrp" {
     cidr        = "0.0.0.0/0"
   }
 }
+
+resource "openstack_compute_keypair_v2" "keypair" {
+  name       = "${local.project}-${var.stage}-key"
+  public_key = file("${path.module}/tsch-appl_rsa.pub")
+}
+

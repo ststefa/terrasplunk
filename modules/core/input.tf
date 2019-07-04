@@ -3,6 +3,7 @@ variable "stage" {
 }
 
 variable "subnet_cidr1" {}
+
 variable "subnet_cidr2" {}
 
 variable "dns_servers" {
