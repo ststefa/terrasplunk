@@ -13,6 +13,8 @@ data "openstack_networking_router_v2" "AppSvc_T_vpc01" {
 
 # How to reference existing interfaces?? Theres no datasource and a
 # resource will inappropriately try to manage the resource
+# Importing will not work as it then tries to manage the resource which
+# is dangerous (it should be readonly)
 #resource "openstack_networking_router_interface_v2" "AppSvc_T_net_AZ1" {
 #  router_id = data.openstack_networking_router_v2.AppSvc_T_vpc01.id
 #  subnet_id = data.openstack_networking_subnet_v2.AppSvc_T_subnet_AZ1.id
@@ -57,14 +59,14 @@ resource "openstack_networking_router_interface_v2" "core2" {
 }
 
 resource "openstack_networking_network_v2" "core1" {
-  name                    = "${local.project}-${var.stage}-network"
+  name                    = "${local.project}-${var.stage}-net1"
   # Error: Error creating openstack_networking_network_v2: Bad request with: [POST https://vpc.eu-ch.o13bb.otc.t-systems.com/v2.0/networks], error message: {"NeutronError":{"message":"Attribute 'availability_zone_hints' not allowed in POST","type":"HTTPBadRequest","detail":""}}
   #availability_zone_hints = ["AZ1"]
   admin_state_up          = true
 }
 
 resource "openstack_networking_network_v2" "core2" {
-  name                    = "${local.project}-${var.stage}-network"
+  name                    = "${local.project}-${var.stage}-net2"
   #availability_zone_hints = ["AZ2"]
   admin_state_up          = true
 }
@@ -86,6 +88,7 @@ resource "openstack_networking_subnet_v2" "core2" {
 }
 
 resource "openstack_compute_secgroup_v2" "indexer-secgrp" {
+  # TODO: Extend/fix ports
   name        = "${local.project}-${var.stage}-indexer-secgrp"
   description = "${local.project}-${var.stage}-indexer-secgrp"
 
@@ -101,6 +104,81 @@ resource "openstack_compute_secgroup_v2" "indexer-secgrp" {
   rule {
     from_port   = 9997
     to_port     = 9997
+    ip_protocol = "tcp"
+    cidr        = "0.0.0.0/0"
+  }
+
+  rule {
+    from_port   = -1
+    to_port     = -1
+    ip_protocol = "icmp"
+    cidr        = "0.0.0.0/0"
+  }
+}
+
+resource "openstack_compute_secgroup_v2" "searchhead-secgrp" {
+  # TODO: Extend/fix ports
+  name        = "${local.project}-${var.stage}-searchhead-secgrp"
+  description = "${local.project}-${var.stage}-searchhead-secgrp"
+
+  # ssh
+  rule {
+    from_port   = 22
+    to_port     = 22
+    ip_protocol = "tcp"
+    cidr        = "0.0.0.0/0"
+  }
+
+  # search gui
+  rule {
+    from_port   = 8000
+    to_port     = 8000
+    ip_protocol = "tcp"
+    cidr        = "0.0.0.0/0"
+  }
+
+  # api
+  rule {
+    from_port   = 8089
+    to_port     = 8089
+    ip_protocol = "tcp"
+    cidr        = "0.0.0.0/0"
+  }
+
+  rule {
+    from_port   = -1
+    to_port     = -1
+    ip_protocol = "icmp"
+    cidr        = "0.0.0.0/0"
+  }
+}
+
+resource "openstack_compute_secgroup_v2" "parser-secgrp" {
+  # TODO: Extend/fix ports
+  name        = "${local.project}-${var.stage}-parser-secgrp"
+  description = "${local.project}-${var.stage}-parser-secgrp"
+
+  # ssh
+  rule {
+    from_port   = 22
+    to_port     = 22
+    ip_protocol = "tcp"
+    cidr        = "0.0.0.0/0"
+  }
+
+  # syslog udp
+  # currently disabled to prevent interference with old splunk-receiver
+  #rule {
+  #  from_port   = 514
+  #  to_port     = 514
+  #  ip_protocol = "udp"
+  #  cidr        = "0.0.0.0/0"
+  #}
+
+  # syslog tcp/tls
+  rule {
+    from_port   = 6514
+    to_port     = 6514
     ip_protocol = "tcp"
     cidr        = "0.0.0.0/0"
   }

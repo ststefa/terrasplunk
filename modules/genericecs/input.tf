@@ -3,7 +3,11 @@ variable "stage" {
 }
 
 variable "name" {
-  description = "Sequential number of indexer instance"
+  description = "Name of the instance"
+}
+
+variable "az" {
+  description = "Availability zone"
 }
 
 variable "keypair_id" {
@@ -23,7 +27,7 @@ variable "ip" {
 }
 
 variable "interface" {
-  description = "Interface that VM depends on"
+  description = "Interface that VM depends on. If omitted, provisioning might fail beause the VM is accessed earlier then the network is built"
 }
 
 variable "secgrp_id" {

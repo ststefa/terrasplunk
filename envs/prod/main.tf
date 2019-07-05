@@ -1,7 +1,11 @@
 locals {
   stage = "prod"
   indexer_ip = ["10.104.198.138",
-                "10.104.198.171"]
+                "10.104.198.171",
+                "10.104.198.132",
+                "10.104.198.169"]
+  parser_ip = ["10.104.198.150",
+                "10.104.198.182"]
 }
 
 module "core" {
@@ -21,7 +25,7 @@ module "indexer1" {
 
   keypair_id = module.core.keypair_id
 
-  ip = local.indexer_ip(1)
+  ip = local.indexer_ip[0]
   network_id = module.core.network_az1_id
   interface  = ""
   #ip         = "10.0.1.11"
@@ -38,7 +42,7 @@ module "indexer2" {
 
   keypair_id = module.core.keypair_id
 
-  ip = local.indexer_ip(2)
+  ip = local.indexer_ip[1]
   network_id = module.core.network_az2_id
   interface  = ""
   #ip         = "10.0.2.12"
@@ -47,11 +51,23 @@ module "indexer2" {
   secgrp_id  = module.core.indexer-secgrp_id
 }
 
-# az1
-#10.104.198.132
+module "parser1" {
+  source = "../../modules/genericecs"
 
-# az2
-#10.104.198.169
+  stage  = "${local.stage}"
+  name = "prs-${local.stage}-1"
+
+  keypair_id = module.core.keypair_id
+
+  ip = local.parser_ip[0]
+  network_id = module.core.network_az1_id
+  interface  = ""
+  az = "eu-ch-01"
+  #ip         = "10.0.2.12"
+  #network_id = module.core.network2_id
+  #interface  = module.core.interface2
+  secgrp_id  = module.core.parser-secgrp_id
+}
 
 terraform {
   required_version = ">= 0.12"

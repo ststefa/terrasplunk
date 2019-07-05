@@ -18,7 +18,7 @@ set -f
 if [ "$1" == "-i" ] ; then
     /usr/bin/env python3 $@
 else
-    /usr/bin/env python3 ${HOME}/parse.py $@
+    /usr/bin/env python3 ${HOME}/parse_tfstate.py $@
 fi
 
 exit $?

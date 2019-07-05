@@ -45,6 +45,13 @@ output "keypair_id" {
   value = openstack_compute_keypair_v2.keypair.id
 }
 
+# Reference by name instead of id, see https://www.terraform.io/docs/providers/openstack/r/compute_secgroup_v2.html#referencing-security-groups
 output "indexer-secgrp_id" {
-  value = openstack_compute_secgroup_v2.indexer-secgrp.id
+  value = openstack_compute_secgroup_v2.indexer-secgrp.name
+}
+output "searchhead-secgrp_id" {
+  value = openstack_compute_secgroup_v2.searchhead-secgrp.name
+}
+output "parser-secgrp_id" {
+  value = openstack_compute_secgroup_v2.parser-secgrp.name
 }

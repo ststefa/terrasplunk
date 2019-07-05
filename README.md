@@ -20,13 +20,14 @@ for the planned level of collaboration and complexity.
 
 # Usage
 
-1. Download and install terraform for your computer
-2. Export your Cload credentials (see envs/*/terraform.tfvars)
-3. cd envs/<any>
-4. terraform plan
-5. terraform apply
+- Download and install terraform for your computer
+- Export your Cload credentials (see `envs/*/terraform.tfvars`)
+- `cd envs/<any>`
+- `terraform init`
+- `terraform plan`
+- `terraform apply`
 
-Don't break stuff!
+Don't break stuff which might be in use!
 
 # Provisioning
 

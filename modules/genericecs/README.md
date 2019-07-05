@@ -1,1 +1,1 @@
-The standard searchhead VM
+Standard multi purpose VM

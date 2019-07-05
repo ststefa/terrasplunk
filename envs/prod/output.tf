@@ -4,3 +4,6 @@ output "indexer1_ip" {
 output "indexer2_ip" {
   value = module.indexer2.ip
 }
+output "attach" {
+  value = module.indexer2.attach
+}
