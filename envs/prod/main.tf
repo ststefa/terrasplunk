@@ -1,5 +1,7 @@
 locals {
-  stage = "blue"
+  stage = "prod"
+  indexer_ip = ["10.104.198.138",
+                "10.104.198.171"]
 }
 
 module "core" {
@@ -19,7 +21,7 @@ module "indexer1" {
 
   keypair_id = module.core.keypair_id
 
-  ip = "10.104.198.138"
+  ip = local.indexer_ip(1)
   network_id = module.core.network_az1_id
   interface  = ""
   #ip         = "10.0.1.11"
@@ -36,7 +38,7 @@ module "indexer2" {
 
   keypair_id = module.core.keypair_id
 
-  ip = "10.104.198.171"
+  ip = local.indexer_ip(2)
   network_id = module.core.network_az2_id
   interface  = ""
   #ip         = "10.0.2.12"

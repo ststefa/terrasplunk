@@ -1,5 +1,5 @@
 variable "stage" {
-  description = "blue / red / test / ..."
+  description = "dev / apptest / ..."
 }
 
 variable "subnet_cidr1" {}
