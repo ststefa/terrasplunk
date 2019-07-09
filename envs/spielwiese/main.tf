@@ -1,11 +1,17 @@
 locals {
-  stage = "prod"
+  stage = "spielwiese"
   indexer_ip = ["10.104.198.138",
                 "10.104.198.171",
                 "10.104.198.132",
                 "10.104.198.169"]
   parser_ip = ["10.104.198.150",
                 "10.104.198.182"]
+}
+
+module "variables" {
+  source = "../../modules/variables"
+
+  stage  = local.stage
 }
 
 module "core" {
@@ -55,11 +61,11 @@ module "parser1" {
   source = "../../modules/genericecs"
 
   stage  = "${local.stage}"
-  name = "prs-${local.stage}-1"
+  name = "splk${module.variables.stage_letter}-sy01"
 
   keypair_id = module.core.keypair_id
 
-  ip = local.parser_ip[0]
+  ip = module.variables.syslog_ip_list[0]
   network_id = module.core.network_az1_id
   interface  = ""
   az = "eu-ch-01"
