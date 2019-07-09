@@ -1,24 +1,24 @@
 locals {
-  stage = "spielwiese"
-  indexer_ip = ["10.104.198.138",
-                "10.104.198.171",
-                "10.104.198.132",
-                "10.104.198.169"]
-  parser_ip = ["10.104.198.150",
-                "10.104.198.182"]
+  workspace = "spielwiese"
+  # Might introduce workspaces instead of multiple envs/ dirs for more DRYness. However see discussion at https://www.terraform.io/docs/state/workspaces.html
+  # See also ideas at https://medium.com/capital-one-tech/deploying-multiple-environments-with-terraform-kubernetes-7b7f389e622
+  #workspace = terraform.workspace
 }
+
+# TODO: move all env-specifics to modules/variables to make more DRY. But how to handle verying amount of instances by stage (e.g. #idx(int) != #idx(prod))? Maybe dynmaic based on contents in mod/var.
 
 module "variables" {
   source = "../../modules/variables"
 
-  stage  = local.stage
+  workspace  = local.workspace
+  #workspace  = terraform.workspace
 }
 
 module "core" {
   source = "../../modules/core"
 
   dns_servers  = ["100.125.4.25", "100.125.0.43"]
-  stage        = "${local.stage}"
+  stage        = module.variables.stage
   subnet_cidr1 = "10.0.1.0/24"
   subnet_cidr2 = "10.0.2.0/24"
 }
@@ -26,12 +26,12 @@ module "core" {
 module "indexer1" {
   source = "../../modules/indexer"
 
-  stage  = "${local.stage}"
+  stage  = module.variables.stage
   number = "1"
 
   keypair_id = module.core.keypair_id
 
-  ip = local.indexer_ip[0]
+  ip = module.variables.indexer_ip_list[0]
   network_id = module.core.network_az1_id
   interface  = ""
   #ip         = "10.0.1.11"
@@ -43,12 +43,12 @@ module "indexer1" {
 module "indexer2" {
   source = "../../modules/indexer"
 
-  stage  = "${local.stage}"
+  stage  = module.variables.stage
   number = "2"
 
   keypair_id = module.core.keypair_id
 
-  ip = local.indexer_ip[1]
+  ip = module.variables.indexer_ip_list[1]
   network_id = module.core.network_az2_id
   interface  = ""
   #ip         = "10.0.2.12"
@@ -57,10 +57,10 @@ module "indexer2" {
   secgrp_id  = module.core.indexer-secgrp_id
 }
 
-module "parser1" {
+module "syslog1" {
   source = "../../modules/genericecs"
 
-  stage  = "${local.stage}"
+  stage  = module.variables.stage
   name = "splk${module.variables.stage_letter}-sy01"
 
   keypair_id = module.core.keypair_id
