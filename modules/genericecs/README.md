@@ -1,1 +1,1 @@
-Standard multi purpose VM
+StanThe `variables` module implements a single standard multi purpose VM

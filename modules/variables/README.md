@@ -1,1 +1,1 @@
-The `modules` directory contains reusable infrastructure objects which are used in the environments.
+The `variables` module attempts to encapsulate differences between environments to keep the code DRYer.

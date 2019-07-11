@@ -1,1 +1,1 @@
-Core parts of the terraform infrastructure like the network zones.
+The `core` module implements core parts of the terraform infrastructure like the network zones as well as shared resources like default ssh keys.
