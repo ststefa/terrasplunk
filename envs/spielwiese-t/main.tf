@@ -15,7 +15,7 @@ module "variables" {
 }
 
 module "core" {
-  source = "../../modules/core"
+  source = "../../modules/core-t"
 
   dns_servers  = ["100.125.4.25", "100.125.0.43"]
   stage        = module.variables.stage
@@ -24,7 +24,7 @@ module "core" {
 }
 
 module "indexer1" {
-  source = "../../modules/indexer"
+  source = "../../modules/indexer-t"
 
   stage  = module.variables.stage
   number = "1"
@@ -38,7 +38,7 @@ module "indexer1" {
 }
 
 module "indexer2" {
-  source = "../../modules/indexer"
+  source = "../../modules/indexer-t"
 
   stage  = module.variables.stage
   number = "2"
