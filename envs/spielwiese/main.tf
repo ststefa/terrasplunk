@@ -1,5 +1,5 @@
 locals {
-  workspace = "spielwiese-p"
+  workspace = "spielwiese"
   # Might introduce workspaces instead of multiple envs/ dirs for more DRYness. However see discussion at https://www.terraform.io/docs/state/workspaces.html
   # See also ideas at https://medium.com/capital-one-tech/deploying-multiple-environments-with-terraform-kubernetes-7b7f389e622
   #workspace = terraform.workspace
@@ -19,6 +19,7 @@ module "core" {
 
   dns_servers  = ["100.125.4.25", "100.125.0.43"]
   stage        = module.variables.stage
+  # OTC does not like /29. Too small
   #subnet_cidr1 = "10.104.146.240/29"
   #subnet_cidr2 = "10.104.146.248/29"
   subnet_cidr1 = "10.104.146.224/28"
