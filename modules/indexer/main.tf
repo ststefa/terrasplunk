@@ -31,8 +31,8 @@ resource "openstack_compute_instance_v2" "indexer" {
   depends_on = [var.interface]
 
   block_device {
-    #uuid                  = "a2f304a0-93c4-4f29-a052-ce412381f1c9" # Enterprise_RedHat_7_latest
-    uuid                  = "51951fc1-059e-4a7a-9906-ec08fd93a224" # Standard_CentOS_7_latest
+    #uuid                  = "f74ced3c-a07f-482a-9527-3f7b63aaaf9d" # Enterprise_RedHat_7_latest
+    uuid                  = "bf85b8b3-6778-42e3-b124-9538465e2a53" # Standard_CentOS_7_latest
     source_type           = "image"
     volume_size           = 20
     boot_index            = 0
