@@ -1,25 +1,8 @@
-locals {
-  project    = "splunk"
-  dns_domain = "sbb.ch"
-}
-
-data "template_file" "cloudinit" {
-  template = "${file("${path.module}/templates/cloudinit.tpl")}"
-
-  vars = {
-    # cycle
-    #hostname = "${openstack_compute_instance_v2.indexer.name}"
-    hostname = "${var.name}"
-    fqdn     = "${var.name}.${local.dns_domain}"
-  }
-}
-
 resource "openstack_compute_instance_v2" "instance" {
   availability_zone = var.az
   flavor_name       = var.flavor
   name              = var.name
   key_pair          = var.keypair_id
-  user_data         = "${data.template_file.cloudinit.rendered}"
   security_groups   = [var.secgrp_id]
 
   network {
@@ -29,8 +12,8 @@ resource "openstack_compute_instance_v2" "instance" {
   depends_on = [var.interface]
 
   block_device {
-    #uuid                  = "a2f304a0-93c4-4f29-a052-ce412381f1c9" # Enterprise_RedHat_7_latest
-    uuid                  = "51951fc1-059e-4a7a-9906-ec08fd93a224" # Standard_CentOS_7_latest
+    #uuid                  = "f74ced3c-a07f-482a-9527-3f7b63aaaf9d" # Enterprise_RedHat_7_latest
+    uuid                  = "bf85b8b3-6778-42e3-b124-9538465e2a53" # Standard_CentOS_7_latest
     source_type           = "image"
     volume_size           = 20
     boot_index            = 0
