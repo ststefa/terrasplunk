@@ -1,28 +1,28 @@
 output "network1_id" {
-#  value = openstack_networking_network_v2.core1.id
-  value = data.openstack_networking_network_v2.AppSvc_T_net_AZ1.id
+  value = openstack_networking_network_v2.core1.id
+#  value = data.openstack_networking_network_v2.AppSvc_T_net_AZ1.id
 }
 output "network2_id" {
-#  value = openstack_networking_network_v2.core2.id
-  value = data.openstack_networking_network_v2.AppSvc_T_net_AZ2.id
+  value = openstack_networking_network_v2.core2.id
+#  value = data.openstack_networking_network_v2.AppSvc_T_net_AZ2.id
 }
 
 output "subnet1_id" {
-#  value = openstack_networking_subnet_v2.core1.id
-  value = data.openstack_networking_subnet_v2.AppSvc_T_subnet_AZ1.id
+  value = openstack_networking_subnet_v2.core1.id
+#  value = data.openstack_networking_subnet_v2.AppSvc_T_subnet_AZ1.id
 }
 output "subnet2_id" {
-#  value = openstack_networking_subnet_v2.core2.id
-  value = data.openstack_networking_subnet_v2.AppSvc_T_subnet_AZ2.id
+  value = openstack_networking_subnet_v2.core2.id
+#  value = data.openstack_networking_subnet_v2.AppSvc_T_subnet_AZ2.id
 }
 
 output "interface1" {
-#  value = openstack_networking_router_interface_v2.core1
-  value = ""
+  value = openstack_networking_router_interface_v2.core1
+#  value = openstack_networking_router_interface_v2.AppSvc_T_net_AZ1.id
 }
 output "interface2" {
-#  value = openstack_networking_router_interface_v2.core2
-  value = ""
+  value = openstack_networking_router_interface_v2.core2
+#  value = openstack_networking_router_interface_v2.AppSvc_T_net_AZ2.id
 }
 
 output "keypair_id" {

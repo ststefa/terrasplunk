@@ -7,9 +7,9 @@ data "openstack_networking_network_v2" "extnet" {
 }
 
 # use datasources if we have to reference existing networks
-#data "openstack_networking_router_v2" "AppSvc_T_vpc01" {
-#  router_id = "b1ae5055-780b-45ad-b77e-f45339cd3aac"
-#}
+data "openstack_networking_router_v2" "AppSvc_T_vpc01" {
+  router_id = "b1ae5055-780b-45ad-b77e-f45339cd3aac"
+}
 
 # How to reference existing interfaces?? Theres no datasource and a
 # resource will inappropriately try to manage the resource
@@ -25,21 +25,21 @@ data "openstack_networking_network_v2" "extnet" {
 #  subnet_id = data.openstack_networking_subnet_v2.AppSvc_T_subnet_AZ2.id
 #}
 
-#data "openstack_networking_network_v2" "AppSvc_T_net_AZ1" {
-#  network_id = "6060ca85-04de-4a66-a586-add3a47ec89f"
-#}
+data "openstack_networking_network_v2" "AppSvc_T_net_AZ1" {
+  network_id = "6060ca85-04de-4a66-a586-add3a47ec89f"
+}
 
-#data "openstack_networking_network_v2" "AppSvc_T_net_AZ2" {
-#  network_id = "dd6c4c98-82ac-46b8-a83b-b884c7536b41"
-#}
+data "openstack_networking_network_v2" "AppSvc_T_net_AZ2" {
+  network_id = "dd6c4c98-82ac-46b8-a83b-b884c7536b41"
+}
 
-#data "openstack_networking_subnet_v2" "AppSvc_T_subnet_AZ1" {
-#  subnet_id = "41ce2481-b595-46d0-ae69-ad6547a06b06"
-#}
+data "openstack_networking_subnet_v2" "AppSvc_T_subnet_AZ1" {
+  subnet_id = "41ce2481-b595-46d0-ae69-ad6547a06b06"
+}
 
-#data "openstack_networking_subnet_v2" "AppSvc_T_subnet_AZ2" {
-#  subnet_id = "b97e7c7d-d7a6-4170-8064-ef1ab2846bea"
-#}
+data "openstack_networking_subnet_v2" "AppSvc_T_subnet_AZ2" {
+  subnet_id = "b97e7c7d-d7a6-4170-8064-ef1ab2846bea"
+}
 
 # use resources to manage our nets
 resource "openstack_networking_router_v2" "core" {

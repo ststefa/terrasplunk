@@ -1,5 +1,5 @@
 locals {
-  workspace = "spielwiese-p"
+  workspace = "spielwiese"
   # Might introduce workspaces instead of multiple envs/ dirs for more DRYness. However see discussion at https://www.terraform.io/docs/state/workspaces.html
   # See also ideas at https://medium.com/capital-one-tech/deploying-multiple-environments-with-terraform-kubernetes-7b7f389e622
   #workspace = terraform.workspace
@@ -15,48 +15,16 @@ module "variables" {
 }
 
 module "core" {
-  source = "../../modules/core-p"
+  source = "../../modules/core"
 
   dns_servers  = ["100.125.4.25", "100.125.0.43"]
   stage        = module.variables.stage
-  #subnet_cidr1 = "10.104.146.240/29"
-  #subnet_cidr2 = "10.104.146.248/29"
-  subnet_cidr1 = "10.104.146.224/28"
-  subnet_cidr2 = "10.104.146.240/28"
-}
-
-module "searchhead1" {
-  source = "../../modules/genericecs"
-
-  stage  = module.variables.stage
-  name = "splk${module.variables.stage_letter}-sh01"
-
-  keypair_id = module.core.keypair_id
-
-  ip = module.variables.searchhead_ip_list[0]
-  network_id = module.core.network1_id
-  interface  = module.core.interface1
-  az = "eu-ch-01"
-  secgrp_id  = module.core.parser-secgrp_id
-}
-
-module "searchhead2" {
-  source = "../../modules/genericecs"
-
-  stage  = module.variables.stage
-  name = "splk${module.variables.stage_letter}-sh02"
-
-  keypair_id = module.core.keypair_id
-
-  ip = module.variables.searchhead_ip_list[1]
-  network_id = module.core.network1_id
-  interface  = module.core.interface1
-  az = "eu-ch-02"
-  secgrp_id  = module.core.parser-secgrp_id
+  subnet_cidr1 = "10.0.1.0/24"
+  subnet_cidr2 = "10.0.2.0/24"
 }
 
 module "indexer1" {
-  source = "../../modules/indexer-p"
+  source = "../../modules/indexer"
 
   stage  = module.variables.stage
   number = "1"
@@ -70,7 +38,7 @@ module "indexer1" {
 }
 
 module "indexer2" {
-  source = "../../modules/indexer-p"
+  source = "../../modules/indexer"
 
   stage  = module.variables.stage
   number = "2"

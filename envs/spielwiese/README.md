@@ -1,2 +1,2 @@
-The **spielwiese** splunk environment is used for platform testing tasks such as installing new Splunk versions, using
-different OS Versions or other architectural IAC changes on the **OTC Test tenant**
+The **spielwiese-p** splunk environment is used for platform testing tasks such as installing new Splunk versions, using
+different OS Versions or other architectural IAC changes on the **OTC Prod tenant**

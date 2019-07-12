@@ -1,20 +1,27 @@
 locals {
+  project    = "splunk"
+  dns_domain = "sbb.ch"
   hot_size   = 5
   cold_size  = 10
 }
 
-module "variables" {
-  source = "../../modules/variables"
+data "template_file" "cloudinit" {
+  template = "${file("${path.module}/templates/cloudinit.tpl")}"
 
-  workspace  = var.stage
-  #workspace  = terraform.workspace
+  vars = {
+    # cycle
+    #hostname = "${openstack_compute_instance_v2.indexer.name}"
+    hostname = "idx-${var.stage}-${var.number}"
+    fqdn     = "idx-${var.stage}-${var.number}.${local.dns_domain}"
+  }
 }
 
 resource "openstack_compute_instance_v2" "indexer" {
   availability_zone = "eu-ch-0${1 + (var.number + 1) % 2}"
   flavor_name       = var.flavor
-  name              = "splk${module.variables.stage_letter}-sh${format("%02d", var.number)}"
+  name              = "idx-${var.stage}-${var.number}"
   key_pair          = var.keypair_id
+  user_data         = "${data.template_file.cloudinit.rendered}"
   security_groups   = [var.secgrp_id]
 
   network {
