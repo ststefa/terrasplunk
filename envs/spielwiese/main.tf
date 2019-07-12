@@ -32,11 +32,8 @@ module "indexer1" {
   keypair_id = module.core.keypair_id
 
   ip = module.variables.indexer_ip_list[0]
-  network_id = module.core.network_az1_id
-  interface  = ""
-  #ip         = "10.0.1.11"
-  #network_id = module.core.network1_id
-  #interface  = module.core.interface1
+  network_id = module.core.network1_id
+  interface  = module.core.interface1
   secgrp_id  = module.core.indexer-secgrp_id
 }
 
@@ -49,11 +46,8 @@ module "indexer2" {
   keypair_id = module.core.keypair_id
 
   ip = module.variables.indexer_ip_list[1]
-  network_id = module.core.network_az2_id
-  interface  = ""
-  #ip         = "10.0.2.12"
-  #network_id = module.core.network2_id
-  #interface  = module.core.interface2
+  network_id = module.core.network2_id
+  interface  = module.core.interface2
   secgrp_id  = module.core.indexer-secgrp_id
 }
 
@@ -66,12 +60,9 @@ module "syslog1" {
   keypair_id = module.core.keypair_id
 
   ip = module.variables.syslog_ip_list[0]
-  network_id = module.core.network_az1_id
-  interface  = ""
+  network_id = module.core.network1_id
+  interface  = module.core.interface1
   az = "eu-ch-01"
-  #ip         = "10.0.2.12"
-  #network_id = module.core.network2_id
-  #interface  = module.core.interface2
   secgrp_id  = module.core.parser-secgrp_id
 }
 
