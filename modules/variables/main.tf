@@ -7,7 +7,7 @@ variable stage_map {
   type = "map"
   default = {
     spielwiese     = "spielwiese"
-    spielwiese-p   = "spielwiese-p"
+    spielwiese-t   = "spielwiese-t"
   }
 }
 
@@ -20,7 +20,7 @@ variable "stage_letter_map" {
   type = "map"
   default = {
     spielwiese   = "S"
-    spielwiese-p = "S"
+    spielwiese-t = "S"
     production   = "P"
     development  = "D"
     test         = "T"
@@ -36,11 +36,11 @@ variable "searchhead_ip_list_map" {
   description = "List of fixed IPs for searchhead instances"
   type = "map"
   default = {
-    spielwiese   = []
+    spielwiese-t = []
     # if using own networks
     #spielwiese   = ["10.0.1.20",
     #                "10.0.2.20"]
-    spielwiese-p = ["10.104.146.225",
+    spielwiese   = ["10.104.146.225",
                     "10.104.146.241"]
   }
 }
@@ -53,12 +53,12 @@ variable "indexer_ip_list_map" {
   description = "List of fixed IPs for indexer instances"
   type = "map"
   default = {
-    spielwiese   = ["10.104.198.138",
+    spielwiese-t = ["10.104.198.138",
                     "10.104.198.171"]
     # if using own networks
     #spielwiese   = ["10.0.1.10",
     #                "10.0.2.10"]
-    spielwiese-p = ["10.104.146.226",
+    spielwiese   = ["10.104.146.226",
                     "10.104.146.242"]
   }
 }
@@ -72,12 +72,12 @@ variable "syslog_ip_list_map" {
   type = "map"
   default = {
     # if using real IPs
-    spielwiese    = ["10.104.198.150",
+    spielwiese-t  = ["10.104.198.150",
                      "10.104.198.182"]
     # if using own networks
     #spielwiese    = ["10.0.1.30",
     #                 "10.0.2.30"]
-    spielwiese-p  = ["10.104.146.227",
+    spielwiese    = ["10.104.146.227",
                      "10.104.146.243"]
   }
 }
