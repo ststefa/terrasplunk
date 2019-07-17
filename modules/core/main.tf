@@ -42,50 +42,78 @@ data "openstack_networking_network_v2" "extnet" {
 #}
 
 # use resources to manage our nets
-resource "openstack_networking_router_v2" "core" {
-  name                = "${local.project}-${var.stage}-router"
-  admin_state_up      = "true"
-  external_network_id = data.openstack_networking_network_v2.extnet.id
+#resource "openstack_networking_router_v2" "core" {
+#  name                = "${local.project}-${var.stage}-router"
+#  admin_state_up      = "true"
+#  external_network_id = data.openstack_networking_network_v2.extnet.id
+#}
+#
+#resource "openstack_networking_router_interface_v2" "core1" {
+#  router_id = openstack_networking_router_v2.core.id
+#  subnet_id = openstack_networking_subnet_v2.core1.id
+#}
+#
+#resource "openstack_networking_router_interface_v2" "core2" {
+#  router_id = openstack_networking_router_v2.core.id
+#  subnet_id = openstack_networking_subnet_v2.core2.id
+#}
+#
+#resource "openstack_networking_network_v2" "core1" {
+#  name                    = "${local.project}-${var.stage}-net1"
+#  # Error: Error creating openstack_networking_network_v2: Bad request with: [POST https://vpc.eu-ch.o13bb.otc.t-systems.com/v2.0/networks], error message: {"NeutronError":{"message":"Attribute 'availability_zone_hints' not allowed in POST","type":"HTTPBadRequest","detail":""}}
+#  #availability_zone_hints = ["AZ1"]
+#  admin_state_up          = true
+#}
+#
+#resource "openstack_networking_network_v2" "core2" {
+#  name                    = "${local.project}-${var.stage}-net2"
+#  #availability_zone_hints = ["AZ2"]
+#  admin_state_up          = true
+#}
+#
+#resource "openstack_networking_subnet_v2" "core1" {
+#  name            = "${local.project}-${var.stage}-subnet1"
+#  network_id      = openstack_networking_network_v2.core1.id
+#  cidr            = var.subnet_cidr1
+#  ip_version      = 4
+#  dns_nameservers = var.dns_servers
+#}
+#
+#resource "openstack_networking_subnet_v2" "core2" {
+#  name            = "${local.project}-${var.stage}-subnet2"
+#  network_id      = openstack_networking_network_v2.core2.id
+#  cidr            = var.subnet_cidr2
+#  ip_version      = 4
+#  dns_nameservers = var.dns_servers
+#}
+
+data "opentelekomcloud_vpc_v1" "vpc" {
+  name = "splunk-vpc"
+  #id = "d7eb20f7-a98d-4616-95f9-d89ef6b0a114"
 }
 
-resource "openstack_networking_router_interface_v2" "core1" {
-  router_id = openstack_networking_router_v2.core.id
-  subnet_id = openstack_networking_subnet_v2.core1.id
+data "opentelekomcloud_networking_network_v2" "net-az1" {
+  #name = "splunk-vpc"
+  network_id = "25081612-36c2-4ea5-ad1f-ece095f9be8e"
 }
 
-resource "openstack_networking_router_interface_v2" "core2" {
-  router_id = openstack_networking_router_v2.core.id
-  subnet_id = openstack_networking_subnet_v2.core2.id
+data "opentelekomcloud_networking_network_v2" "net-az2" {
+  name = "splunk-subnet-az2-1"
 }
 
-resource "openstack_networking_network_v2" "core1" {
-  name                    = "${local.project}-${var.stage}-net1"
-  # Error: Error creating openstack_networking_network_v2: Bad request with: [POST https://vpc.eu-ch.o13bb.otc.t-systems.com/v2.0/networks], error message: {"NeutronError":{"message":"Attribute 'availability_zone_hints' not allowed in POST","type":"HTTPBadRequest","detail":""}}
-  #availability_zone_hints = ["AZ1"]
-  admin_state_up          = true
+data "opentelekomcloud_vpc_subnet_v1" "subnet_az1" {
+  vpc_id = data.opentelekomcloud_vpc_v1.vpc.id
+  name = "splunk-subnet-az1-1"
 }
 
-resource "openstack_networking_network_v2" "core2" {
-  name                    = "${local.project}-${var.stage}-net2"
-  #availability_zone_hints = ["AZ2"]
-  admin_state_up          = true
+data "opentelekomcloud_vpc_subnet_ids_v1" "subnet_ids" {
+  vpc_id = data.opentelekomcloud_vpc_v1.vpc.id
 }
 
-resource "openstack_networking_subnet_v2" "core1" {
-  name            = "${local.project}-${var.stage}-subnet1"
-  network_id      = openstack_networking_network_v2.core1.id
-  cidr            = var.subnet_cidr1
-  ip_version      = 4
-  dns_nameservers = var.dns_servers
-}
-
-resource "openstack_networking_subnet_v2" "core2" {
-  name            = "${local.project}-${var.stage}-subnet2"
-  network_id      = openstack_networking_network_v2.core2.id
-  cidr            = var.subnet_cidr2
-  ip_version      = 4
-  dns_nameservers = var.dns_servers
-}
+#resource "opentelekomcloud_networking_router_interface_v2" "router-interface-az1" {
+#  router_id = data.opentelekomcloud_vpc_v1.vpc.id
+#  subnet_id = data.opentelekomcloud_vpc_subnet_v1.subnet_az1.id
+#}
 
 resource "openstack_compute_secgroup_v2" "indexer-secgrp" {
   # TODO: Extend/fix ports

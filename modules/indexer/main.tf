@@ -13,7 +13,7 @@ module "variables" {
 resource "openstack_compute_instance_v2" "indexer" {
   availability_zone = "eu-ch-0${1 + (var.number + 1) % 2}"
   flavor_name       = var.flavor
-  name              = "splk${module.variables.stage_letter}-sh${format("%02d", var.number)}"
+  name              = "splk${module.variables.stage_letter}-ix${format("%02d", var.number)}"
   key_pair          = var.keypair_id
   security_groups   = [var.secgrp_id]
 
@@ -134,23 +134,23 @@ resource "openstack_compute_volume_attach_v2" "hot4_attach" {
   depends_on  = [openstack_compute_volume_attach_v2.hot3_attach]
 }
 
-resource "null_resource" "provisioner" {
-
-  triggers = {
-    ecs_id = openstack_compute_instance_v2.indexer.id
-  }
-
-  provisioner "remote-exec" {
-    inline = [
-      "echo $(hostname -f) $(pwd) $(date) name=${openstack_compute_instance_v2.indexer.name} >> provisioned.txt",
-      "cat provisioned.txt",
-    ]
-    connection {
-      type      = "ssh"
-      host      = openstack_compute_instance_v2.indexer.access_ip_v4
-      user      = "linux"
-      agent     = true
-      timeout   = "120s"
-    }
-  }
-}
+#resource "null_resource" "provisioner" {
+#
+#  triggers = {
+#    ecs_id = openstack_compute_instance_v2.indexer.id
+#  }
+#
+#  provisioner "remote-exec" {
+#    inline = [
+#      "echo $(hostname -f) $(pwd) $(date) name=${openstack_compute_instance_v2.indexer.name} >> provisioned.txt",
+#      "cat provisioned.txt",
+#    ]
+#    connection {
+#      type      = "ssh"
+#      host      = openstack_compute_instance_v2.indexer.access_ip_v4
+#      user      = "linux"
+#      agent     = true
+#      timeout   = "120s"
+#    }
+#  }
+#}

@@ -40,8 +40,8 @@ variable "searchhead_ip_list_map" {
     # if using own networks
     #spielwiese   = ["10.0.1.20",
     #                "10.0.2.20"]
-    spielwiese   = ["10.104.146.225",
-                    "10.104.146.241"]
+    spielwiese   = ["10.104.146.226",
+                    "10.104.146.242"]
   }
 }
 
@@ -58,8 +58,8 @@ variable "indexer_ip_list_map" {
     # if using own networks
     #spielwiese   = ["10.0.1.10",
     #                "10.0.2.10"]
-    spielwiese   = ["10.104.146.226",
-                    "10.104.146.242"]
+    spielwiese   = ["10.104.146.227",
+                    "10.104.146.243"]
   }
 }
 
@@ -77,8 +77,8 @@ variable "syslog_ip_list_map" {
     # if using own networks
     #spielwiese    = ["10.0.1.30",
     #                 "10.0.2.30"]
-    spielwiese    = ["10.104.146.227",
-                     "10.104.146.243"]
+    spielwiese    = ["10.104.146.228",
+                     "10.104.146.244"]
   }
 }
 

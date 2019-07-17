@@ -38,23 +38,23 @@ resource "openstack_compute_volume_attach_v2" "opt_attach" {
   depends_on  = [openstack_compute_instance_v2.instance]
 }
 
-resource "null_resource" "provisioner" {
-
-  triggers = {
-    ecs_id = openstack_compute_instance_v2.instance.id
-  }
-
-  provisioner "remote-exec" {
-    inline = [
-      "echo $(hostname -f) $(pwd) $(date) name=${openstack_compute_instance_v2.instance.name} >> provisioned.txt",
-      "cat provisioned.txt",
-    ]
-    connection {
-      type      = "ssh"
-      host      = openstack_compute_instance_v2.instance.access_ip_v4
-      user      = "linux"
-      agent     = true
-      timeout   = "120s"
-    }
-  }
-}
+#resource "null_resource" "provisioner" {
+#
+#  triggers = {
+#    ecs_id = openstack_compute_instance_v2.instance.id
+#  }
+#
+#  provisioner "remote-exec" {
+#    inline = [
+#      "echo $(hostname -f) $(pwd) $(date) name=${openstack_compute_instance_v2.instance.name} >> provisioned.txt",
+#      "cat provisioned.txt",
+#    ]
+#    connection {
+#      type      = "ssh"
+#      host      = openstack_compute_instance_v2.instance.access_ip_v4
+#      user      = "linux"
+#      agent     = true
+#      timeout   = "120s"
+#    }
+#  }
+#}
