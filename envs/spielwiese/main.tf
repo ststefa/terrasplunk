@@ -13,11 +13,17 @@ locals {
 # TODO: move all env-specifics to modules/variables to make more DRY. But how to handle verying amount of instances by stage (e.g. #idx(int) != #idx(prod))? Maybe dynmaic based on contents in mod/var?
 #TODO: Rewrite everthing from OpSt to OTC, kick OpSt provider
 
+# credentials can be provided using shell variables
+#   export TF_VAR_username=john
+#   export TF_VAR_password=secret
+variable "username" {}
+variable "password" {}
+
 provider "opentelekomcloud" {
   domain_name = "tsch_rz_t_001"
   tenant_name = "eu-ch_splunk"
-  user_name   = "ssteine2"
-  password    = "4w8puELDteCC"
+  user_name   = var.username
+  password    = var.password
   #delegated_project = "eu-ch_splunk"
   auth_url    = "https://iam.eu-ch.o13bb.otc.t-systems.com/v3"
 }
