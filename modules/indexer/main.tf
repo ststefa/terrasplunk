@@ -6,37 +6,23 @@ locals {
 module "variables" {
   source = "../../modules/variables"
 
-  workspace  = var.stage
-  #workspace  = terraform.workspace
+  workspace  = terraform.workspace
+  stage      = var.stage
 }
 
-resource "openstack_compute_instance_v2" "indexer" {
-  availability_zone = "eu-ch-0${1 + (var.number + 1) % 2}"
-  flavor_name       = var.flavor
-  name              = "splk${module.variables.stage_letter}-ix${format("%02d", var.number)}"
-  key_pair          = var.keypair_id
-  security_groups   = [var.secgrp_id]
-
-  network {
-    uuid        = var.network_id
-    fixed_ip_v4 = var.ip
-  }
-  depends_on = [var.interface]
-
-  block_device {
-    #uuid                  = "f74ced3c-a07f-482a-9527-3f7b63aaaf9d" # Enterprise_RedHat_7_latest
-    uuid                  = "bf85b8b3-6778-42e3-b124-9538465e2a53" # Standard_CentOS_7_latest
-    source_type           = "image"
-    volume_size           = 20
-    boot_index            = 0
-    destination_type      = "volume"
-    delete_on_termination = true
-  }
+module "idx-instance" {
+  source = "../../modules/genericecs"
+  stage  = var.stage
+  name = "splk${module.variables.stage_letter}-id${format("%02d", var.number)}"
+  network_id = var.network_id
+  interface  =var.interface
+  secgrp_id  = var.secgrp_id
 }
+
 
 resource "openstack_blockstorage_volume_v2" "opt" {
   availability_zone = "eu-ch-0${1 + (var.number + 1) % 2}"
-  name              = "${openstack_compute_instance_v2.indexer.name}-opt"
+  name              = "${module.idx-instance.name}-opt"
   size              = 20
   # mMaybe good idea as safety measure?
   #lifecycle {
@@ -45,112 +31,91 @@ resource "openstack_blockstorage_volume_v2" "opt" {
 }
 resource "openstack_blockstorage_volume_v2" "cold1" {
   availability_zone = "eu-ch-0${1 + (var.number + 1) % 2}"
-  name              = "${openstack_compute_instance_v2.indexer.name}-cold1"
+  name              = "${module.idx-instance.name}-cold1"
   size              = local.cold_size
 }
 resource "openstack_blockstorage_volume_v2" "cold2" {
   availability_zone = "eu-ch-0${1 + (var.number + 1) % 2}"
-  name              = "${openstack_compute_instance_v2.indexer.name}-cold2"
+  name              = "${module.idx-instance.name}-cold2"
   size              = local.cold_size
 }
 resource "openstack_blockstorage_volume_v2" "cold3" {
   availability_zone = "eu-ch-0${1 + (var.number + 1) % 2}"
-  name              = "${openstack_compute_instance_v2.indexer.name}-cold3"
+  name              = "${module.idx-instance.name}-cold3"
   size              = local.cold_size
 }
 resource "openstack_blockstorage_volume_v2" "cold4" {
   availability_zone = "eu-ch-0${1 + (var.number + 1) % 2}"
-  name              = "${openstack_compute_instance_v2.indexer.name}-cold4"
+  name              = "${module.idx-instance.name}-cold4"
   size              = local.cold_size
 }
 resource "openstack_blockstorage_volume_v2" "hot1" {
   availability_zone = "eu-ch-0${1 + (var.number + 1) % 2}"
-  name              = "${openstack_compute_instance_v2.indexer.name}-hot1"
+  name              = "${module.idx-instance.name}-hot1"
   size              = local.hot_size
   volume_type       = "SSD"
 }
 resource "openstack_blockstorage_volume_v2" "hot2" {
   availability_zone = "eu-ch-0${1 + (var.number + 1) % 2}"
-  name              = "${openstack_compute_instance_v2.indexer.name}-hot2"
+  name              = "${module.idx-instance.name}-hot2"
   size              = local.hot_size
   volume_type       = "SSD"
 }
 resource "openstack_blockstorage_volume_v2" "hot3" {
   availability_zone = "eu-ch-0${1 + (var.number + 1) % 2}"
-  name              = "${openstack_compute_instance_v2.indexer.name}-hot3"
+  name              = "${module.idx-instance.name}-hot3"
   size              = local.hot_size
   volume_type       = "SSD"
 }
 resource "openstack_blockstorage_volume_v2" "hot4" {
   availability_zone = "eu-ch-0${1 + (var.number + 1) % 2}"
-  name              = "${openstack_compute_instance_v2.indexer.name}-hot4"
+  name              = "${module.idx-instance.name}-hot4"
   size              = local.hot_size
   volume_type       = "SSD"
 }
 
 resource "openstack_compute_volume_attach_v2" "opt_attach" {
-  instance_id = openstack_compute_instance_v2.indexer.id
+  instance_id = module.idx-instance.id
   volume_id   = openstack_blockstorage_volume_v2.opt.id
-  depends_on  = [openstack_compute_instance_v2.indexer]
+  depends_on  = [module.idx-instance]
 }
 resource "openstack_compute_volume_attach_v2" "cold1_attach" {
-  instance_id = openstack_compute_instance_v2.indexer.id
+  instance_id = module.idx-instance.id
   volume_id   = openstack_blockstorage_volume_v2.cold1.id
   depends_on  = [openstack_compute_volume_attach_v2.opt_attach]
 }
 resource "openstack_compute_volume_attach_v2" "cold2_attach" {
-  instance_id = openstack_compute_instance_v2.indexer.id
+  instance_id = module.idx-instance.id
   volume_id   = openstack_blockstorage_volume_v2.cold2.id
   depends_on  = [openstack_compute_volume_attach_v2.cold1_attach]
 }
 resource "openstack_compute_volume_attach_v2" "cold3_attach" {
-  instance_id = openstack_compute_instance_v2.indexer.id
+  instance_id = module.idx-instance.id
   volume_id   = openstack_blockstorage_volume_v2.cold3.id
   depends_on  = [openstack_compute_volume_attach_v2.cold2_attach]
 }
 resource "openstack_compute_volume_attach_v2" "cold4_attach" {
-  instance_id = openstack_compute_instance_v2.indexer.id
+  instance_id = module.idx-instance.id
   volume_id   = openstack_blockstorage_volume_v2.cold4.id
   depends_on  = [openstack_compute_volume_attach_v2.cold3_attach]
 }
 resource "openstack_compute_volume_attach_v2" "hot1_attach" {
-  instance_id = openstack_compute_instance_v2.indexer.id
+  instance_id = module.idx-instance.id
   volume_id   = openstack_blockstorage_volume_v2.hot1.id
   depends_on  = [openstack_compute_volume_attach_v2.cold4_attach]
 }
 resource "openstack_compute_volume_attach_v2" "hot2_attach" {
-  instance_id = openstack_compute_instance_v2.indexer.id
+  instance_id = module.idx-instance.id
   volume_id   = openstack_blockstorage_volume_v2.hot2.id
   depends_on  = [openstack_compute_volume_attach_v2.hot1_attach]
 }
 resource "openstack_compute_volume_attach_v2" "hot3_attach" {
-  instance_id = openstack_compute_instance_v2.indexer.id
+  instance_id = module.idx-instance.id
   volume_id   = openstack_blockstorage_volume_v2.hot3.id
   depends_on  = [openstack_compute_volume_attach_v2.hot2_attach]
 }
 resource "openstack_compute_volume_attach_v2" "hot4_attach" {
-  instance_id = openstack_compute_instance_v2.indexer.id
+  instance_id = module.idx-instance.id
   volume_id   = openstack_blockstorage_volume_v2.hot4.id
   depends_on  = [openstack_compute_volume_attach_v2.hot3_attach]
 }
-
-#resource "null_resource" "provisioner" {
-#
-#  triggers = {
-#    ecs_id = openstack_compute_instance_v2.indexer.id
-#  }
-#
-#  provisioner "remote-exec" {
-#    inline = [
-#      "echo $(hostname -f) $(pwd) $(date) name=${openstack_compute_instance_v2.indexer.name} >> provisioned.txt",
-#      "cat provisioned.txt",
-#    ]
-#    connection {
-#      type      = "ssh"
-#      host      = openstack_compute_instance_v2.indexer.access_ip_v4
-#      user      = "linux"
-#      agent     = true
-#      timeout   = "120s"
-#    }
-#  }
-#}

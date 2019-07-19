@@ -80,8 +80,8 @@ The workspaces are
 
 
 - Download and install terraform for your computer
-- Export your OTC credentials (see provider resource in any <env>/main.tf)
-- `cd envs/<any>`
+- Export your OTC credentials (see provider resource in any <stage>/main.tf)
+- `cd stages/<any>`
 - `terraform init`
 - `terraform plan`
 - `terraform apply`

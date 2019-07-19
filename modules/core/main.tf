@@ -89,26 +89,27 @@ data "openstack_networking_network_v2" "extnet" {
 
 data "opentelekomcloud_vpc_v1" "vpc" {
   name = "splunk-vpc"
-  #id = "d7eb20f7-a98d-4616-95f9-d89ef6b0a114"
 }
 
 data "opentelekomcloud_networking_network_v2" "net-az1" {
-  #name = "splunk-vpc"
-  network_id = "25081612-36c2-4ea5-ad1f-ece095f9be8e"
+  name = "splunk-net-az1-1"
 }
 
 data "opentelekomcloud_networking_network_v2" "net-az2" {
-  name = "splunk-subnet-az2-1"
+  name = "splunk-net-az2-1"
 }
 
 data "opentelekomcloud_vpc_subnet_v1" "subnet_az1" {
-  vpc_id = data.opentelekomcloud_vpc_v1.vpc.id
   name = "splunk-subnet-az1-1"
 }
 
-data "opentelekomcloud_vpc_subnet_ids_v1" "subnet_ids" {
-  vpc_id = data.opentelekomcloud_vpc_v1.vpc.id
+data "opentelekomcloud_vpc_subnet_v1" "subnet_az2" {
+  name = "splunk-subnet-az2-1"
 }
+
+#data "opentelekomcloud_vpc_subnet_ids_v1" "subnet_ids" {
+#  vpc_id = data.opentelekomcloud_vpc_v1.vpc.id
+#}
 
 #resource "opentelekomcloud_networking_router_interface_v2" "router-interface-az1" {
 #  router_id = data.opentelekomcloud_vpc_v1.vpc.id
@@ -195,13 +196,12 @@ resource "openstack_compute_secgroup_v2" "parser-secgrp" {
   }
 
   # syslog udp
-  # currently disabled to prevent interference with old splunk-receiver
-  #rule {
-  #  from_port   = 514
-  #  to_port     = 514
-  #  ip_protocol = "udp"
-  #  cidr        = "0.0.0.0/0"
-  #}
+  rule {
+    from_port   = 514
+    to_port     = 514
+    ip_protocol = "udp"
+    cidr        = "0.0.0.0/0"
+  }
 
   # syslog tcp/tls
   rule {

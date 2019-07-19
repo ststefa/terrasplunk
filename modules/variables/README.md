@@ -1,1 +1,1 @@
-The `variables` module attempts to encapsulate differences between environments to keep the code DRYer.
+The `variables` module attempts to encapsulate differences between stages to keep the code DRYer.

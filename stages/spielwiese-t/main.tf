@@ -5,7 +5,7 @@ locals {
   #workspace = terraform.workspace
 }
 
-# TODO: move all env-specifics to modules/variables to make more DRY. But how to handle verying amount of instances by stage (e.g. #idx(int) != #idx(prod))? Maybe dynmaic based on contents in mod/var.
+# TODO: move all stage-specifics to modules/variables to make more DRY. But how to handle verying amount of instances by stage (e.g. #idx(int) != #idx(prod))? Maybe dynmaic based on contents in mod/var.
 
 module "variables" {
   source = "../../modules/variables"

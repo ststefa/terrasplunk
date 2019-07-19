@@ -1,1 +1,1 @@
-The `modules` directory contains reusable infrastructure objects which are used in the environments.
+The `modules` directory contains reusable infrastructure objects which are used in the stages.

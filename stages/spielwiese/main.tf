@@ -1,5 +1,5 @@
 locals {
-  workspace = "spielwiese"
+  stage = "spielwiese"
   # Might introduce workspaces instead of multiple stages/ dirs for more DRYness. However see discussion at https://www.terraform.io/docs/state/workspaces.html
   # See also ideas at https://medium.com/capital-one-tech/deploying-multiple-environments-with-terraform-kubernetes-7b7f389e622
   # workspaces might be a good idea to seperate between test/prod tenant:
@@ -10,7 +10,7 @@ locals {
   #workspace = terraform.workspace
 }
 
-# TODO: move all env-specifics to modules/variables to make more DRY. But how to handle verying amount of instances by stage (e.g. #idx(int) != #idx(prod))? Maybe dynmaic based on contents in mod/var?
+# TODO: move all stage-specifics to modules/variables to make more DRY. But how to handle verying amount of instances by stage (e.g. #idx(int) != #idx(prod))? Maybe dynmaic based on contents in mod/var?
 #TODO: Rewrite everthing from OpSt to OTC, kick OpSt provider
 
 # credentials can be provided using shell variables
@@ -23,7 +23,7 @@ module "variables" {
   source = "../../modules/variables"
 
   workspace  = terraform.workspace
-  stage      = "spielwiese"
+  stage      = local.stage
 }
 
 provider "opentelekomcloud" {
@@ -55,53 +55,31 @@ module "core" {
   source = "../../modules/core"
 
   dns_servers  = ["100.125.4.25", "100.125.0.43"]
-  stage        = module.variables.stage
-  # OTC does not like /29. Too small
-  #subnet_cidr1 = "10.104.146.240/29"
-  #subnet_cidr2 = "10.104.146.248/29"
-  subnet_cidr1 = "10.104.146.224/28"
-  subnet_cidr2 = "10.104.146.240/28"
+  stage        = local.stage
 }
 
 module "searchhead1" {
   source = "../../modules/genericecs"
-
-  stage  = module.variables.stage
+  stage  = local.stage
   name = "splk${module.variables.stage_letter}-sh01"
-
-  keypair_id = module.core.keypair_id
-
-  ip = module.variables.searchhead_ip_list[0]
   network_id = module.core.network1_id
   interface  = module.core.interface1
-  az = "eu-ch-01"
   secgrp_id  = module.core.parser-secgrp_id
 }
 
 module "searchhead2" {
   source = "../../modules/genericecs"
-
-  stage  = module.variables.stage
-  name = "splk${module.variables.stage_letter}-sh02"
-
-  keypair_id = module.core.keypair_id
-
-  ip = module.variables.searchhead_ip_list[1]
+  stage  = local.stage
+  name = "splk${upper(module.variables.stage_letter)}-sh02"
   network_id = module.core.network2_id
   interface  = module.core.interface2
-  az = "eu-ch-02"
   secgrp_id  = module.core.parser-secgrp_id
 }
 
 module "indexer1" {
   source = "../../modules/indexer"
-
-  stage  = module.variables.stage
+  stage  = local.stage
   number = "1"
-
-  keypair_id = module.core.keypair_id
-
-  ip = module.variables.indexer_ip_list[0]
   network_id = module.core.network1_id
   interface  = module.core.interface1
   secgrp_id  = module.core.indexer-secgrp_id
@@ -109,13 +87,8 @@ module "indexer1" {
 
 module "indexer2" {
   source = "../../modules/indexer"
-
-  stage  = module.variables.stage
+  stage  = local.stage
   number = "2"
-
-  keypair_id = module.core.keypair_id
-
-  ip = module.variables.indexer_ip_list[1]
   network_id = module.core.network2_id
   interface  = module.core.interface2
   secgrp_id  = module.core.indexer-secgrp_id
@@ -123,31 +96,19 @@ module "indexer2" {
 
 module "syslog1" {
   source = "../../modules/genericecs"
-
-  stage  = module.variables.stage
-  name = "splk${module.variables.stage_letter}-sy01"
-
-  keypair_id = module.core.keypair_id
-
-  ip = module.variables.syslog_ip_list[0]
+  stage  = local.stage
+  name = "splk${upper(module.variables.stage_letter)}-sy01"
   network_id = module.core.network1_id
   interface  = module.core.interface1
-  az = "eu-ch-01"
   secgrp_id  = module.core.parser-secgrp_id
 }
 
 module "syslog2" {
   source = "../../modules/genericecs"
-
-  stage  = module.variables.stage
-  name = "splk${module.variables.stage_letter}-sy02"
-
-  keypair_id = module.core.keypair_id
-
-  ip = module.variables.syslog_ip_list[1]
+  stage  = local.stage
+  name = "splk${upper(module.variables.stage_letter)}-sy02"
   network_id = module.core.network2_id
   interface  = module.core.interface2
-  az = "eu-ch-02"
   secgrp_id  = module.core.parser-secgrp_id
 }
 

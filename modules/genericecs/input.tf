@@ -6,13 +6,13 @@ variable "name" {
   description = "Name of the instance"
 }
 
-variable "az" {
-  description = "Availability zone"
-}
+#variable "az" {
+#  description = "Availability zone"
+#}
 
-variable "keypair_id" {
-  description = "id of ssh access key"
-}
+#variable "keypair_id" {
+#  description = "id of ssh access key"
+#}
 
 variable "flavor" {
   default = "s2.medium.4"
@@ -20,10 +20,6 @@ variable "flavor" {
 
 variable "network_id" {
   description = "Network id"
-}
-
-variable "ip" {
-  description = "VM IP"
 }
 
 variable "interface" {

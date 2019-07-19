@@ -1,16 +1,16 @@
 output "network1_id" {
-  value = data.opentelekomcloud_networking_network_v2.net-az1
+  value = data.opentelekomcloud_networking_network_v2.net-az1.id
 }
 output "network2_id" {
-  value = data.opentelekomcloud_networking_network_v2.net-az2
+  value = data.opentelekomcloud_networking_network_v2.net-az2.id
 }
 
 output "subnet1_id" {
   value = data.opentelekomcloud_vpc_subnet_v1.subnet_az1.subnet_id
 }
-#output "subnet2_id" {
-#  value = openstack_networking_subnet_v2.core2.id
-#}
+output "subnet2_id" {
+  value = data.opentelekomcloud_vpc_subnet_v1.subnet_az2.subnet_id
+}
 
 output "interface1" {
   #value = opentelekomcloud_networking_router_interface_v2.router-interface-az1
