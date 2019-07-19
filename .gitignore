@@ -1,9 +1,9 @@
-# Eclipse IDE
+# Eclipse
 /.settings
 /.classpath
 /.project
 
-# JetBrains Intellij/PyCharm
+# JetBrains IntelliJ
 /*.eml
 /*.iml
 /.idea/
@@ -14,6 +14,7 @@
 # terraform
 .terraform/
 terraform.tfstate*
+terraform.tfstate.d/
 build/
 .crash.log
 

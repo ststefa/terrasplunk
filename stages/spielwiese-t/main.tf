@@ -1,6 +1,6 @@
 locals {
   workspace = "spielwiese-t"
-  # Might introduce workspaces instead of multiple envs/ dirs for more DRYness. However see discussion at https://www.terraform.io/docs/state/workspaces.html
+  # Might introduce workspaces instead of multiple stages/ dirs for more DRYness. However see discussion at https://www.terraform.io/docs/state/workspaces.html
   # See also ideas at https://medium.com/capital-one-tech/deploying-multiple-environments-with-terraform-kubernetes-7b7f389e622
   #workspace = terraform.workspace
 }

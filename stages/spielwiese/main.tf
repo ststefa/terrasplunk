@@ -1,10 +1,10 @@
 locals {
   workspace = "spielwiese"
-  # Might introduce workspaces instead of multiple envs/ dirs for more DRYness. However see discussion at https://www.terraform.io/docs/state/workspaces.html
+  # Might introduce workspaces instead of multiple stages/ dirs for more DRYness. However see discussion at https://www.terraform.io/docs/state/workspaces.html
   # See also ideas at https://medium.com/capital-one-tech/deploying-multiple-environments-with-terraform-kubernetes-7b7f389e622
   # workspaces might be a good idea to seperate between test/prod tenant:
-  #   one seperate envs/ directory for each stage s/t/i/p
-  #   two workspaces in each envs/* dir (prod and test for prod tenant and test tenant)
+  #   one seperate stages/ directory for each stage s/t/i/p
+  #   two workspaces in each stages/* dir (prod and test for prod tenant and test tenant)
   # also set some provider values (e.g. tenant) based on mod/var to prevent errors
   # need to find wording to seperate t/p (tenant) axis from s/t/i/p (stage) axis
   #workspace = terraform.workspace
@@ -18,6 +18,13 @@ locals {
 #   export TF_VAR_password=secret
 variable "username" {}
 variable "password" {}
+
+module "variables" {
+  source = "../../modules/variables"
+
+  workspace  = terraform.workspace
+  stage      = "spielwiese"
+}
 
 provider "opentelekomcloud" {
   domain_name = "tsch_rz_t_001"
@@ -43,13 +50,6 @@ provider "openstack" {
 provider "null" {
 }
 
-
-module "variables" {
-  source = "../../modules/variables"
-
-  workspace  = local.workspace
-  #workspace  = terraform.workspace
-}
 
 module "core" {
   source = "../../modules/core"

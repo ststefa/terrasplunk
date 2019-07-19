@@ -18,7 +18,7 @@ While the `splunkprod` has a *multi terralith* structure this project restructur
 ## Network setup
 The current setup does not manage the network setup. While this violates iac rules ("everything as code") we have it setup like that because we are jump-start beginners who a supposed to create production grade infrastructure. So some prereqs regarding the networks must be prepared. Details on how to perform this setup reach beyond the scope of this readme.
 
-1. Using the OTC webgui, create a new VPC "splunk-vpc" with all the subnets. The vpc should be located *inside* the otc project (not on the top level). The subnets should be named "splunk-subnet-az[12]-[1-9]".
+1. Using the OTC webgui, create a new VPC "splunk-vpc" with all the subnets. The vpc should be located *inside* the splunk project eu-ch_splunk and not on the top level eu-ch. The subnets should be named "splunk-subnet-az[12]-[1-9]".
 1. Create a vpc peering "splunk-peering" between the splunk-vpc and the tenants hub vpc (e.g. tsch_rz_t_hub).
 1. Add the peer routing. This is 0.0.0.0/0 as a local route and the dedicated ip range (e.g. 10.104.146.0/24) of the vpc as a peer route.
 1. Accept the peering request on the tenants hub vpc.
@@ -36,7 +36,7 @@ The current setup does not manage the network setup. While this violates iac rul
     | 0a2228f2-7f8a-45f1-8e09-9039e1d09975 | admin_external_net                   |                                      |
     +--------------------------------------+--------------------------------------+--------------------------------------+
     ```
-    However we need to reference the network in several places like e.g. the ECS network config. It is fragile to reference them by id because ids should generally be considered ephemeral. We could reference by cidr but that's complicated and error prone. Therefore, we rename them in analogy to the subnets in order to make them easier to reference. This approach has the ugly drawback that it violates iac "everything is code" rule as it cannot be done with terraform itself but has to be done with the openstack cli:
+    However we need to reference the network in several places like e.g. the ECS network config. It is fragile to reference them by id because ids (apart from being unreadable) should generally be considered ephemeral. We could reference by cidr but that's complicated and error prone. Therefore, we rename them in analogy to the subnets in order to make them easier to reference. This approach has the ugly drawback that it violates iac "everything is code" rule as it cannot be done with terraform itself but has to be done with the openstack cli:
 
     ```
     $ openstack --os-cloud otc-sbb-t subnet list
@@ -68,14 +68,27 @@ The current setup does not manage the network setup. While this violates iac rul
     We can now refer to the networks by name (e.g. name="splunk-net-az1-1")
 
 # Usage
+
+We have split up the infrastructure between tenants (test and prod tenant) as well as between stages (s/t/i/p). Each stage has a separate state directory in the `stages/` tree. In each stage there are two **terraform workspaces**. We thus have two "axis" by which we separate state, the "tenant axis" and the "stage axis". By doing so we have two equivalent code paths for any stage.
+
+This was done because we expect to have major differences (i.e. not just in size but also in structure) between stages because they are used for different purpose. E.g. there will be no indexing nodes on int. This would lead to untestable code.
+
+The workspaces are
+
+- "default" for the test tenant
+- "prod" for the production tenant
+
+
 - Download and install terraform for your computer
-- Export your Cload credentials (see `envs/*/terraform.tfvars`)
+- Export your OTC credentials (see provider resource in any <env>/main.tf)
 - `cd envs/<any>`
 - `terraform init`
 - `terraform plan`
 - `terraform apply`
 
 Don't break stuff which might be in use!
+
+Any codechange 
 
 # Provisioning
 
