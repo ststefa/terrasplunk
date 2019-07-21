@@ -1,1 +1,1 @@
-The `variables` module implements a single standard indexer VM
+The `indexer` module implements a single standard splunk indexer VM.
