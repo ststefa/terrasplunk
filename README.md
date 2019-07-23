@@ -69,15 +69,32 @@ The current setup does not manage the network setup. While this violates iac rul
 
 # Usage
 
-We have split up the infrastructure between tenants (test and prod tenant) as well as between stages (s/t/i/p). Each stage has a separate state directory in the `stages/` tree. In each stage there are two **terraform workspaces**. We thus have two "axis" by which we separate state, the "tenant axis" and the "stage axis". By doing so we have two equivalent code paths for any stage.
+## General
+We have split up the infrastructure between tenants (test and prod tenant) as well as between stages (s/t/i/p). Each stage has a separate state directory in the `stages/` tree. In each stage directory there are two **terraform workspaces**. We thus have two "axis" by which we separate state, the "tenant axis" and the "stage axis". By doing so we have two equivalent code paths for any stage.
 
-This was done because we expect to have major differences (i.e. not just in size but also in structure) between stages because they are used for different purpose. E.g. there will be no indexing nodes on int. This would lead to untestable code.
+This was done because we expect to have major differences (i.e. not just in size but also in structure) between stages because they are used for different purpose. E.g. there will be no indexing nodes on the integration stage. This would lead to untestable code.
 
 The workspaces are
 
-- "default" for the test tenant
-- "prod" for the production tenant
+- "default" for the test tenant tsch_rz_t_001
+- "prod" for the production tenant tsch_rz_p_001
 
+## Terraform usage
+
+Hashicorp provides a great documentation site for terraform which details the language as well as all the providers that are used to build up infrastructure.
+
+Some places to visit:
+
+Download and setup: https://www.terraform.io/downloads.html
+Introduction: https://www.terraform.io/intro/index.html
+The language: https://www.terraform.io/docs/configuration/index.html
+The OpenStack provider: https://www.terraform.io/docs/providers/openstack/index.html
+The OpenTelekomCloud provider: https://www.terraform.io/docs/providers/opentelekomcloud/index.html
+About expressions: https://www.terraform.io/docs/configuration/expressions.html
+About state: https://www.terraform.io/docs/state/index.html
+About workspaces: https://www.terraform.io/docs/state/workspaces.html
+
+To get started with this project:
 
 - Download and install terraform for your computer
 - Export your OTC credentials (see provider resource in any <stage>/main.tf)
@@ -86,9 +103,8 @@ The workspaces are
 - `terraform plan`
 - `terraform apply`
 
-Don't break stuff which might be in use!
+Don't break stuff on the production tenant. Feel free to break everything on the test tenant.
 
-Any codechange 
 
 # Provisioning
 

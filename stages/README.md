@@ -71,16 +71,16 @@ The **spielwiese-p** splunk stage is used for platform testing tasks such as ins
     
         Searchhead area
     
-            Searchhead cluster prod (2*2)
+            Searchhead cluster prod (2*1)+1
 
-            Searchhead cluster preprod (2*1)
+            Searchhead cluster preprod (2*1)+1
           
-            Searchhead cluster ITSI (2*1)
+            Searchhead cluster ITSI (2*1)+1
 
-            Searchhead cluster ES (2*1)
+            Searchhead cluster ES (2*1)+1
 
         Indexer area
-        
+
             Indexer prod (2*2)
 
         Supplemental area
@@ -89,6 +89,7 @@ The **spielwiese-p** splunk stage is used for platform testing tasks such as ins
             
             syslog (2*1)
 
+    spare subnet
 
     nonprod subnet
         10.104.198.224/28 (usable 10.104.198.226 - 10.104.198.238, 13 IPs)
@@ -118,14 +119,14 @@ The **spielwiese-p** splunk stage is used for platform testing tasks such as ins
 
         Searchhead area (2*14)
 
-            Searchhead cluster prod+ITSI (2*8)
+            Searchhead cluster prod+ITSI (2*8)+1
             or
-            Searchhead cluster prod  (2*5)
-            Searchhead cluster ITSI (2*3)
+            Searchhead cluster prod  (2*5)+1
+            Searchhead cluster ITSI (2*3)+1
 
-            Searchhead cluster preprod (2*3)
+            Searchhead cluster preprod (2*3)+1
 
-            Searchhead cluster ES (2*3)
+            Searchhead cluster ES (2*1)+1
 
         Indexer area (2*20)
 
@@ -141,12 +142,23 @@ The **spielwiese-p** splunk stage is used for platform testing tasks such as ins
 
             Cluster Master (1*1)
 
+            Monitoring? (2*1)
+
+            <DNS? (2*1)>
+
             ... more splunk things?
 
-
-    nonprod subnet
+    spare subnet
         10.104.146.128/27 (usable 10.104.146.130 - 10.104.146.158, 29 IPs)
         10.104.146.160/27 (usable 10.104.146.162 - 10.104.146.190, 29 IPs)
+
+        Whatever area
+
+            ?
+
+    nonprod subnet
+        10.104.146.160/27 (usable 10.104.146.162 - 10.104.146.191, 29 IPs)
+        10.104.146.192/27 (usable 10.104.146.194 - 10.104.146.223, 29 IPs)
 
         Searchhead area (2*2)
 
@@ -162,12 +174,3 @@ The **spielwiese-p** splunk stage is used for platform testing tasks such as ins
 
             Heavy Forwarder test (2*5)
 
-    not-so-splunk subnet
-        10.104.146.128/27 (usable 10.104.146.130 - 10.104.146.158, 29 IPs)
-        10.104.146.160/27 (usable 10.104.146.162 - 10.104.146.190, 29 IPs)
-
-        Supplemental area (2*1)
-
-            Monitoring? (2*1)
-
-            <DNS? (2*1)>
