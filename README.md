@@ -70,7 +70,9 @@ The current setup does not manage the network setup. While this violates iac rul
 # Usage
 
 ## General
-We have split up the infrastructure between tenants (test and prod tenant) as well as between stages (s/t/i/p). Each stage has a separate state directory in the `stages/` tree. In each stage directory there are two **terraform workspaces**. We thus have two "axis" by which we separate state, the "tenant axis" and the "stage axis". By doing so we have two equivalent code paths for any stage.
+We have split up the infrastructure between tenants (test and prod tenant) as well as between stages (s/t/i/p). Each stage has a separate state directory in the `stages/` tree. In each stage directory you can have two **terraform workspaces** which are *default* (exists impclicitly) and *prod* (has to be explicitly created using `terraform workspace`).
+
+We thus have two "axis" by which we separate terraform state, the "tenant axis" and the "stage axis". By doing so we have two equivalent code paths for any stage.
 
 This was done because we expect to have major differences (i.e. not just in size but also in structure) between stages because they are used for different purpose. E.g. there will be no indexing nodes on the integration stage. This would lead to untestable code.
 
