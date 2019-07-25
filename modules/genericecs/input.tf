@@ -1,6 +1,6 @@
-variable "stage" {
-  description = "dev / apptest / ..."
-}
+#variable "stage" {
+# description = "dev / apptest / ..."
+#}
 
 variable "name" {
   description = "Name of the instance"
@@ -15,16 +15,24 @@ variable "name" {
 #}
 
 variable "flavor" {
-  default = "s2.medium.4"
+  default = "s2.2xlarge.4"
 }
 
-variable "network_id" {
-  description = "Network id"
+variable "autorecover" {
+  default = "false"
 }
 
-variable "interface" {
-  description = "Interface that VM depends on. If omitted, provisioning might fail beause the VM is accessed earlier then the network is built"
+variable "opt_size" {
+  default = 20
 }
+
+#variable "network_id" {
+#  description = "Network id"
+#}
+#
+#variable "interface" {
+#  description = "Interface that VM depends on. If omitted, provisioning might fail beause the VM is accessed earlier then the network is built"
+#}
 
 variable "secgrp_id" {
   description = "Security group id"

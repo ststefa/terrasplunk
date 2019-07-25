@@ -1,14 +1,38 @@
+#module "variables" {
+#  source = "../../modules/variables"
+#
+#  workspace  = terraform.workspace
+#  stage      = var.stage
+#}
+
+locals {
+  stage_map = {
+    d : "development"
+    t : "test"
+    q : "quality"
+    p : "production"
+    w : "spielwiese"
+    u : "universal"
+  }
+  stage             = local.stage_map[substr(var.name, 3, 1)]
+  hostnumber        = tonumber(substr(var.name, -2, 1))
+  availability_zone = local.hostnumber % 2 == 0 ? "eu-ch-01" : "eu-ch-02"
+  netname           = local.stage == "production" ? "neta" : "netc"
+  network_id        = local.hostnumber % 2 == 0 ? data.terraform_remote_state.shared.outputs["${local.netname}-az1_id"] : data.terraform_remote_state.shared.outputs["${local.netname}-az2_id"]
+}
+
 module "variables" {
   source = "../../modules/variables"
 
-  workspace  = terraform.workspace
-  stage      = var.stage
+  workspace = terraform.workspace
+  stage     = local.stage
 }
 
-module "core" {
-  source = "../../modules/core"
-
-  stage        = var.stage
+data "terraform_remote_state" "shared" {
+  backend = "local"
+  config = {
+    path = "../../shared/terraform.tfstate"
+  }
 }
 
 data "opentelekomcloud_images_image_v2" "osimage" {
@@ -16,18 +40,20 @@ data "opentelekomcloud_images_image_v2" "osimage" {
   most_recent = true
 }
 
-resource "openstack_compute_instance_v2" "instance" {
-  availability_zone = module.variables.hostconfig[var.name]["az"]
+resource "opentelekomcloud_compute_instance_v2" "instance" {
+  availability_zone = local.availability_zone
   flavor_name       = var.flavor
   name              = var.name
-  key_pair          = module.core.keypair_id
+  key_pair          = data.terraform_remote_state.shared.outputs["keypair_id"]
   security_groups   = [var.secgrp_id]
+  stop_before_destroy = true
+  auto_recovery = var.autorecover
 
   network {
-    uuid        = var.network_id
-    fixed_ip_v4 = module.variables.hostconfig[var.name]["ip"]
+    uuid        = local.network_id
+    fixed_ip_v4 = module.variables.pmdns[var.name]
   }
-  depends_on = [var.interface]
+  #depends_on = [var.interface]
 
   block_device {
     uuid                  = data.opentelekomcloud_images_image_v2.osimage.id
@@ -39,17 +65,14 @@ resource "openstack_compute_instance_v2" "instance" {
   }
 }
 
-resource "openstack_blockstorage_volume_v2" "opt" {
-  availability_zone = module.variables.hostconfig[var.name]["az"]
+resource "opentelekomcloud_blockstorage_volume_v2" "opt" {
+  availability_zone = local.availability_zone
   name              = "${var.name}-opt"
-  size              = 20
-  lifecycle {
-    prevent_destroy = true
-  }
+  size              = var.opt_size
 }
 
-resource "openstack_compute_volume_attach_v2" "opt_attach" {
-  instance_id = openstack_compute_instance_v2.instance.id
-  volume_id   = openstack_blockstorage_volume_v2.opt.id
-  depends_on  = [openstack_compute_instance_v2.instance]
+resource "opentelekomcloud_compute_volume_attach_v2" "opt_attach" {
+  instance_id = opentelekomcloud_compute_instance_v2.instance.id
+  volume_id   = opentelekomcloud_blockstorage_volume_v2.opt.id
+  depends_on  = [opentelekomcloud_compute_instance_v2.instance]
 }

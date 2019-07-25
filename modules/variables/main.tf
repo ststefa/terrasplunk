@@ -1,11 +1,3 @@
-variable "workspace" {
-  description = "One of 'default' or 'prod'"
-}
-
-variable "stage" {
-  description = "One of 'spielwiese', 'dev', 'test', 'int',  or 'prod'"
-}
-
 #variable stage_map {
 #  description = "Assign workspace names (lval) to stage names (rval). There might be more workspaces than stages!"
 #  type = "map"
@@ -14,126 +6,139 @@ variable "stage" {
 #  }
 #}
 
-variable "stage_letter_map" {
+#variable "stage_letter_map" {
+#  description = "Each stage must be represented by a single letter"
+#  type = "map"
+#  default = {
+#    spielwiese   = "w"
+#    production   = "p"
+#    development  = "d"
+#    test         = "t"
+#    qa           = "q"
+#  }
+#}
+#output "stage_letter" {
+#  value = var.stage_letter_map
+#}
+
+variable "tenant_map" {
   description = "Each stage must be represented by a single letter"
-  type = "map"
+  type        = "map"
   default = {
-    spielwiese   = "s"
-    production   = "p"
-    development  = "d"
-    test         = "t"
-    integration  = "i"
+    default = "tsch_rz_t_001"
+    prod    = "tsch_rz_p_001"
   }
 }
-output "stage_letter" {
-  value = var.stage_letter_map[var.stage]
+output "tenant" {
+  value = var.tenant_map[var.workspace]
 }
 
 variable "subnet_cidr_map" {
-  description = "List of fixed IPs for searchhead instances"
-  type = "map"
+  description = "Subnet CIDRs"
+  type        = "map"
   default = {
     default = {
-      spielwiese = [
-        "10.104.198.224/28",
-        "10.104.198.240/28"]
-      dev = [
-        "10.104.198.224/28",
-        "10.104.198.240/28"]
-      test = [
-        "10.104.198.224/28",
-        "10.104.198.240/28"]
-      int = [
-        "10.104.198.192/28",
-        "10.104.198.208/28"]
-      test = [
-        "10.104.198.192/28",
-        "10.104.198.208/28"]
+      neta-az1 = "10.104.198.192/28",
+      neta-az2 = "10.104.198.208/28",
+      # no space for buffer
+      netc-az1 = "10.104.198.224/28",
+      netc-az2 = "10.104.198.240/28",
     }
     prod = {
-      spielwiese = [
-        "10.104.146.128/27",
-        "10.104.146.160/27"]
-      dev = [
-        "10.104.146.128/27",
-        "10.104.146.160/27"]
-      test = [
-        "10.104.146.128/27",
-        "10.104.146.160/27"]
-      int = [
-        "10.104.146.0/26",
-        "10.104.146.64/26"]
-      prod = [
-        "10.104.146.0/26",
-        "10.104.146.64/26"]
+      neta-az1 = "10.104.146.0/26",
+      neta-az2 = "10.104.146.64/26",
+      netb-az1 = "10.104.146.128/27",
+      netb-az2 = "10.104.146.160/27",
+      netc-az1 = "10.104.146.192/27",
+      netc-az2 = "10.104.146.224/27",
     }
   }
 }
-output "subnet_list" {
-  value = var.subnet_cidr_map[var.workspace][var.stage]
+output "subnet_cidr" {
+  value = var.subnet_cidr_map[var.workspace]
 }
 
-# base host information
-variable "hostconfig" {
-  description = "Where others use rocket science we do it by hand"
-  type = "map"
+variable "gateway_map" {
+  description = "List of fixed IPs for searchhead instances"
+  type        = "map"
   default = {
     default = {
-      splkp-sh01: {
-        ip: "10.104.146.194",
-        az: "eu-ch-01"
-      },
-      splkp-sh02: {
-        ip: "10.104.146.210",
-        az: "eu-ch-02"
-      },
-      splkp-id01: {
-        ip: "10.104.146.199",
-        az: "eu-ch-02"
-      },
-      splkp-id02: {
-        ip: "10.104.146.215",
-        az: "eu-ch-02"
-      },
-      splkp-sy01: {
-        ip: "10.104.146.202",
-        az: "eu-ch-02"
-      },
-      splkp-sy02: {
-        ip: "10.104.146.218",
-        az: "eu-ch-02"
-      },
+      neta-az1 = "10.104.198.193",
+      neta-az2 = "10.104.198.209",
+      # no space for buffer
+      netc-az1 = "10.104.198.225",
+      netc-az2 = "10.104.198.241",
     }
     prod = {
-      splkp-sh01: {
-        ip: "10.104.146.2",
-        az: "eu-ch-01"
-      },
-      splkp-sh02: {
-        ip: "10.104.146.66",
-        az: "eu-ch-02"
-      },
-      splkp-id01: {
-        ip: "10.104.146.17",
-        az: "eu-ch-02"
-      },
-      splkp-id02: {
-        ip: "10.104.146.80",
-        az: "eu-ch-02"
-      },
-      splkp-sy01: {
-        ip: "10.104.146.52",
-        az: "eu-ch-02"
-      },
-      splkp-sy02: {
-        ip: "10.104.146.119",
-        az: "eu-ch-02"
-      },
+      neta-az1 = "10.104.146.1",
+      neta-az2 = "10.104.146.65",
+      netb-az1 = "10.104.146.129",
+      netb-az2 = "10.104.146.161",
+      netc-az1 = "10.104.146.193",
+      netc-az2 = "10.104.146.225",
     }
   }
 }
-output "hostconfig" {
-  value = var.hostconfig[var.workspace]
+output "gateway" {
+  value = var.gateway_map[var.workspace]
+}
+
+
+# poor mans DNS
+variable "pmdns_map" {
+  description = "Where others use rocket science we do it by hand"
+  #sh:   Searchhead
+  #it:   ITSI searchhead
+  #es:   ES searchhead
+  #ix:   Indexer
+  #cm:   Cluster-Master
+  #hf:   Heavy-Forwarder  <- Not yet implemented
+  #st:   Stand-alone
+  #sy:   Syslog  <- Not yet implemented
+  #he:   HEC-Gateway  <- Not yet implemented
+  #pr:   Parser (Syslog, HEC-Gateway and Heavy-Forwarder on same machine)
+  #lm:   License-Master  <- Not yet implemented
+  #dp:   Deployer  <- Not yet implemented
+  #ds:   Deployment-Server  <- Not yet implemented
+  #mt:   Management tools (License-Master, Deployment-Server and Deployer)
+  #mc:   Monitor Console
+  #bd:   Builder, where all Ansible, Terraform, etc. scripts are running  type = "map"
+  default = {
+    default = {
+      splp0cm01 : "10.104.198.226",
+      splp0hf01 : "10.104.198.227",
+      splp0hf02 : "10.104.198.228",
+      splp0id01 : "10.104.198.229",
+      splp0id02 : "10.104.198.230",
+      splp0id03 : "10.104.198.231",
+      splp0id04 : "10.104.198.232",
+      splp0mt01 : "10.104.198.233",
+      splp0sh01 : "10.104.198.234",
+      splp0sh02 : "10.104.198.235",
+      splp0sh03 : "10.104.198.236",
+      splp0sy01 : "10.104.198.237",
+      splp0sy02 : "10.104.198.238",
+
+    }
+    prod = {
+      splp0cm01 : "10.104.146.194",
+      splp0hf01 : "10.104.146.195",
+      splp0hf02 : "10.104.146.196",
+      splp0id01 : "10.104.146.197",
+      splp0id02 : "10.104.146.198",
+      splp0id03 : "10.104.146.199",
+      splp0id04 : "10.104.146.200",
+      splp0mt01 : "10.104.146.201",
+      splp0sh01 : "10.104.146.202",
+      splp0sh02 : "10.104.146.203",
+      splp0sh03 : "10.104.146.204",
+      splp0sy01 : "10.104.146.205",
+      splp0sy02 : "10.104.146.206",
+    }
+  }
+}
+output "pmdns" {
+  value = var.pmdns_map[var.workspace]
 }
 
 

@@ -1,22 +1,27 @@
-variable "stage" {
-  description = "dev / apptest / ..."
+#variable "stage" {
+#  description = "dev / apptest / ..."
+#}
+
+variable "name" {
+  description = "Name of the instance"
 }
 
-variable "number" {
-  description = "Sequential number of indexer instance"
-}
+#variable "number" {
+#  description = "Sequential number of indexer instance"
+#}
 
 #variable "keypair_id" {
 #  description = "id of ssh access key"
 #}
 
-variable "flavor" {
-  default = "s2.medium.4"
-}
+# force all indexers be same size
+#variable "flavor" {
+#  default = "s2.medium.4"
+#}
 
-variable "network_id" {
-  description = "Network id"
-}
+#variable "network_id" {
+#  description = "Network id"
+#}
 
 #variable "ip" {
 #  description = "VM IP"

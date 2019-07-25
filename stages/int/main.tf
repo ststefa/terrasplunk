@@ -11,6 +11,6 @@ variable "password" {}
 module "variables" {
   source = "../../modules/variables"
 
-  workspace  = terraform.workspace
-  stage      = local.stage
+  workspace = terraform.workspace
+  stage     = local.stage
 }
