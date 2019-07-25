@@ -9,7 +9,7 @@ locals {
   stage_map = {
     d : "development"
     t : "test"
-    q : "quality"
+    q : "qa"
     p : "production"
     w : "spielwiese"
     u : "universal"
@@ -42,9 +42,9 @@ data "opentelekomcloud_images_image_v2" "osimage" {
 
 resource "opentelekomcloud_compute_instance_v2" "instance" {
   availability_zone = local.availability_zone
-  flavor_name       = var.flavor
+  flavor_name       = module.variables.flavor[local.stage]
   name              = var.name
-  key_pair          = data.terraform_remote_state.shared.outputs["keypair_id"]
+  key_pair          = data.terraform_remote_state.shared.outputs["keypair-tss_id"]
   security_groups   = [var.secgrp_id]
   stop_before_destroy = true
   auto_recovery = var.autorecover

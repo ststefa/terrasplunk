@@ -8,15 +8,15 @@ output "indexer1_name" {
   value = module.indexer1.name
 }
 
-output "syslog1_id" {
-  value = module.syslog1.id
-}
-output "syslog1_ip" {
-  value = module.syslog1.ip
-}
-output "syslog1_name" {
-  value = module.syslog1.name
-}
+#output "syslog1_id" {
+#  value = module.syslog1.id
+#}
+#output "syslog1_ip" {
+#  value = module.syslog1.ip
+#}
+#output "syslog1_name" {
+#  value = module.syslog1.name
+#}
 
 output "searchhead1_id" {
   value = module.searchhead1.id

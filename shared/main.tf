@@ -2,11 +2,8 @@ locals {
   project = "splunk"
 }
 
-
-module "variables" {
-  source    = "../modules/variables"
-  workspace = terraform.workspace
-  stage     = "dontcare"
+terraform {
+  required_version = ">= 0.12"
 }
 
 provider "opentelekomcloud" {
@@ -18,8 +15,10 @@ provider "opentelekomcloud" {
   auth_url = "https://iam.eu-ch.o13bb.otc.t-systems.com/v3"
 }
 
-terraform {
-  required_version = ">= 0.12"
+module "variables" {
+  source    = "../modules/variables"
+  workspace = terraform.workspace
+  stage     = "dontcare"
 }
 
 data "opentelekomcloud_networking_network_v2" "extnet" {
@@ -38,13 +37,13 @@ data "opentelekomcloud_networking_network_v2" "neta-az2" {
   name = "${local.project}-neta-az2"
 }
 
-data "opentelekomcloud_networking_network_v2" "netb-az1" {
-  name = "${local.project}-netb-az1"
-}
-
-data "opentelekomcloud_networking_network_v2" "netb-az2" {
-  name = "${local.project}-netb-az2"
-}
+#data "opentelekomcloud_networking_network_v2" "netb-az1" {
+#  name = "${local.project}-netb-az1"
+#}
+#
+#data "opentelekomcloud_networking_network_v2" "netb-az2" {
+#  name = "${local.project}-netb-az2"
+#}
 
 data "opentelekomcloud_networking_network_v2" "netc-az1" {
   name = "${local.project}-netc-az1"
@@ -55,27 +54,27 @@ data "opentelekomcloud_networking_network_v2" "netc-az2" {
 }
 
 data "opentelekomcloud_vpc_subnet_v1" "subneta_az1" {
-  name = "${local.project}-subneta_az1"
+  name = "${local.project}-subneta-az1"
 }
 
 data "opentelekomcloud_vpc_subnet_v1" "subneta_az2" {
-  name = "${local.project}-subneta_az2"
+  name = "${local.project}-subneta-az2"
 }
 
-data "opentelekomcloud_vpc_subnet_v1" "subnetb_az1" {
-  name = "${local.project}-subnetb_az1"
-}
-
-data "opentelekomcloud_vpc_subnet_v1" "subnetb_az2" {
-  name = "${local.project}-subnetb_az2"
-}
+#data "opentelekomcloud_vpc_subnet_v1" "subnetb_az1" {
+#  name = "${local.project}-subnetb-az1"
+#}
+#
+#data "opentelekomcloud_vpc_subnet_v1" "subnetb_az2" {
+#  name = "${local.project}-subnetb-az2"
+#}
 
 data "opentelekomcloud_vpc_subnet_v1" "subnetc_az1" {
-  name = "${local.project}-subnetc_az1"
+  name = "${local.project}-subnetc-az1"
 }
 
 data "opentelekomcloud_vpc_subnet_v1" "subnetc_az2" {
-  name = "${local.project}-subnetc_az2"
+  name = "${local.project}-subnetc-az2"
 }
 
 #data "opentelekomcloud_vpc_subnet_ids_v1" "subnet_ids" {
@@ -150,4 +149,8 @@ data "opentelekomcloud_vpc_subnet_v1" "subnetc_az2" {
 #}
 
 
+resource "opentelekomcloud_compute_keypair_v2" "keypair-tss" {
+  name       = "${local.project}-tss-key"
+  public_key = file("../lib/splunk-otc.pub")
+}
 

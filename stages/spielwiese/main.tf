@@ -1,12 +1,9 @@
 locals {
-  stage = "spielwiese"
+  stage   = "spielwiese"
 }
 
-
-module "variables" {
-  source    = "../../modules/variables"
-  workspace = terraform.workspace
-  stage     = local.stage
+terraform {
+  required_version = ">= 0.12"
 }
 
 provider "opentelekomcloud" {
@@ -18,9 +15,11 @@ provider "opentelekomcloud" {
   auth_url = "https://iam.eu-ch.o13bb.otc.t-systems.com/v3"
 }
 
-provider "null" {
+module "variables" {
+  source    = "../../modules/variables"
+  workspace = terraform.workspace
+  stage     = local.stage
 }
-
 
 module "core" {
   source = "../../modules/core"
@@ -29,23 +28,36 @@ module "core" {
 
 module "searchhead1" {
   source = "../../modules/genericecs"
-  #stage  = local.stage
   name = "splw0sh01"
-  #network_id = module.core.network1_id
-  #interface  = module.core.interface1
+  secgrp_id = module.core.searchhead-secgrp_id
+}
+
+module "searchhead2" {
+  source = "../../modules/genericecs"
+  name = "splw0sh02"
   secgrp_id = module.core.searchhead-secgrp_id
 }
 
 module "indexer1" {
   source = "../../modules/indexer"
-  stage  = local.stage
-  number = "1"
-  #network_id = module.core.network1_id
-  #interface  = module.core.interface1
+  name = "splw0id01"
   secgrp_id = module.core.indexer-secgrp_id
 }
 
+module "indexer2" {
+  source = "../../modules/indexer"
+  name = "splw0id02"
+  secgrp_id = module.core.indexer-secgrp_id
+}
 
-terraform {
-  required_version = ">= 0.12"
+module "syslog1" {
+  source = "../../modules/genericecs"
+  name = "splw0sy01"
+  secgrp_id = module.core.parser-secgrp_id
+}
+
+module "syslog2" {
+  source = "../../modules/genericecs"
+  name = "splw0sy02"
+  secgrp_id = module.core.parser-secgrp_id
 }

@@ -33,6 +33,32 @@ output "tenant" {
   value = var.tenant_map[var.workspace]
 }
 
+variable "flavor_map" {
+  description = "VM sizes to use"
+  type        = "map"
+  default = {
+    default = {
+      development: "s2.medium.4"
+      test: "s2.medium.4"
+      quality: "s2.medium.4"
+      production: "s2.medium.8"
+      spielwiese: "s2.medium.4"
+      universal: "s2.medium.4"
+    }
+    default = {
+      development: "s2.medium.4"
+      test: "s2.xlarge.4"
+      quality: "s2.xlarge.4"
+      production: "s2.2xlarge.4"
+      spielwiese: "s2.medium.4"
+      universal: "s2.medium.4"
+    }
+  }
+}
+output "flavor" {
+  value = var.flavor_map[var.workspace]
+}
+
 variable "subnet_cidr_map" {
   description = "Subnet CIDRs"
   type        = "map"
@@ -103,101 +129,68 @@ variable "pmdns_map" {
   #mt:   Management tools (License-Master, Deployment-Server and Deployer)
   #mc:   Monitor Console
   #bd:   Builder, where all Ansible, Terraform, etc. scripts are running  type = "map"
+
   default = {
     default = {
-      splp0cm01 : "10.104.198.226",
-      splp0hf01 : "10.104.198.227",
-      splp0hf02 : "10.104.198.228",
-      splp0id01 : "10.104.198.229",
-      splp0id02 : "10.104.198.230",
-      splp0id03 : "10.104.198.231",
-      splp0id04 : "10.104.198.232",
-      splp0mt01 : "10.104.198.233",
-      splp0sh01 : "10.104.198.234",
-      splp0sh02 : "10.104.198.235",
-      splp0sh03 : "10.104.198.236",
-      splp0sy01 : "10.104.198.237",
-      splp0sy02 : "10.104.198.238",
+      # test tenant
+      #     prod subnet
+      #         10.104.198.194 - 10.104.198.206
+      #         10.104.198.210 - 10.104.198.222
+      #     nonprod subnet
+      #         10.104.198.226 - 10.104.198.238
+      #         10.104.198.242 - 10.104.198.254
+      splp0cm01 : "10.104.198.194",
+      splp0hf01 : "10.104.198.195",
+      splp0hf02 : "10.104.198.210",
+      splp0id01 : "10.104.198.196",
+      splp0id02 : "10.104.198.211",
+      splp0id03 : "10.104.198.197",
+      splp0id04 : "10.104.198.212",
+      splp0mt01 : "10.104.198.198",
+      splp0sh01 : "10.104.198.199",
+      splp0sh02 : "10.104.198.213",
+      splp0sh03 : "10.104.198.200",
+      splp0sy01 : "10.104.198.201",
+      splp0sy02 : "10.104.198.214",
+
+      splw0cm01 : "10.104.198.226",
+      splw0hf01 : "10.104.198.227",
+      splw0id01 : "10.104.198.228",
+      splw0id02 : "10.104.198.242",
+      splw0mt01 : "10.104.198.229",
+      splw0sh01 : "10.104.198.230",
+      splw0sh02 : "10.104.198.243",
+      splw0sy01 : "10.104.198.231",
+      splw0sy02 : "10.104.198.244",
 
     }
     prod = {
-      splp0cm01 : "10.104.146.194",
-      splp0hf01 : "10.104.146.195",
-      splp0hf02 : "10.104.146.196",
-      splp0id01 : "10.104.146.197",
-      splp0id02 : "10.104.146.198",
-      splp0id03 : "10.104.146.199",
-      splp0id04 : "10.104.146.200",
-      splp0mt01 : "10.104.146.201",
-      splp0sh01 : "10.104.146.202",
-      splp0sh02 : "10.104.146.203",
-      splp0sh03 : "10.104.146.204",
-      splp0sy01 : "10.104.146.205",
-      splp0sy02 : "10.104.146.206",
+      # prod tenant
+      #     prod subnet
+      #         usable 10.104.146.2  - 10.104.146.62
+      #         usable 10.104.146.66 - 10.104.146.126
+      #     spare buffer subnet
+      #         10.104.146.130 - 10.104.146.158
+      #         10.104.146.162 - 10.104.146.190
+      #     nonprod subnet
+      #         10.104.146.194 - 10.104.146.223
+      #         10.104.146.226 - 10.104.146.254
+      splp0cm01 : "10.104.146.2",
+      splp0hf01 : "10.104.146.3",
+      splp0hf02 : "10.104.146.66",
+      splp0id01 : "10.104.146.4",
+      splp0id02 : "10.104.146.67",
+      splp0id03 : "10.104.146.5",
+      splp0id04 : "10.104.146.68",
+      splp0mt01 : "10.104.146.6",
+      splp0sh01 : "10.104.146.7",
+      splp0sh02 : "10.104.146.69",
+      splp0sh03 : "10.104.146.8",
+      splp0sy01 : "10.104.146.9",
+      splp0sy02 : "10.104.146.70",
     }
   }
 }
 output "pmdns" {
   value = var.pmdns_map[var.workspace]
 }
-
-
-#variable "searchhead_ip_list_map" {
-#  description = "List of fixed IPs for searchhead instances"
-#  type = "map"
-#  default = {
-#    default = {
-#      spielwiese = [
-#        "10.104.198.137",
-#        "10.104.198.170"]
-#    }
-#    prod = {
-#      spielwiese = [
-#        "10.104.146.226",
-#        "10.104.146.242"]
-#    }
-#  }
-#}
-#output "searchhead_ip_list" {
-#  value = var.searchhead_ip_list_map[var.workspace][var.stage]
-#}
-#
-#variable "indexer_ip_list_map" {
-#  description = "List of fixed IPs for indexer instances"
-#  type = "map"
-#  default = {
-#    default = {
-#      spielwiese = [
-#        "10.104.198.138",
-#        "10.104.198.171"]
-#    }
-#    prod = {
-#      spielwiese = [
-#        "10.104.146.227",
-#        "10.104.146.243"]
-#    }
-#  }
-#}
-#output "indexer_ip_list" {
-#  value = var.indexer_ip_list_map[var.workspace][var.stage]
-#}
-#
-#variable "syslog_ip_list_map" {
-#  description = "List of fixed IPs for syslog instances"
-#  type = "map"
-#  default = {
-#    default = {
-#      spielwiese = [
-#        "10.104.198.150",
-#        "10.104.198.182"]
-#    }
-#    prod = {
-#      spielwiese = [
-#        "10.104.146.228",
-#        "10.104.146.244"]
-#    }
-#  }
-#}
-#output "syslog_ip_list" {
-#  value = var.syslog_ip_list_map[var.workspace][var.stage]
-#}

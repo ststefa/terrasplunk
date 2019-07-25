@@ -27,9 +27,9 @@ variable "name" {
 #  description = "VM IP"
 #}
 
-variable "interface" {
-  description = "Interface that VM depends on"
-}
+#variable "interface" {
+#  description = "Interface that VM depends on"
+#}
 
 variable "secgrp_id" {
   description = "Security group id"

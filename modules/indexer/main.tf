@@ -1,22 +1,28 @@
 locals {
   hot_size  = 5
   cold_size = 10
-  flavor = "s2.2xlarge.4"
+  stage_map = {
+    d : "development"
+    t : "test"
+    q : "quality"
+    p : "production"
+    w : "spielwiese"
+    u : "universal"
+  }
+  stage             = local.stage_map[substr(var.name, 3, 1)]
 }
 
+module "variables" {
+  source = "../../modules/variables"
 
-#module "variables" {
-#  source = "../../modules/variables"
-#
-#  workspace  = terraform.workspace
-#  stage      = var.stage
-#}
+  workspace  = terraform.workspace
+  stage      = local.stage
+}
 
 module "idx-instance" {
   source    = "../../modules/genericecs"
   name      = var.name
   secgrp_id = var.secgrp_id
-  flavor    = local.flavor
 }
 
 resource "opentelekomcloud_blockstorage_volume_v2" "cold1" {

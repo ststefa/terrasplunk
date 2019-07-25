@@ -1,5 +1,5 @@
 locals {
-  stage = "development"
+  stage = "qa"
 }
 
 terraform {

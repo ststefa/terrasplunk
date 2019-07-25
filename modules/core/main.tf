@@ -106,8 +106,4 @@ resource "opentelekomcloud_compute_secgroup_v2" "parser-secgrp" {
   }
 }
 
-resource "opentelekomcloud_compute_keypair_v2" "keypair" {
-  name       = "${local.project}-${var.stage}-key"
-  public_key = file("${path.module}/tsch-appl_rsa.pub")
-}
 

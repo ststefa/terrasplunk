@@ -14,10 +14,6 @@ variable "name" {
 #  description = "id of ssh access key"
 #}
 
-variable "flavor" {
-  default = "s2.2xlarge.4"
-}
-
 variable "autorecover" {
   default = "false"
 }

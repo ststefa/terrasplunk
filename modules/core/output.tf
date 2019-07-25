@@ -1,7 +1,3 @@
-output "keypair_id" {
-  value = opentelekomcloud_compute_keypair_v2.keypair.id
-}
-
 # Reference by name instead of id, see https://www.terraform.io/docs/providers/opentelekomcloud/r/compute_secgroup_v2.html#referencing-security-groups
 output "indexer-secgrp_id" {
   value = opentelekomcloud_compute_secgroup_v2.indexer-secgrp.name
