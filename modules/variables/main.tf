@@ -25,12 +25,24 @@ variable "tenant_map" {
   description = "Each stage must be represented by a single letter"
   type        = "map"
   default = {
-    default = "tsch_rz_t_001"
-    prod    = "tsch_rz_p_001"
+    default    = "tsch_rz_t_001"
+    production = "tsch_rz_p_001"
   }
 }
 output "tenant" {
   value = var.tenant_map[var.workspace]
+}
+
+variable "shared_statefile_map" {
+  description = "Each stage must be represented by a single letter"
+  type        = "map"
+  default = {
+    default    = "../../shared/terraform.tfstate"
+    production = "../../shared/terraform.tfstate.d/production/terraform.tfstate"
+  }
+}
+output "shared_statefile" {
+  value = var.shared_statefile_map[var.workspace]
 }
 
 variable "flavor_map" {
@@ -38,20 +50,20 @@ variable "flavor_map" {
   type        = "map"
   default = {
     default = {
-      development: "s2.medium.4"
-      test: "s2.medium.4"
-      quality: "s2.medium.4"
-      production: "s2.medium.8"
-      spielwiese: "s2.medium.4"
-      universal: "s2.medium.4"
+      development : "s2.medium.4"
+      test : "s2.medium.4"
+      quality : "s2.medium.4"
+      production : "s2.medium.8"
+      spielwiese : "s2.medium.4"
+      universal : "s2.medium.4"
     }
-    default = {
-      development: "s2.medium.4"
-      test: "s2.xlarge.4"
-      quality: "s2.xlarge.4"
-      production: "s2.2xlarge.4"
-      spielwiese: "s2.medium.4"
-      universal: "s2.medium.4"
+    production = {
+      development : "s2.medium.4"
+      test : "s2.xlarge.4"
+      quality : "s2.xlarge.4"
+      production : "s2.2xlarge.4"
+      spielwiese : "s2.medium.4"
+      universal : "s2.medium.4"
     }
   }
 }
@@ -70,7 +82,7 @@ variable "subnet_cidr_map" {
       netc-az1 = "10.104.198.224/28",
       netc-az2 = "10.104.198.240/28",
     }
-    prod = {
+    production = {
       neta-az1 = "10.104.146.0/26",
       neta-az2 = "10.104.146.64/26",
       netb-az1 = "10.104.146.128/27",
@@ -95,7 +107,7 @@ variable "gateway_map" {
       netc-az1 = "10.104.198.225",
       netc-az2 = "10.104.198.241",
     }
-    prod = {
+    production = {
       neta-az1 = "10.104.146.1",
       neta-az2 = "10.104.146.65",
       netb-az1 = "10.104.146.129",
@@ -139,32 +151,32 @@ variable "pmdns_map" {
       #     nonprod subnet
       #         10.104.198.226 - 10.104.198.238
       #         10.104.198.242 - 10.104.198.254
-      splp0cm01 : "10.104.198.194",
-      splp0hf01 : "10.104.198.195",
-      splp0hf02 : "10.104.198.210",
-      splp0id01 : "10.104.198.196",
-      splp0id02 : "10.104.198.211",
-      splp0id03 : "10.104.198.197",
-      splp0id04 : "10.104.198.212",
-      splp0mt01 : "10.104.198.198",
-      splp0sh01 : "10.104.198.199",
-      splp0sh02 : "10.104.198.213",
-      splp0sh03 : "10.104.198.200",
-      splp0sy01 : "10.104.198.201",
-      splp0sy02 : "10.104.198.214",
+      splp0cm00 : "10.104.198.194",
+      splp0hf00 : "10.104.198.195",
+      splp0hf01 : "10.104.198.210",
+      splp0id00 : "10.104.198.196",
+      splp0id01 : "10.104.198.211",
+      splp0id02 : "10.104.198.197",
+      splp0id03 : "10.104.198.212",
+      splp0mt00 : "10.104.198.198",
+      splp0sh00 : "10.104.198.199",
+      splp0sh01 : "10.104.198.213",
+      splp0sh02 : "10.104.198.200",
+      splp0sy00 : "10.104.198.201",
+      splp0sy01 : "10.104.198.214",
 
-      splw0cm01 : "10.104.198.226",
-      splw0hf01 : "10.104.198.227",
-      splw0id01 : "10.104.198.228",
-      splw0id02 : "10.104.198.242",
-      splw0mt01 : "10.104.198.229",
-      splw0sh01 : "10.104.198.230",
-      splw0sh02 : "10.104.198.243",
-      splw0sy01 : "10.104.198.231",
-      splw0sy02 : "10.104.198.244",
+      splw0cm00 : "10.104.198.226",
+      splw0hf00 : "10.104.198.227",
+      splw0id00 : "10.104.198.228",
+      splw0id01 : "10.104.198.242",
+      splw0mt00 : "10.104.198.229",
+      splw0sh00 : "10.104.198.230",
+      splw0sh01 : "10.104.198.243",
+      splw0sy00 : "10.104.198.231",
+      splw0sy01 : "10.104.198.244",
 
     }
-    prod = {
+    production = {
       # prod tenant
       #     prod subnet
       #         usable 10.104.146.2  - 10.104.146.62
@@ -175,19 +187,29 @@ variable "pmdns_map" {
       #     nonprod subnet
       #         10.104.146.194 - 10.104.146.223
       #         10.104.146.226 - 10.104.146.254
-      splp0cm01 : "10.104.146.2",
-      splp0hf01 : "10.104.146.3",
-      splp0hf02 : "10.104.146.66",
-      splp0id01 : "10.104.146.4",
-      splp0id02 : "10.104.146.67",
-      splp0id03 : "10.104.146.5",
-      splp0id04 : "10.104.146.68",
-      splp0mt01 : "10.104.146.6",
-      splp0sh01 : "10.104.146.7",
-      splp0sh02 : "10.104.146.69",
-      splp0sh03 : "10.104.146.8",
-      splp0sy01 : "10.104.146.9",
-      splp0sy02 : "10.104.146.70",
+      splp0cm00 : "10.104.146.2",
+      splp0hf00 : "10.104.146.3",
+      splp0hf01 : "10.104.146.66",
+      splp0id00 : "10.104.146.4",
+      splp0id01 : "10.104.146.67",
+      splp0id02 : "10.104.146.5",
+      splp0id03 : "10.104.146.68",
+      splp0mt00 : "10.104.146.6",
+      splp0sh00 : "10.104.146.7",
+      splp0sh01 : "10.104.146.69",
+      splp0sh02 : "10.104.146.8",
+      splp0sy00 : "10.104.146.9",
+      splp0sy01 : "10.104.146.70",
+
+      splw0cm00 : "10.104.146.194",
+      splw0hf00 : "10.104.146.195",
+      splw0id00 : "10.104.146.196",
+      splw0id01 : "10.104.146.226",
+      splw0mt00 : "10.104.146.197",
+      splw0sh00 : "10.104.146.198",
+      splw0sh01 : "10.104.146.227",
+      splw0sy00 : "10.104.146.199",
+      splw0sy01 : "10.104.146.228",
     }
   }
 }

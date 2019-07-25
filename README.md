@@ -67,6 +67,16 @@ The current setup does not manage the network setup. While this violates iac rul
     ```
     We can now refer to the networks by name (e.g. name="splunk-net-az1-1")
 
+# Code architecture
+
+To understand the reasoning for the code layout it might be helpful to know the preconditions:
+
+1. We use two perfectly symetric setups on two different tenants
+2. We don't have DNS as an OTC feature on our OTC-private installation
+3. Number of searchhead, indexers, ... must be easily extendable
+4. The definition of the network is shared among stages due to IP range limitations
+5. Stages are not identical. E.g. the production stage contains different systems than the test change (i.e. not just by number but also by structure). There are for example no indexer instances on the qa stage.
+
 # Usage
 
 ## General
