@@ -14,8 +14,3 @@ output "az" {
   description = "availibility zone"
   value       = opentelekomcloud_compute_instance_v2.instance.availability_zone
 }
-#output "opt_attach" {
-#  description = "attach.opt"
-#  value       = opentelekomcloud_compute_volume_attach_v2.opt_attach.device
-#}
-

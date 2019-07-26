@@ -1,10 +1,3 @@
-#module "variables" {
-#  source = "../../modules/variables"
-#
-#  workspace  = terraform.workspace
-#  stage      = var.stage
-#}
-
 locals {
   stage_map = {
     d : "development"

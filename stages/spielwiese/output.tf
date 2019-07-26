@@ -1,4 +1,4 @@
-# outputs are just for testing pupose and are (currently) not referenced by anything. Might be referenced by provisioning later on. But provisioning might as well take values directly from terraform.tfstate files.
+# outputs are just for testing pupose and are (currently) not referenced by anything. Might be referenced by provisioning later on. Alternatively provisioning might as well take values directly from terraform.tfstate files.
 
 output "indexer1_id" {
   value = module.indexer1.id

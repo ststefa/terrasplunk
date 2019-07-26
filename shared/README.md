@@ -101,7 +101,7 @@ Foreign state differs from the use of modules in that a module does not have sta
 
 # Manual tweaking of network objects
 
-The current setup does not (yet) manage the network setup. While this violates "Infrastructure As Code" (IAC) rules ("everything is code") it is currently setup like that because we are jump-start beginners who a supposed to create production grade infrastructure. So we opted out of managing the most crucial components for now. As a result, some manual prepwork regarding the networks needs to be done. Details on how to setup the network components reach beyond the scope of this readme and are online outlined here. Documented test code for managing VPC networks can be found at https://gitlab-tss.sbb.ch/ssteine2/vpctest.
+The current setup does not (yet) manage the network setup. While this violates "Infrastructure As Code" (IAC) rules ("everything is code") it is currently setup like that because we are jump-start beginners who a supposed to create production grade infrastructure. So we opted out of managing the most crucial components for now. As a result, some manual prepwork regarding the networks needs to be done. Details on how to setup the network components reach beyond the scope of this readme and are only outlined here. Documented test code for managing VPC networks can be found at https://gitlab-tss.sbb.ch/ssteine2/vpctest.
 
 1. Using the OTC web gui, create a new VPC "splunk-vpc" with six subnets. Place the vpc *inside* the splunk project eu-ch_splunk and not on the top level eu-ch. The subnets should be named "splunk-subnet[abc]-az1" in AZ1 and "splunk-subnet[abc]-az2" in AZ2.
 2. Create a vpc peering "splunk-peering" between the splunk-vpc and the tenants hub vpc (e.g. tsch_rz_t_hub).

@@ -1,17 +1,6 @@
-#variable "stage" {
-# description = "dev / test / ..."
-#}
-
-variable "name" {
-  description = "Name of the instance"
-}
-
+# do not allow az as parameter to guarantee strict placement logic based on name
 #variable "az" {
 #  description = "Availability zone"
-#}
-
-#variable "keypair_id" {
-#  description = "id of ssh access key"
 #}
 
 variable "autorecover" {
@@ -19,13 +8,9 @@ variable "autorecover" {
   default = "false"
 }
 
-#variable "network_id" {
-#  description = "Network id"
-#}
-#
-#variable "interface" {
-#  description = "Interface that VM depends on. If omitted, provisioning might fail beause the VM is accessed earlier then the network is built"
-#}
+variable "name" {
+  description = "Name of the instance"
+}
 
 variable "secgrp_id" {
   description = "Security group id"

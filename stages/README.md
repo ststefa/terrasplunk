@@ -3,9 +3,9 @@ The `stages` directory contains several distinct parts of the infrastructure. Th
 # Tenants
 We use two tenants, test and production.
 
-Prod tenant will be used for (and only for) all customer-facing components with uptime 24/7.
+The production tenant will be used for (and only for) all customer-facing components with uptime 24/7.
 
-Test Tenant will be used for (and only for) non-customer-facing components, tests and experimentation. Each stage on prod-tenant has an equivalent stage on test-tenant with uptime as required, environments recycled frequently.
+The test tenant will be used for (and only for) non-customer-facing components, tests and experimentation. Each stage on the prod-tenant has an equivalent stage on test-tenant. Everything on the test tenant has a collaborative best-effort uptime. Environments will be completely recycled frequently.
 
 # Stages
 ## development stage

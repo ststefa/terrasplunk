@@ -1,35 +1,11 @@
-#variable "stage" {
-#  description = "dev / apptest / ..."
+# do not allow autorecover for indexers
+#variable "autorecover" {
+#  default = "false"
 #}
 
 variable "name" {
   description = "Name of the instance"
 }
-
-#variable "number" {
-#  description = "Sequential number of indexer instance"
-#}
-
-#variable "keypair_id" {
-#  description = "id of ssh access key"
-#}
-
-# force all indexers be same size
-#variable "flavor" {
-#  default = "s2.medium.4"
-#}
-
-#variable "network_id" {
-#  description = "Network id"
-#}
-
-#variable "ip" {
-#  description = "VM IP"
-#}
-
-#variable "interface" {
-#  description = "Interface that VM depends on"
-#}
 
 variable "secgrp_id" {
   description = "Security group id"
