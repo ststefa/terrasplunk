@@ -20,16 +20,21 @@ Foreign state differs from the use of modules in that a module does not have sta
         10.104.198.192/28 (usable 10.104.198.194 - 10.104.198.206, 13 IPs)
         10.104.198.208/28 (usable 10.104.198.210 - 10.104.198.222, 13 IPs)
     
-        Searchhead area
-            Searchhead cluster prod (2*1)+1
-            Searchhead cluster preprod (2*1)+1
-            Searchhead cluster ITSI (2*1)+1
-            Searchhead cluster ES (2*1)+1
-        Indexer area
-            Indexer prod (2*2)
-        Supplemental area
+        Searchhead area (2*4)
+            Searchhead cluster prod (2*1)
+            Searchhead cluster preprod (2*1)
+            Searchhead cluster ITSI (2*1)
+            Searchhead cluster ES (2*1)
+        Indexer area (2*1)
+            Indexer prod (2*1)
+        Supplemental area (2*6)
             Heavy Forwarder prod (2*1)
             syslog (2*1)
+            License Master + Deployment Server + Monitor Console  ("tool-ts") (1*1)
+            Cluster Master (1*1)
+            Monitoring? (2*1)
+            <DNS? (2*1)>
+            ... more splunk things?
 
     spare buffer subnet ("netb")
         no space for that :-(
@@ -39,12 +44,12 @@ Foreign state differs from the use of modules in that a module does not have sta
         10.104.198.224/28 (usable 10.104.198.226 - 10.104.198.238, 13 IPs)
         10.104.198.240/28 (usable 10.104.198.242 - 10.104.198.254, 13 IPs)
 
-        Searchhead area
-            Searchhead cluster test (2*1)
-        Indexer area
-            Indexer test (2*1)
-        Dev System Area
-        Supplemental area
+        Searchhead area (2*2)
+            Searchhead cluster test (2*2)
+        Indexer area (2*2)
+            Indexer test (2*2)
+        Dev System Area (2*1)
+        Supplemental area (2*1)
             Heavy Forwarder test (2*1)
 
 
@@ -56,17 +61,17 @@ Foreign state differs from the use of modules in that a module does not have sta
         10.104.146.0/26 (usable 10.104.146.2 - 10.104.146.62, 61 IPs)
         10.104.146.64/26 (usable 10.104.146.66 - 10.104.146.126, 61 IPs)
 
-        Searchhead area (2*14)
+        Searchhead area (2*12)
             either
-                Searchhead cluster prod+ITSI (2*8)+1
+                Searchhead cluster prod+ITSI (2*8)
             or
-                Searchhead cluster prod  (2*5)+1
-                Searchhead cluster ITSI (2*3)+1
-            Searchhead cluster preprod (2*3)+1
-            Searchhead cluster ES (2*1)+1
+                Searchhead cluster prod  (2*5)
+                Searchhead cluster ITSI (2*3)
+            Searchhead cluster preprod (2*3)
+            Searchhead cluster ES (2*1)
         Indexer area (2*20)
             Indexer prod (2*20)
-        Supplemental area (2*12)?
+        Supplemental area (2*13)?
             Heavy Forwarder prod (2*5)
             syslog (2*4)
             License Master + Deployment Server + Monitor Console  ("tool-ts") (1*1)
@@ -90,7 +95,7 @@ Foreign state differs from the use of modules in that a module does not have sta
             Searchhead cluster test (2*2)
         Indexer area (2*5)
             Indexer test (2*5)
-        Dev System Area (2*20)
+        Dev System Area (2*10)
         Supplemental area (2*5)
             Heavy Forwarder test (2*5)
 
@@ -98,11 +103,11 @@ Foreign state differs from the use of modules in that a module does not have sta
 
 The current setup does not (yet) manage the network setup. While this violates "Infrastructure As Code" (IAC) rules ("everything is code") it is currently setup like that because we are jump-start beginners who a supposed to create production grade infrastructure. So we opted out of managing the most crucial components for now. As a result, some manual prepwork regarding the networks needs to be done. Details on how to setup the network components reach beyond the scope of this readme and are online outlined here. Documented test code for managing VPC networks can be found at https://gitlab-tss.sbb.ch/ssteine2/vpctest.
 
-1. Using the OTC web gui, create a new VPC "splunk-vpc" with all the subnets. The vpc should be located *inside* the splunk project eu-ch_splunk and not on the top level eu-ch. The subnets should be named "splunk-subnet[abc]-az[12]".
+1. Using the OTC web gui, create a new VPC "splunk-vpc" with six subnets. Place the vpc *inside* the splunk project eu-ch_splunk and not on the top level eu-ch. The subnets should be named "splunk-subnet[abc]-az1" in AZ1 and "splunk-subnet[abc]-az2" in AZ2.
 2. Create a vpc peering "splunk-peering" between the splunk-vpc and the tenants hub vpc (e.g. tsch_rz_t_hub).
 3. Accept the peering request on the tenants hub vpc.
-4. Add the peer routing. This is 0.0.0.0/0 as a local route and the dedicated ip range (e.g. 10.104.146.0/24) of the peer vpc as a peer route.
-5. The VPC construct on OTC is an attempt to shortcut the creation of openstack router, network and subnet. It tries to simplify this by making the network creation implicit. Unfortunately this has the ugly side effect that the networks are all named like the vpc which makes them hard to reference in terraform code:
+4. Add the peer routing. This is 0.0.0.0/0 as a local route and the dedicated ip range of the peer vpc (e.g. 10.104.146.0/24 in case of the prod vpc) as a peer route.
+5. The VPC construct on OTC is an attempt to shortcut the creation of openstack router, network and subnet. It tries to simplify this by making the network creation implicit. Unfortunately this has the side effect that the networks are all named like the vpc which makes them hard to reference in terraform code:
 
     ```
     $ openstack --os-cloud otc-sbb-p network list
@@ -117,7 +122,7 @@ The current setup does not (yet) manage the network setup. While this violates "
     | f1ff2600-d4e4-4c0a-8851-e9603e6dcbc3 | a3c29b56-571b-4346-9252-68693a2909bf | c7f4430a-1d99-4eb3-b962-0c4c42b36218 |
     +--------------------------------------+--------------------------------------+--------------------------------------+
     ```
-    However we need to reference the network in several places like e.g. the ECS network config. It is fragile to reference them by id because ids (apart from being unreadable) should generally be considered ephemeral. We could reference by CIDR but that seems error prone. Therefore, we rename them in analogy to the subnets in order to make them easier to reference. This approach has the ugly drawback that it violates iac "everything is code" rule as it cannot be done with terraform itself but has to be done with the openstack cli:
+    However we need to reference the network in several places like e.g. the ECS network config. It is fragile to reference them by id because ids (apart from being unreadable) should generally be considered ephemeral. They could be referenced by CIDR but that seems error prone. Therefore, we rename them in analogy to the subnets in order to make them more intuitive to reference. This approach has the ugly drawback that it violates iac "everything is code" rule as it cannot be done with terraform itself but has to be done with the openstack cli:
 
     ```
     $ openstack --os-cloud otc-sbb-p subnet list
