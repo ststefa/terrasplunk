@@ -42,9 +42,11 @@ data "opentelekomcloud_images_image_v2" "osimage" {
 
 resource "opentelekomcloud_compute_instance_v2" "instance" {
   availability_zone   = local.availability_zone
-  flavor_name         = module.variables.flavor[local.stage]
+  flavor_name         = module.variables.flavor
   name                = var.name
   key_pair            = data.terraform_remote_state.shared.outputs["keypair-tss_id"]
+  # Attention! Any change (even comments) to user_data will rebuild the VM. Use only for the most stable and basic tasks!
+  #user_data         = "${data.template_file.provtest.rendered}"
   security_groups     = [var.secgrp_id]
   stop_before_destroy = true
   auto_recovery       = var.autorecover
@@ -58,7 +60,7 @@ resource "opentelekomcloud_compute_instance_v2" "instance" {
   block_device {
     uuid                  = data.opentelekomcloud_images_image_v2.osimage.id
     source_type           = "image"
-    volume_size           = 20
+    volume_size           = module.variables.pvsize_root
     boot_index            = 0
     destination_type      = "volume"
     delete_on_termination = true
@@ -68,11 +70,20 @@ resource "opentelekomcloud_compute_instance_v2" "instance" {
 resource "opentelekomcloud_blockstorage_volume_v2" "opt" {
   availability_zone = local.availability_zone
   name              = "${var.name}-opt"
-  size              = var.opt_size
+  size              = module.variables.pvsize_opt
 }
 
 resource "opentelekomcloud_compute_volume_attach_v2" "opt_attach" {
   instance_id = opentelekomcloud_compute_instance_v2.instance.id
   volume_id   = opentelekomcloud_blockstorage_volume_v2.opt.id
   depends_on  = [opentelekomcloud_compute_instance_v2.instance]
+}
+
+data "template_file" "provtest" {
+  template = "${file("${path.module}/templates/cloudinit.tpl")}"
+
+  vars = {
+    fqdn = "${var.name}.sbb.ch"
+    hostname = "${var.name}"
+  }
 }

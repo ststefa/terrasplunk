@@ -18,7 +18,7 @@
 #  }
 #}
 #output "stage_letter" {
-#  value = var.stage_letter_map
+#  value = var.stage_letter_map[var.stage]
 #}
 
 variable "tenant_map" {
@@ -68,7 +68,23 @@ variable "flavor_map" {
   }
 }
 output "flavor" {
-  value = var.flavor_map[var.workspace]
+  value = var.flavor_map[var.workspace][var.stage]
+}
+
+output "pvsize_root" {
+  value = 20
+}
+
+output "pvsize_opt" {
+  value = 20
+}
+
+output "pvsize_hot" {
+  value = 5
+}
+
+output "pvsize_cold" {
+  value = 10
 }
 
 variable "subnet_cidr_map" {
@@ -78,7 +94,7 @@ variable "subnet_cidr_map" {
     default = {
       neta-az1 = "10.104.198.192/28",
       neta-az2 = "10.104.198.208/28",
-      # no space for buffer
+      # no space for buffer :-(
       netc-az1 = "10.104.198.224/28",
       netc-az2 = "10.104.198.240/28",
     }
@@ -103,7 +119,7 @@ variable "gateway_map" {
     default = {
       neta-az1 = "10.104.198.193",
       neta-az2 = "10.104.198.209",
-      # no space for buffer
+      # no space for buffer :-(
       netc-az1 = "10.104.198.225",
       netc-az2 = "10.104.198.241",
     }

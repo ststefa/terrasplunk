@@ -1,5 +1,5 @@
 #variable "stage" {
-# description = "dev / apptest / ..."
+# description = "dev / test / ..."
 #}
 
 variable "name" {
@@ -15,11 +15,8 @@ variable "name" {
 #}
 
 variable "autorecover" {
+  description = "Whether the VM should do magic OTC failover"
   default = "false"
-}
-
-variable "opt_size" {
-  default = 20
 }
 
 #variable "network_id" {
