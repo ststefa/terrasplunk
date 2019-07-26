@@ -2,10 +2,10 @@ The `shared` module is a place where we can put parts of the infrastructure whic
 
 Don't get confused by the diametrical use of the terms "local" and "remote". Terraform documentation uses them to differentiate between a `terraform.tfstate` file which is stored on the local filesystem as opposed to storing it on a remote location like Amazon S3. At the same time the terms are also used to differentiate the "owned read-write" state (e.g. in the current directory) and the "imported read-only" state (e.g. in a different directory). For clarity I'll refer to this not as remote but instead as `foreign state` Thus "foreign local state" is "read-only state stored in another directory locally on the system."
 
-Foreign state differs from the use of modules in that a module does not have state and needs to be "instantiated" to use it. However instantiating a module also creates the resources defined in it. This means that values from a module cannot be used without instantiating it which is not always possible. Remote state, on the other hand, allows to refer to infrastructure objects whose state is kept elsewhere. In our case we use this to reference objects which are shared among all stages. This directory should contain as few resources as possible which expresses minimal shared state between stages.
+Foreign state differs from the use of modules in that a module does not have state and needs to be "instantiated" to use it. However instantiating a module also creates the resources defined in it. This means that values from a module cannot be used without instantiating it which is not always possible. Foreign state, on the other hand, allows to refer to infrastructure objects whose state is kept elsewhere. In our case we use this to reference objects which are shared among all stages. This directory should contain as few resources as possible which expresses minimal shared state between stages.
 
 
-# Stage subnets and IP ranges
+# IP capacity planning
 ## Test tenant
     Total subnet: 10.104.198.192/26
 
@@ -16,23 +16,14 @@ Foreign state differs from the use of modules in that a module does not have sta
         10.104.198.208/28 (usable 10.104.198.210 - 10.104.198.222, 13 IPs)
     
         Searchhead area
-    
             Searchhead cluster prod (2*1)+1
-
             Searchhead cluster preprod (2*1)+1
-          
             Searchhead cluster ITSI (2*1)+1
-
             Searchhead cluster ES (2*1)+1
-
         Indexer area
-
             Indexer prod (2*2)
-
         Supplemental area
-        
             Heavy Forwarder prod (2*1)
-            
             syslog (2*1)
 
     spare buffer subnet ("netb")
@@ -44,17 +35,11 @@ Foreign state differs from the use of modules in that a module does not have sta
         10.104.198.240/28 (usable 10.104.198.242 - 10.104.198.254, 13 IPs)
 
         Searchhead area
-        
             Searchhead cluster test (2*1)
-
         Indexer area
-        
             Indexer test (2*1)
-
         Dev System Area
-
         Supplemental area
-        
             Heavy Forwarder test (2*1)
 
 
@@ -67,34 +52,22 @@ Foreign state differs from the use of modules in that a module does not have sta
         10.104.146.64/26 (usable 10.104.146.66 - 10.104.146.126, 61 IPs)
 
         Searchhead area (2*14)
-
-            Searchhead cluster prod+ITSI (2*8)+1
+            either
+                Searchhead cluster prod+ITSI (2*8)+1
             or
-            Searchhead cluster prod  (2*5)+1
-            Searchhead cluster ITSI (2*3)+1
-
+                Searchhead cluster prod  (2*5)+1
+                Searchhead cluster ITSI (2*3)+1
             Searchhead cluster preprod (2*3)+1
-
             Searchhead cluster ES (2*1)+1
-
         Indexer area (2*20)
-
             Indexer prod (2*20)
-
         Supplemental area (2*12)?
-
             Heavy Forwarder prod (2*5)
-
             syslog (2*4)
-
             License Master + Deployment Server + Monitor Console  ("tool-ts") (1*1)
-
             Cluster Master (1*1)
-
             Monitoring? (2*1)
-
             <DNS? (2*1)>
-
             ... more splunk things?
 
     spare buffer subnet ("netb")
@@ -109,17 +82,11 @@ Foreign state differs from the use of modules in that a module does not have sta
         10.104.146.224/27 (usable 10.104.146.226 - 10.104.146.254, 29 IPs)
 
         Searchhead area (2*2)
-
             Searchhead cluster test (2*2)
-
         Indexer area (2*5)
-
             Indexer test (2*5)
-
         Dev System Area (2*20)
-
         Supplemental area (2*5)
-
             Heavy Forwarder test (2*5)
 
 # Manual tweaking of network objects
