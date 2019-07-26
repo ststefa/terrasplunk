@@ -88,7 +88,7 @@ Basic terraform setup
 ### ...on the test tenant
 
 - Create shared resources first:
-    - `cd stages/shared`
+    - `cd shared`
     - Work through README.md for required manual network setup
     - `terraform init`
     - `terraform plan`
@@ -104,7 +104,7 @@ Don't break stuff on the production tenant. Feel free to break everything on the
 ### ...on the production tenant
 
 - Create shared resources first:
-    - `cd stages/shared`
+    - `cd shared`
     - Work through README.md for required manual network setup
     - `terraform workspace new production`
     - `terraform workspace select production`
@@ -120,7 +120,7 @@ Don't break stuff on the production tenant. Feel free to break everything on the
     - `terraform apply`
 
 # Provisioning
-Once the base infrastructure has been created with terraform the next most important step is the provisioning. Provisioing is a term commonly used for the process of turning the empty infrastructure into its real, usable state. It encompasses all the steps required from installing and configuring software, through configuring the relations between instances, to finally setting up and managing entry- and exit-points of the platform. A key point must be to ensure that this entire process is automated without exception.
+Once the base infrastructure has been created with terraform the next most important step is the provisioning. Provisioing is a term commonly used for the process of turning the empty infrastructure into its real, usable state. It encompasses all the steps required from installing and configuring software, through configuring the relations between instances, to finally setting up and managing entry- and exit-points of the platform. A key point must be to ensure that this entire process is automated without exception so that rebuilds can be fluent and without human intervention.
 
 Multiple approaches how this can be done are available and there is (afaik) currently no proven and generally applicable "best of breed" solution. Oftentimes state definition tools like salt or puppet are used. Some prefer a more procedural way using ansible or plain bash. There are also tools like `packer` (https://www.packer.io/) which aim to use preconfigured images. Each of these have their pros and cons which are outside of the scope of this README.
 
