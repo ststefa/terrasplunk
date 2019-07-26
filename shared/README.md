@@ -1,6 +1,11 @@
 The `shared` module is a place where we can put parts of the infrastructure which are shared across all stages and which profit from having their own state. Other parts of the code are able to access this state using "foreign local" state.
 
-Don't get confused by the diametrical use of the terms "local" and "remote". Terraform documentation uses them to differentiate between a `terraform.tfstate` file which is stored on the local filesystem as opposed to storing it on a remote location like Amazon S3. At the same time the terms are also used to differentiate the "owned read-write" state (e.g. in the current directory) and the "imported read-only" state (e.g. in a different directory). For clarity I'll refer to this not as remote but instead as `foreign state` Thus "foreign local state" is "read-only state stored in another directory locally on the system."
+Don't get confused by the redundant use of the terms "local" and "remote". Terraform documentation uses them to
+
+- differentiate between a `terraform.tfstate` file which is stored on the local filesystem as opposed to storing it on a remote location like Amazon S3
+- differentiate the "owned read-write" state (e.g. in the current directory) and the "imported read-only" state (e.g. in a different directory). For clarity I'll refer to this not as remote state but instead as `foreign state`.
+
+Thus "foreign local state" is "read-only state stored in another directory locally on the system."
 
 Foreign state differs from the use of modules in that a module does not have state and needs to be "instantiated" to use it. However instantiating a module also creates the resources defined in it. This means that values from a module cannot be used without instantiating it which is not always possible. Foreign state, on the other hand, allows to refer to infrastructure objects whose state is kept elsewhere. In our case we use this to reference objects which are shared among all stages. This directory should contain as few resources as possible which expresses minimal shared state between stages.
 
