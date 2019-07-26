@@ -8,7 +8,7 @@ with open('terraform.tfstate', 'r') as f:
 
 result = {'roles': {'indexers': [], 'searchheads': []}, 'hosts': [], 'configs': []}
 
-for instance in jsonpath.jsonpath(tfstate, "$.resources[?(@.type=='openstack_compute_instance_v2')]"):
+for instance in jsonpath.jsonpath(tfstate, "$.resources[?(@.type=='opentelekomcloud_compute_instance_v2')]"):
     result['roles']['indexers'].append(instance['instances'][0]['attributes']['name'])
     result['hosts'].append(instance['instances'][0]['attributes']['name'])
     config = {}
@@ -19,7 +19,7 @@ for instance in jsonpath.jsonpath(tfstate, "$.resources[?(@.type=='openstack_com
     #print("$.resources[?(@.type=='openstack_compute_volume_attach_v2')].instances[0].attributes[?(@.instance_id=='%s')]" % config['id'])
 
     attach_dict = {}
-    for attach in jsonpath.jsonpath(tfstate, "$.resources[?(@.type=='openstack_compute_volume_attach_v2')]"):
+    for attach in jsonpath.jsonpath(tfstate, "$.resources[?(@.type=='opentelekomcloud_compute_volume_attach_v2')]"):
         #print(attach['instances'][0]['attributes']['device']+','+attach['instances'][0]['attributes']['instance_id'])
         if attach['instances'][0]['attributes']['instance_id'] == instance['instances'][0]['attributes']['id']:
             attach_dict[attach['name']]=attach['instances'][0]['attributes']['device']
