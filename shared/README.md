@@ -122,7 +122,7 @@ The current setup does not (yet) manage the network setup. While this violates "
     | f1ff2600-d4e4-4c0a-8851-e9603e6dcbc3 | a3c29b56-571b-4346-9252-68693a2909bf | c7f4430a-1d99-4eb3-b962-0c4c42b36218 |
     +--------------------------------------+--------------------------------------+--------------------------------------+
     ```
-    However we need to reference the network in several places like e.g. the ECS network config. It is fragile to reference them by id because ids (apart from being unreadable) should generally be considered ephemeral. They could be referenced by CIDR but that seems error prone. Therefore, we rename them in analogy to the subnets in order to make them more intuitive to reference. This approach has the ugly drawback that it violates iac "everything is code" rule as it cannot be done with terraform itself but has to be done with the openstack cli:
+    However we need to reference the network in several places like e.g. the ECS network config. It is fragile to reference them by id because ids (apart from being unreadable) should generally be considered ephemeral. They could be referenced by CIDR but that seems error prone. Therefore, we rename them in analogy to the subnets in order to make them more intuitive to reference. This approach has the ugly drawback that it violates iac "everything is code" rule because it cannot be done with terraform itself. But as we do not currently manage the network objects with terraform anyway this seems acceptable. We need the openstack cli to do this:
 
     ```
     $ openstack --os-cloud otc-sbb-p subnet list
@@ -137,12 +137,12 @@ The current setup does not (yet) manage the network setup. While this violates "
     | e02e6bc6-7bfe-42ff-8bf9-88cdfcfc2e9f | splunk-subnetb-az1 | ea9cf6ee-ecd7-4166-bbb1-337b784ef508 | 10.104.146.128/27 |
     +--------------------------------------+--------------------+--------------------------------------+-------------------+
     
-    $ openstack --os-cloud otc-sbb-t network set --name splunk-neta-az1 2b842d2f-1331-451d-b35a-78ca61752294
-    $ openstack --os-cloud otc-sbb-t network set --name splunk-neta-az2 f1ff2600-d4e4-4c0a-8851-e9603e6dcbc3
-    $ openstack --os-cloud otc-sbb-t network set --name splunk-netb-az1 ea9cf6ee-ecd7-4166-bbb1-337b784ef508
-    $ openstack --os-cloud otc-sbb-t network set --name splunk-netb-az2 25abde7a-d8d2-444e-8c9f-78bb113ffa5b
-    $ openstack --os-cloud otc-sbb-t network set --name splunk-netc-az1 531e6c12-f773-4550-91ec-b4addc2c8c3a
-    $ openstack --os-cloud otc-sbb-t network set --name splunk-netc-az2 89a7ec0e-891f-4b24-9979-b10c0334e14d
+    $ openstack --os-cloud otc-sbb-p network set --name splunk-neta-az1 2b842d2f-1331-451d-b35a-78ca61752294
+    $ openstack --os-cloud otc-sbb-p network set --name splunk-neta-az2 f1ff2600-d4e4-4c0a-8851-e9603e6dcbc3
+    $ openstack --os-cloud otc-sbb-p network set --name splunk-netb-az1 ea9cf6ee-ecd7-4166-bbb1-337b784ef508
+    $ openstack --os-cloud otc-sbb-p network set --name splunk-netb-az2 25abde7a-d8d2-444e-8c9f-78bb113ffa5b
+    $ openstack --os-cloud otc-sbb-p network set --name splunk-netc-az1 531e6c12-f773-4550-91ec-b4addc2c8c3a
+    $ openstack --os-cloud otc-sbb-p network set --name splunk-netc-az2 89a7ec0e-891f-4b24-9979-b10c0334e14d
     
     $ openstack --os-cloud otc-sbb-p network list
     +--------------------------------------+--------------------+--------------------------------------+
@@ -157,4 +157,4 @@ The current setup does not (yet) manage the network setup. While this violates "
     | 0a2228f2-7f8a-45f1-8e09-9039e1d09975 | admin_external_net | f2da9b91-3cc1-4dde-a5f7-a603aa65a2c1 |
     +--------------------------------------+--------------------+--------------------------------------+
     ```
-    We can now refer to the networks by name (e.g. name="splunk-net-az1-1")
+    We can now refer to the networks by name (e.g. name="splunk-neta-az1")
