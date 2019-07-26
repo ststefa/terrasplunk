@@ -99,8 +99,6 @@ Basic terraform setup
     - `terraform plan`
     - `terraform apply`
 
-Don't break stuff on the production tenant. Feel free to break everything on the test tenant. I.e. do not just yet create the terraform "production" workspace until you know what you're doing. As long as you stick with the default terraform workspace you can only break things on the test tenant. This is fine.
-
 ### ...on the production tenant
 
 - Create shared resources first:
@@ -118,6 +116,10 @@ Don't break stuff on the production tenant. Feel free to break everything on the
     - `terraform init`
     - `terraform plan`
     - `terraform apply`
+
+Don't break stuff on the production tenant! Feel free to break everything on the test tenant. I.e. do not just yet create the terraform production workspace until you know what you're doing. As long as you stick with the default terraform workspace you can only break things on the test tenant. This is fine.
+
+As an additional security net you should use different credentials on the test and prod tenant. This will safe you from accidentally using the wrong workspace.
 
 # Provisioning
 Once the base infrastructure has been created with terraform the next most important step is the provisioning. Provisioing is a term commonly used for the process of turning the empty infrastructure into its real, usable state. It encompasses all the steps required from installing and configuring software, through configuring the relations between instances, to finally setting up and managing entry- and exit-points of the platform. A key point must be to ensure that this entire process is automated without exception so that rebuilds can be fluent and without human intervention.

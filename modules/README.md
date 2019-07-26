@@ -14,6 +14,6 @@ The `genericecs` can be used directly in the stage definitions. If other types o
 Contains the definition for a single indexer instance which is a basic instance with additional disks attached. It uses the `genericecs` module internally so that the same rules apply. Multiple instaces of this module are instantiated on every stage.
 
 # `variables`
-Centralizes all parameters which differ between tenants and stages. It encapsulates both differentiation axes (tenant axis and stage axis). E.g. a "prod-tenant/prod-stage" VM may have a different flavor than a "prod-tenant/test-stage" VM may have a different flavor than a "test-tenant/prod-stage" VM.
+Centralizes all parameters which differ between tenants and stages. It encapsulates both differentiation axes (*tenant axis* and *stage axis*). E.g. a "prod-tenant/prod-stage" VM may have a different flavor than a "prod-tenant/test-stage" VM may have a different flavor than a "test-tenant/prod-stage" VM.
 
 Values in `variables` can be divided by any (or no) axes which is achieved by corresponding nesting of values. Use as appropriate.
