@@ -46,6 +46,36 @@ output "shared_statefile" {
 }
 
 variable "flavor_map" {
+  #$ openstack --os-cloud otc-sbb-t flavor list
+  #+--------------+--------------+--------+------+-----------+-------+-----------+
+  #| ID           | Name         |    RAM | Disk | Ephemeral | VCPUs | Is Public |
+  #+--------------+--------------+--------+------+-----------+-------+-----------+
+  #| s2.2xlarge.1 | s2.2xlarge.1 |   8192 |    0 |         0 |     8 | True      |
+  #| s2.2xlarge.2 | s2.2xlarge.2 |  16384 |    0 |         0 |     8 | True      |
+  #| s2.2xlarge.4 | s2.2xlarge.4 |  32768 |    0 |         0 |     8 | True      |
+  #| s2.2xlarge.8 | s2.2xlarge.8 |  65536 |    0 |         0 |     8 | True      |
+  #| s2.4xlarge.1 | s2.4xlarge.1 |  16384 |    0 |         0 |    16 | True      |
+  #| s2.4xlarge.2 | s2.4xlarge.2 |  32768 |    0 |         0 |    16 | True      |
+  #| s2.4xlarge.4 | s2.4xlarge.4 |  65536 |    0 |         0 |    16 | True      |
+  #| s2.4xlarge.8 | s2.4xlarge.8 | 131072 |    0 |         0 |    16 | True      |
+  #| s2.8xlarge.1 | s2.8xlarge.1 |  32768 |    0 |         0 |    32 | True      |
+  #| s2.8xlarge.2 | s2.8xlarge.2 |  65536 |    0 |         0 |    32 | True      |
+  #| s2.8xlarge.4 | s2.8xlarge.4 | 131072 |    0 |         0 |    32 | True      |
+  #| s2.8xlarge.8 | s2.8xlarge.8 | 262144 |    0 |         0 |    32 | True      |
+  #| s2.large.1   | s2.large.1   |   2048 |    0 |         0 |     2 | True      |
+  #| s2.large.2   | s2.large.2   |   4096 |    0 |         0 |     2 | True      |
+  #| s2.large.4   | s2.large.4   |   8192 |    0 |         0 |     2 | True      |
+  #| s2.large.8   | s2.large.8   |  16384 |    0 |         0 |     2 | True      |
+  #| s2.medium.1  | s2.medium.1  |   1024 |    0 |         0 |     1 | True      |
+  #| s2.medium.2  | s2.medium.2  |   2048 |    0 |         0 |     1 | True      |
+  #| s2.medium.4  | s2.medium.4  |   4096 |    0 |         0 |     1 | True      |
+  #| s2.medium.8  | s2.medium.8  |   8192 |    0 |         0 |     1 | True      |
+  #| s2.xlarge.1  | s2.xlarge.1  |   4096 |    0 |         0 |     4 | True      |
+  #| s2.xlarge.2  | s2.xlarge.2  |   8192 |    0 |         0 |     4 | True      |
+  #| s2.xlarge.4  | s2.xlarge.4  |  16384 |    0 |         0 |     4 | True      |
+  #| s2.xlarge.8  | s2.xlarge.8  |  32768 |    0 |         0 |     4 | True      |
+  #+--------------+--------------+--------+------+-----------+-------+-----------+
+
   description = "VM sizes to use"
   type        = "map"
   default = {

@@ -29,7 +29,8 @@ To understand the reasoning for the code layout it might be helpful to know the 
 ## Design goals
 - Safe ourselves from making catastrophic mistakes
 - Be flexible towards expected changes as far as possible
-- Be DRY (https://en.wikipedia.org/wiki/Don%27t_repeat_yourself)
+- Be DRY / avoid redundancy
+- Minimize risk of human error / consistency through code
 
 ## Project layout
 The project is structured into several parts
