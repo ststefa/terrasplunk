@@ -48,7 +48,7 @@ Each terraform directory/module is structured in a default layout as proposed by
 - `main.tf` contains the infrastructure objects
 - `output.tf` contains the output parameters which can be referenced by other objects
 
-Changes between tenants and stages are factored out into the `variables` module as much as possible. It encapsulates e.g. changes in IP adresses or tenant names. By doing so it becomes somewhat safer to compose code in the stages. For further details see `modules/README.md`
+Changes between tenants and stages are factored out into the `variables` module as much as possible. It encapsulates e.g. changes in IP addresses or tenant names. By doing so it becomes somewhat safer to compose code in the stages. For further details see `modules/README.md`
 
 
 # Usage
@@ -131,6 +131,6 @@ A key requirement is that arbitrary data from terraform can be passed to the pro
 
 I currently see two approaches to pass arbitrary data to the provisioning:
 
-- Keep the terraform step separate from the provisioning step by first building everything up with terraform and then using some code to use the terraform state as an input. The terraform state contains a complete description of all parameters. This has the drawback of having two seperate processes which might complicate automation.
+- Keep the terraform step separate from the provisioning step by first building everything up with terraform and then using some code to use the terraform state as an input. The terraform state contains a complete description of all parameters. This has the drawback of having two separate processes which might complicate automation.
 
 - Uses terraform `local-exec` provisioners which create parameter files. Any resource can add to this parameter files. A separate provisioning process can use it as input data to perform the provisioning. While this might make it possible to couple terraforming and provisioning closer together it might also make the terraform code more complicated.
