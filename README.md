@@ -108,6 +108,7 @@ Basic terraform setup
     - `terraform workspace new production`
     - `terraform workspace select production`
     - `terraform init`
+    - `terraform refresh`
     - `terraform plan`
     - `terraform apply`
 - Create any stage
@@ -115,6 +116,7 @@ Basic terraform setup
     - `terraform workspace select production`
     - `cd stages/<any>`
     - `terraform init`
+    - `terraform refresh`
     - `terraform plan`
     - `terraform apply`
 
