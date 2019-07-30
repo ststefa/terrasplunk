@@ -144,19 +144,19 @@ variable "subnet_cidr_map" {
   type        = "map"
   default = {
     default = {
-      neta-az1 = "10.104.198.192/28",
-      neta-az2 = "10.104.198.208/28",
+      netA-az1 = "10.104.198.192/28",
+      netA-az2 = "10.104.198.208/28",
       # no space for buffer :-(
-      netc-az1 = "10.104.198.224/28",
-      netc-az2 = "10.104.198.240/28",
+      netC-az1 = "10.104.198.224/28",
+      netC-az2 = "10.104.198.240/28",
     }
     production = {
-      neta-az1 = "10.104.146.0/26",
-      neta-az2 = "10.104.146.64/26",
-      netb-az1 = "10.104.146.128/27",
-      netb-az2 = "10.104.146.160/27",
-      netc-az1 = "10.104.146.192/27",
-      netc-az2 = "10.104.146.224/27",
+      netA-az1 = "10.104.146.0/26",
+      netA-az2 = "10.104.146.64/26",
+      netB-az1 = "10.104.146.128/27",
+      netB-az2 = "10.104.146.160/27",
+      netC-az1 = "10.104.146.192/27",
+      netC-az2 = "10.104.146.224/27",
     }
   }
 }
@@ -169,19 +169,19 @@ variable "gateway_map" {
   type        = "map"
   default = {
     default = {
-      neta-az1 = "10.104.198.193",
-      neta-az2 = "10.104.198.209",
+      netA-az1 = "10.104.198.193",
+      netA-az2 = "10.104.198.209",
       # no space for buffer :-(
-      netc-az1 = "10.104.198.225",
-      netc-az2 = "10.104.198.241",
+      netC-az1 = "10.104.198.225",
+      netC-az2 = "10.104.198.241",
     }
     production = {
-      neta-az1 = "10.104.146.1",
-      neta-az2 = "10.104.146.65",
-      netb-az1 = "10.104.146.129",
-      netb-az2 = "10.104.146.161",
-      netc-az1 = "10.104.146.193",
-      netc-az2 = "10.104.146.225",
+      netA-az1 = "10.104.146.1",
+      netA-az2 = "10.104.146.65",
+      netB-az1 = "10.104.146.129",
+      netB-az2 = "10.104.146.161",
+      netC-az1 = "10.104.146.193",
+      netC-az2 = "10.104.146.225",
     }
   }
 }
@@ -212,7 +212,7 @@ variable "pmdns_map" {
 
   default = {
     default = {
-      # Test tenant > Prod subnet > neta (AZ1 network) > 10.104.198.194 - 10.104.198.206
+      # Test tenant > Prod subnet > netA (AZ1 network) > 10.104.198.194 - 10.104.198.206
       splp0cm00 : "10.104.198.194",
       splp0hf00 : "10.104.198.195",
       splp0id00 : "10.104.198.196",
@@ -227,7 +227,7 @@ variable "pmdns_map" {
       ######### : "10.104.198.205",
       ######### : "10.104.198.206",
 
-      # Test tenant > Prod subnet > neta (AZ2 network) > 10.104.198.210 - 10.104.198.222
+      # Test tenant > Prod subnet > netA (AZ2 network) > 10.104.198.210 - 10.104.198.222
       splp0hf01 : "10.104.198.210",
       splp0id01 : "10.104.198.211",
       splp0id03 : "10.104.198.212",
@@ -242,7 +242,7 @@ variable "pmdns_map" {
       ######### : "10.104.198.221",
       ######### : "10.104.198.222",
 
-      # Test tenant > nonProd subnet - netc (AZ1 network) > 10.104.198.226 - 10.104.198.238
+      # Test tenant > nonProd subnet - netC (AZ1 network) > 10.104.198.226 - 10.104.198.238
       splw0cm00 : "10.104.198.226",
       splw0hf00 : "10.104.198.227",
       splw0id00 : "10.104.198.228",
@@ -257,7 +257,7 @@ variable "pmdns_map" {
       ######### : "10.104.198.237",
       ######### : "10.104.198.238",
 
-      # Test tenant > nonProd subnet - netc (AZ2 network) > 10.104.198.242 - 10.104.198.254
+      # Test tenant > nonProd subnet - netC (AZ2 network) > 10.104.198.242 - 10.104.198.254
       splw0id01 : "10.104.198.242",
       splw0sh01 : "10.104.198.243",
       splw0sy01 : "10.104.198.244",
@@ -273,7 +273,7 @@ variable "pmdns_map" {
       ######### : "10.104.198.254",
     }
     production = {
-      # Prod tenant > Prod subnet - neta (AZ1 network) > 10.104.146.2  - 10.104.146.62
+      # Prod tenant > Prod subnet - netA (AZ1 network) > 10.104.146.2  - 10.104.146.62
       splp0cm00 : "10.104.146.2",
       splp0hf00 : "10.104.146.3",
       splp0id00 : "10.104.146.4",
@@ -339,7 +339,7 @@ variable "pmdns_map" {
       ######### : "10.104.146.64",
       ######### : "10.104.146.65",
 
-      # Prod tenant > Prod subnet - neta (AZ2 network) > 10.104.146.66 - 10.104.146.126
+      # Prod tenant > Prod subnet - netA (AZ2 network) > 10.104.146.66 - 10.104.146.126
       splp0hf01 : "10.104.146.66",
       splp0id01 : "10.104.146.67",
       splp0id03 : "10.104.146.68",
@@ -402,13 +402,13 @@ variable "pmdns_map" {
       ######### : "10.104.146.125",
       ######### : "10.104.146.126",
 
-      # Prod tenant > spare buffer subnet - netb (AZ1 network) > 10.104.146.130 - 10.104.146.158
+      # Prod tenant > spare buffer subnet - netB (AZ1 network) > 10.104.146.130 - 10.104.146.158
       ######### : <IPs not assignable yet, they're reserved until all previous actual IPs are used>
 
-      # Prod tenant > spare buffer subnet - netb (AZ2 network) > 10.104.146.162 - 10.104.146.190
+      # Prod tenant > spare buffer subnet - netB (AZ2 network) > 10.104.146.162 - 10.104.146.190
       ######### : <IPs not assignable yet, they're reserved until all previous actual IPs are used>
 
-      # Prod tenant > nonProd subnet - netc (AZ1 network) > 10.104.146.194 - 10.104.146.223
+      # Prod tenant > nonProd subnet - netC (AZ1 network) > 10.104.146.194 - 10.104.146.223
       splw0cm00 : "10.104.146.194",
       splw0hf00 : "10.104.146.195",
       splw0id00 : "10.104.146.196",
@@ -440,7 +440,7 @@ variable "pmdns_map" {
       ######### : "10.104.146.222",
       ######### : "10.104.146.223",
 
-      # Prod tenant > nonProd subnet - netc (AZ2 network) > 10.104.146.226 - 10.104.146.254
+      # Prod tenant > nonProd subnet - netC (AZ2 network) > 10.104.146.226 - 10.104.146.254
       splw0id01 : "10.104.146.226",
       splw0sh01 : "10.104.146.227",
       splw0sy01 : "10.104.146.228",
