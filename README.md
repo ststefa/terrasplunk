@@ -20,17 +20,16 @@ The network is not (yet) managed on this version of the code but only referenced
 ## Preconditions
 To understand the reasoning for the code layout it might be helpful to know the preconditions:
 
-- We use two perfectly symmetrical network setups on two different tenants
-- Stages are not symmetrical. E.g. the production stage contains different systems than the test stage. I.e. the stages do not just differ by number of VMs but also by structure. For example there are no indexer instances on the qa stage.
-- We don't have DNS as an OTC feature on our OTC-private installation
-- Number of searchhead, indexers, ... must be easily extendable
-- The definition of the network is shared among stages due to IP range limitations
+- We use two symmetrical network setups on two different tenants. The network is shared over stages, i.e. there is no symmetry between networks and stages (e.g. there is a "dev" stage but no "dev" network).
+- Stages are symmetrical between tenants
+- Stages are not symmetrical to each other, e.g. the production stage contains different systems than the test stage. I.e. the stages do not just differ by number of VMs but also by structure. For example there are no indexer instances on the "qa" (quality assurance) stage.
+- We don't have DNS as an OTC feature on our OTC-private installation and thus IPs need to be assigned statically
 
 ## Design goals
 - Safe ourselves from making catastrophic mistakes
 - Be flexible towards expected changes as far as possible
 - Be DRY / avoid redundancy
-- Minimize risk of human error / consistency through code
+- Minimize risk of human error, ensure consistency through algorithms
 
 ## Project layout
 The project is structured into several parts
@@ -40,7 +39,7 @@ The project is structured into several parts
 - `shared` contains code and state for infrastructure which is shared among stages
 - `stages` contains one directory for each stage. Each directory contains code and state for that stage. The code is mostly composed from modules.
 
-Each top-level directory may contain additional README.md(s) to document further details.
+Each top-level directory contains an additional README.md to document further details.
 
 Each terraform directory/module is structured in a default layout as proposed by Hashicorp:
 
