@@ -109,8 +109,30 @@ output "pvsize_opt" {
   value = 20
 }
 
+variable "pvsize_hot_map" {
+  description = "Size of Hot-warm Splunk buckets phisical volume (pv)"
+  type        = "map"
+  default = {
+    default = {
+      development : 50
+      test : 50
+      quality : 50
+      production : 50
+      spielwiese : 50
+      universal : 50
+    }
+    production = {
+      development : 50
+      test : 50
+      quality : 50
+      production : 100
+      spielwiese : 50
+      universal : 50
+    }
+  }
+}
 output "pvsize_hot" {
-  value = 5
+  value = var.pvsize_hot_map[var.workspace][var.stage]
 }
 
 output "pvsize_cold" {
