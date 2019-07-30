@@ -29,52 +29,52 @@ data "opentelekomcloud_vpc_v1" "vpc" {
   name = "${local.project}-vpc"
 }
 
-data "opentelekomcloud_networking_network_v2" "neta-az1" {
-  name = "${local.project}-neta-az1"
+data "opentelekomcloud_networking_network_v2" "netA-az1" {
+  name = "${local.project}-netA-az1"
 }
 
-data "opentelekomcloud_networking_network_v2" "neta-az2" {
-  name = "${local.project}-neta-az2"
+data "opentelekomcloud_networking_network_v2" "netA-az2" {
+  name = "${local.project}-netA-az2"
 }
 
-#data "opentelekomcloud_networking_network_v2" "netb-az1" {
-#  name = "${local.project}-netb-az1"
+#data "opentelekomcloud_networking_network_v2" "netB-az1" {
+#  name = "${local.project}-netB-az1"
 #}
 #
-#data "opentelekomcloud_networking_network_v2" "netb-az2" {
-#  name = "${local.project}-netb-az2"
+#data "opentelekomcloud_networking_network_v2" "netB-az2" {
+#  name = "${local.project}-netB-az2"
 #}
 
-data "opentelekomcloud_networking_network_v2" "netc-az1" {
-  name = "${local.project}-netc-az1"
+data "opentelekomcloud_networking_network_v2" "netC-az1" {
+  name = "${local.project}-netC-az1"
 }
 
-data "opentelekomcloud_networking_network_v2" "netc-az2" {
-  name = "${local.project}-netc-az2"
+data "opentelekomcloud_networking_network_v2" "netC-az2" {
+  name = "${local.project}-netC-az2"
 }
 
-data "opentelekomcloud_vpc_subnet_v1" "subneta_az1" {
-  name = "${local.project}-subneta-az1"
+data "opentelekomcloud_vpc_subnet_v1" "subnetA_az1" {
+  name = "${local.project}-subnetA-az1"
 }
 
-data "opentelekomcloud_vpc_subnet_v1" "subneta_az2" {
-  name = "${local.project}-subneta-az2"
+data "opentelekomcloud_vpc_subnet_v1" "subnetA_az2" {
+  name = "${local.project}-subnetA-az2"
 }
 
-#data "opentelekomcloud_vpc_subnet_v1" "subnetb_az1" {
-#  name = "${local.project}-subnetb-az1"
+#data "opentelekomcloud_vpc_subnet_v1" "subnetB_az1" {
+#  name = "${local.project}-subnetB-az1"
 #}
 #
-#data "opentelekomcloud_vpc_subnet_v1" "subnetb_az2" {
-#  name = "${local.project}-subnetb-az2"
+#data "opentelekomcloud_vpc_subnet_v1" "subnetB_az2" {
+#  name = "${local.project}-subnetB-az2"
 #}
 
-data "opentelekomcloud_vpc_subnet_v1" "subnetc_az1" {
-  name = "${local.project}-subnetc-az1"
+data "opentelekomcloud_vpc_subnet_v1" "subnetC_az1" {
+  name = "${local.project}-subnetC-az1"
 }
 
-data "opentelekomcloud_vpc_subnet_v1" "subnetc_az2" {
-  name = "${local.project}-subnetc-az2"
+data "opentelekomcloud_vpc_subnet_v1" "subnetC_az2" {
+  name = "${local.project}-subnetC-az2"
 }
 
 #data "opentelekomcloud_vpc_subnet_ids_v1" "subnet_ids" {
@@ -82,7 +82,7 @@ data "opentelekomcloud_vpc_subnet_v1" "subnetc_az2" {
 #}
 
 # do not manage nets but use datasources because its
-#resource "opentelekomcloud_vpc_subnet_v1" "neta-az1" {
+#resource "opentelekomcloud_vpc_subnet_v1" "netA-az1" {
 #  name = "${local.project}-prod-az1"
 #  cidr              = module.variables.subnet_cidr["prod-az1"]
 #  gateway_ip        = module.variables.gateway["prod-az1"]
@@ -103,40 +103,40 @@ data "opentelekomcloud_vpc_subnet_v1" "subnetc_az2" {
 #}
 #
 ## cannot currently have spare because no room left on test tenant
-##resource "opentelekomcloud_vpc_subnet_v1" "netb-az1" {
-##  name = "${local.project}-netb-az1"
-##  cidr              = module.variables.subnet_cidr["netb-az1"]
-##  gateway_ip        = module.variables.gateway["netb-az1"]
+##resource "opentelekomcloud_vpc_subnet_v1" "netB-az1" {
+##  name = "${local.project}-netB-az1"
+##  cidr              = module.variables.subnet_cidr["netB-az1"]
+##  gateway_ip        = module.variables.gateway["netB-az1"]
 ##  vpc_id            = data.opentelekomcloud_vpc_v1.vpc.id
 ##  availability_zone = "eu-ch-01"
 ##  primary_dns       = "100.125.4.25"
 ##  secondary_dns     = "100.125.0.43"
 ##}
 ##
-##resource "opentelekomcloud_vpc_subnet_v1" "netb-az2" {
-##  name = "${local.project}-netb-az2"
-##  cidr              = module.variables.subnet_cidr["netb-az2"]
-##  gateway_ip        = module.variables.gateway["netb-az2"]
+##resource "opentelekomcloud_vpc_subnet_v1" "netB-az2" {
+##  name = "${local.project}-netB-az2"
+##  cidr              = module.variables.subnet_cidr["netB-az2"]
+##  gateway_ip        = module.variables.gateway["netB-az2"]
 ##  vpc_id            = data.opentelekomcloud_vpc_v1.vpc.id
 ##  availability_zone = "eu-ch-02"
 ##  primary_dns       = "100.125.4.25"
 ##  secondary_dns     = "100.125.0.43"
 ##}
 #
-#resource "opentelekomcloud_vpc_subnet_v1" "netc-az1" {
-#  name = "${local.project}-netc-az1"
-#  cidr              = module.variables.subnet_cidr["netc-az1"]
-#  gateway_ip        = module.variables.gateway["netc-az1"]
+#resource "opentelekomcloud_vpc_subnet_v1" "netC-az1" {
+#  name = "${local.project}-netC-az1"
+#  cidr              = module.variables.subnet_cidr["netC-az1"]
+#  gateway_ip        = module.variables.gateway["netC-az1"]
 #  vpc_id            = data.opentelekomcloud_vpc_v1.vpc.id
 #  availability_zone = "eu-ch-01"
 #  primary_dns       = "100.125.4.25"
 #  secondary_dns     = "100.125.0.43"
 #}
 #
-#resource "opentelekomcloud_vpc_subnet_v1" "netc-az2" {
-#  name = "${local.project}-netc-az2"
-#  cidr              = module.variables.subnet_cidr["netc-az2"]
-#  gateway_ip        = module.variables.gateway["netc-az2"]
+#resource "opentelekomcloud_vpc_subnet_v1" "netC-az2" {
+#  name = "${local.project}-netC-az2"
+#  cidr              = module.variables.subnet_cidr["netC-az2"]
+#  gateway_ip        = module.variables.gateway["netC-az2"]
 #  vpc_id            = data.opentelekomcloud_vpc_v1.vpc.id
 #  availability_zone = "eu-ch-02"
 #  primary_dns       = "100.125.4.25"
