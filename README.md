@@ -135,3 +135,12 @@ I currently see two approaches to pass arbitrary data to the provisioning:
 - Keep the terraform step separate from the provisioning step by first building everything up with terraform and then using some code to use the terraform state as an input. The terraform state contains a complete description of all parameters. This has the drawback of having two separate processes which might complicate automation.
 
 - Uses terraform `local-exec` provisioners which create parameter files. Any resource can add to this parameter files. A separate provisioning process can use it as input data to perform the provisioning. While this might make it possible to couple terraforming and provisioning closer together it might also make the terraform code more complicated.
+
+# Open Points (notes to self)
+
+## Handling tfstate between multiple developers
+Might use S3
+etcdv3 seems promising
+
+## Asymetry between tenants
+The current logic does allows to have a different number of VMs between stages but not between tenants. Feature toggles based on existence of VM names in the variables module might solve this (https://medium.com/capital-one-tech/building-feature-toggles-into-terraform-d75806217647)
