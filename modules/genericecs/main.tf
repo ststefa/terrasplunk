@@ -10,7 +10,7 @@ locals {
   stage             = local.stage_map[substr(var.name, 3, 1)]
   hostnumber        = tonumber(substr(var.name, -2, 2))
   availability_zone = local.hostnumber % 2 == 0 ? "eu-ch-01" : "eu-ch-02"
-  netname           = local.stage == "production" ? "neta" : "netc"
+  netname           = local.stage == "production" ? "netA" : "netC"
   network_id        = local.hostnumber % 2 == 0 ? data.terraform_remote_state.shared.outputs["${local.netname}-az1_id"] : data.terraform_remote_state.shared.outputs["${local.netname}-az2_id"]
 }
 
