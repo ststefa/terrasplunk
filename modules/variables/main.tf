@@ -135,7 +135,7 @@ variable "pvsize_hot_map" {
   }
 }
 output "pvsize_hot" {
-  value = var.pvsize_hot_map[var.workspace][var.stage]
+  value = contains(keys(var.pvsize_hot_map[var.workspace]), var.stage) ? var.pvsize_hot_map[var.workspace][var.stage] : ""
 }
 
 variable "pvsize_cold_map" {
@@ -161,7 +161,7 @@ variable "pvsize_cold_map" {
   }
 }
 output "pvsize_cold" {
-  value = var.pvsize_cold_map[var.workspace][var.stage]
+  value = contains(keys(var.pvsize_cold_map[var.workspace]), var.stage) ? var.pvsize_cold_map[var.workspace][var.stage] : ""
 }
 
 variable "subnet_cidr_map" {
