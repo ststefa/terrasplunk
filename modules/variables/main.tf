@@ -86,6 +86,7 @@ variable "flavor_map" {
       production : "s2.medium.8"
       spielwiese : "s2.medium.4"
       universal : "s2.medium.4"
+      #dontcare: ""
     }
     production = {
       development : "s2.medium.4"
@@ -94,11 +95,13 @@ variable "flavor_map" {
       production : "s2.2xlarge.4"
       spielwiese : "s2.medium.4"
       universal : "s2.medium.4"
+      #dontcare: ""
     }
   }
 }
 output "flavor" {
-  value = var.flavor_map[var.workspace][var.stage]
+  # note that this behaviour is not perfect. It returns a reasonably wrong value in case a stage does not exist. Instead terraform should really abort with failure
+  value = contains(keys(var.flavor_map[var.workspace]), var.stage) ? var.flavor_map[var.workspace][var.stage] : ""
 }
 
 output "pvsize_root" {
