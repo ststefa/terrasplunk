@@ -22,3 +22,4 @@ build/
 .python_history
 .pyc
 .pyo
+__pycache__
