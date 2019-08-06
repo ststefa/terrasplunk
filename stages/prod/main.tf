@@ -36,77 +36,77 @@ module "core" {
   stage  = local.stage
 }
 
-module "server-mt00" {
+module "server-0mt00" {
   source = "../../modules/genericecs"
   name = "${local.prefix}0mt00"
   secgrp_id = module.core.searchhead-secgrp_id
 }
 
-module "server-sh00" {
+module "server-0sh00" {
   source = "../../modules/genericecs"
   name = "${local.prefix}0sh00"
   secgrp_id = module.core.searchhead-secgrp_id
 }
 
-module "server-sh01" {
+module "server-0sh01" {
   source = "../../modules/genericecs"
   name = "${local.prefix}0sh01"
   secgrp_id = module.core.searchhead-secgrp_id
 }
-module "server-sh02" {
+module "server-0sh02" {
   source = "../../modules/genericecs"
   name = "${local.prefix}0sh02"
   secgrp_id = module.core.searchhead-secgrp_id
 }
 
-module "server-cm00" {
+module "server-0cm00" {
   source = "../../modules/genericecs"
   name = "${local.prefix}0cm00"
   secgrp_id = module.core.searchhead-secgrp_id
 }
 
-module "server-id00" {
+module "server-0ix00" {
   source = "../../modules/indexer"
-  name = "${local.prefix}0id00"
+  name = "${local.prefix}0ix00"
   secgrp_id = module.core.searchhead-secgrp_id
 }
 
-module "server-id01" {
+module "server-0ix01" {
   source = "../../modules/indexer"
-  name = "${local.prefix}0id01"
+  name = "${local.prefix}0ix01"
   secgrp_id = module.core.searchhead-secgrp_id
 }
-module "server-id02" {
+module "server-0ix02" {
   source = "../../modules/indexer"
-  name = "${local.prefix}0id02"
-  secgrp_id = module.core.searchhead-secgrp_id
-}
-
-module "server-id03" {
-  source = "../../modules/indexer"
-  name = "${local.prefix}0id03"
+  name = "${local.prefix}0ix02"
   secgrp_id = module.core.searchhead-secgrp_id
 }
 
-module "server-hf00" {
+module "server-0ix03" {
+  source = "../../modules/indexer"
+  name = "${local.prefix}0ix03"
+  secgrp_id = module.core.searchhead-secgrp_id
+}
+
+module "server-0hf00" {
   source = "../../modules/genericecs"
   name = "${local.prefix}0hf00"
   secgrp_id = module.core.searchhead-secgrp_id
 }
 
-module "server-hf01" {
+module "server-0hf01" {
   source = "../../modules/genericecs"
   name = "${local.prefix}0hf01"
   secgrp_id = module.core.searchhead-secgrp_id
 }
 
-module "server-sy00" {
+module "server-0sy00" {
   source = "../../modules/genericecs"
   name = "${local.prefix}0sy00"
   secgrp_id = module.core.searchhead-secgrp_id
 }
 
-module "server-sy01" {
+module "server-0sy01" {
   source = "../../modules/genericecs"
   name = "${local.prefix}0sy01"
   secgrp_id = module.core.searchhead-secgrp_id
