@@ -1,5 +1,15 @@
 locals {
-  stage   = "spielwiese"
+  this_stage = "w"  # Substitute value for the environment ID
+  stage_map = {
+    d : "development"
+    p : "production"
+    q : "qa"
+    t : "test"
+    u : "universal"
+    w : "spielwiese"
+  }
+  stage   = local.stage_map[local.this_stage]
+  prefix  = "spl${local.this_stage}"
 }
 
 terraform {
@@ -26,38 +36,38 @@ module "core" {
   stage  = local.stage
 }
 
-module "searchhead1" {
+module "server-0sh00" {
   source = "../../modules/genericecs"
-  name = "splw0sh00"
+  name = "${local.prefix}0sh00"
   secgrp_id = module.core.searchhead-secgrp_id
 }
 
-module "searchhead2" {
+module "server-0sh01" {
   source = "../../modules/genericecs"
-  name = "splw0sh01"
+  name = "${local.prefix}0sh01"
   secgrp_id = module.core.searchhead-secgrp_id
 }
 
-module "indexer1" {
+module "server-0ix00" {
   source = "../../modules/indexer"
-  name = "splw0id00"
+  name = "${local.prefix}0ix00"
   secgrp_id = module.core.indexer-secgrp_id
 }
 
-module "indexer2" {
+module "server-0ix01" {
   source = "../../modules/indexer"
-  name = "splw0id01"
+  name = "${local.prefix}0ix01"
   secgrp_id = module.core.indexer-secgrp_id
 }
 
-module "syslog1" {
+module "server-0ix01" {
   source = "../../modules/genericecs"
-  name = "splw0sy00"
+  name = "${local.prefix}0sy00"
   secgrp_id = module.core.parser-secgrp_id
 }
 
-module "syslog2" {
+module "server-0ix01" {
   source = "../../modules/genericecs"
-  name = "splw0sy01"
+  name = "${local.prefix}0sy01"
   secgrp_id = module.core.parser-secgrp_id
 }
