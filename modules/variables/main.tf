@@ -112,12 +112,56 @@ output "pvsize_opt" {
   value = 20
 }
 
+variable "pvsize_hot_map" {
+  description = "Size of Hot-warm Splunk buckets phisical volume (pv)"
+  type        = "map"
+  default = {
+    default = {
+      development : 50
+      test : 50
+      quality : 50
+      production : 50
+      spielwiese : 50
+      universal : 50
+    }
+    production = {
+      development : 50
+      test : 50
+      quality : 50
+      production : 100
+      spielwiese : 50
+      universal : 50
+    }
+  }
+}
 output "pvsize_hot" {
-  value = 5
+  value = contains(keys(var.pvsize_hot_map[var.workspace]), var.stage) ? var.pvsize_hot_map[var.workspace][var.stage] : ""
 }
 
+variable "pvsize_cold_map" {
+  description = "Size of Cold Splunk buckets phisical volume (pv)"
+  type        = "map"
+  default = {
+    default = {
+      development : 50
+      test : 50
+      quality : 50
+      production : 50
+      spielwiese : 50
+      universal : 50
+    }
+    production = {
+      development : 50
+      test : 50
+      quality : 50
+      production : 100
+      spielwiese : 50
+      universal : 50
+    }
+  }
+}
 output "pvsize_cold" {
-  value = 10
+  value = contains(keys(var.pvsize_cold_map[var.workspace]), var.stage) ? var.pvsize_cold_map[var.workspace][var.stage] : ""
 }
 
 variable "subnet_cidr_map" {
@@ -174,22 +218,7 @@ output "gateway" {
 # poor mans DNS
 variable "pmdns_map" {
   description = "Where others use rocket science we do it by hand"
-  #sh:   Searchhead
-  #it:   ITSI searchhead
-  #es:   ES searchhead
-  #ix:   Indexer
-  #cm:   Cluster-Master
-  #hf:   Heavy-Forwarder  <- Not yet implemented
-  #st:   Stand-alone
-  #sy:   Syslog  <- Not yet implemented
-  #he:   HEC-Gateway  <- Not yet implemented
-  #pr:   Parser (Syslog, HEC-Gateway and Heavy-Forwarder on same machine)
-  #lm:   License-Master  <- Not yet implemented
-  #dp:   Deployer  <- Not yet implemented
-  #ds:   Deployment-Server  <- Not yet implemented
-  #mt:   Management tools (License-Master, Deployment-Server and Deployer)
-  #mc:   Monitor Console
-  #bd:   Builder, where all Ansible, Terraform, etc. scripts are running  type = "map"
+  # For servers name nomenclature refert to http://wiki.t-systems.ch/x/ieMLAg
 
   default = {
     default = {

@@ -25,7 +25,6 @@ module "idx-instance" {
   secgrp_id = var.secgrp_id
 }
 
-# reduced number of disks for testing. Attaching takes 35s each
 resource "opentelekomcloud_blockstorage_volume_v2" "cold1" {
   availability_zone = module.idx-instance.az
   name              = "${module.idx-instance.name}-cold1"
