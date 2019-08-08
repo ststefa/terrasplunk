@@ -1,6 +1,12 @@
 #!/usr/bin/env python3
 
+import os
+import sys
 import json
+
+base_path = os.path.normpath(
+    os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', 'lib'))
+sys.path.append(base_path)
 import jsonpath
 
 with open('terraform.tfstate', 'r') as f:
