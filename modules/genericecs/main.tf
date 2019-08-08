@@ -69,7 +69,7 @@ resource "opentelekomcloud_blockstorage_volume_v2" "opt" {
 resource "opentelekomcloud_compute_volume_attach_v2" "opt_attach" {
   instance_id = opentelekomcloud_compute_instance_v2.instance.id
   volume_id   = opentelekomcloud_blockstorage_volume_v2.opt.id
-  depends_on  = [opentelekomcloud_compute_instance_v2.instance]
+  depends_on  = [opentelekomcloud_compute_instance_v2.instance.block_device]
 }
 
 data "template_file" "provtest" {
