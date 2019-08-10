@@ -1,5 +1,5 @@
 locals {
-  this_stage = "w0"  # Substitute value with stage name (e.g. "p0", "t1", ...)
+  this_stage = "w0"  # Substitute value with stage name (e.g. "p0", "t1", ...) TODO try to get value from $path
   stage_map = {
     d : "development"
     p : "production"
