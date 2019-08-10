@@ -33,6 +33,13 @@ data "opentelekomcloud_images_image_v2" "osimage" {
   most_recent = true
 }
 
+resource "opentelekomcloud_blockstorage_volume_v2" "root" {
+  name              = "${var.name}-root"
+  availability_zone = local.availability_zone
+  size              = module.variables.pvsize_root
+  image_id          = data.opentelekomcloud_images_image_v2.osimage.id
+}
+
 resource "opentelekomcloud_compute_instance_v2" "instance" {
   availability_zone = local.availability_zone
   flavor_name       = module.variables.flavor
@@ -40,12 +47,13 @@ resource "opentelekomcloud_compute_instance_v2" "instance" {
   key_pair          = data.terraform_remote_state.shared.outputs["keypair-tss_id"]
   # Attention! Any change (even comments) to user_data will rebuild the VM. Use only for the most stable and basic tasks!
   #user_data         = "${data.template_file.provtest.rendered}"
-  security_groups = [var.secgrp_id]
-  auto_recovery       = var.autorecover
+  security_groups = var.secgrp_id_list
+  auto_recovery   = var.autorecover
   # Give OS daemons time to shutdown
   stop_before_destroy = true
   # sometimes instance are not deleted causing problems with recreation (IP still claimed)
-  force_delete        = true
+  # However: "Error: Unsupported argument" although documented on https://www.terraform.io/docs/providers/opentelekomcloud/r/compute_instance_v2.html
+  #force_delete        = true
 
   network {
     uuid        = local.network_id
@@ -54,9 +62,11 @@ resource "opentelekomcloud_compute_instance_v2" "instance" {
   #depends_on = [var.interface]
 
   block_device {
-    uuid                  = data.opentelekomcloud_images_image_v2.osimage.id
-    source_type           = "image"
-    volume_size           = module.variables.pvsize_root
+    #uuid                  = data.opentelekomcloud_images_image_v2.osimage.id
+    uuid        = opentelekomcloud_blockstorage_volume_v2.root.id
+    source_type = "volume"
+    # This shouldN#t be necessary according to https://www.terraform.io/docs/providers/opentelekomcloud/r/compute_instance_v2.html. However terraform complains if not specified
+    #volume_size           = module.variables.pvsize_root
     boot_index            = 0
     destination_type      = "volume"
     delete_on_termination = true
@@ -72,7 +82,9 @@ resource "opentelekomcloud_blockstorage_volume_v2" "opt" {
 resource "opentelekomcloud_compute_volume_attach_v2" "opt_attach" {
   instance_id = opentelekomcloud_compute_instance_v2.instance.id
   volume_id   = opentelekomcloud_blockstorage_volume_v2.opt.id
-  depends_on = [opentelekomcloud_compute_instance_v2.instance.block_device]
+  # Sometimes leads to swapped vda<>vdb
+  #depends_on = [opentelekomcloud_compute_instance_v2.instance]
+  depends_on = [opentelekomcloud_compute_instance_v2.instance, opentelekomcloud_blockstorage_volume_v2.root]
 }
 
 data "template_file" "provtest" {
