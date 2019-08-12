@@ -39,75 +39,75 @@ module "core" {
 module "server-0mt00" {
   source = "../../modules/genericecs"
   name = "${local.prefix}0mt00"
-  secgrp_id = module.core.searchhead-secgrp_id
+  secgrp_id_list = [module.core.base-secgrp_id]
 }
 
 module "server-0sh00" {
   source = "../../modules/genericecs"
   name = "${local.prefix}0sh00"
-  secgrp_id = module.core.searchhead-secgrp_id
+  secgrp_id_list = [module.core.base-secgrp_id, module.core.searchhead-secgrp_id]
 }
 
 module "server-0sh01" {
   source = "../../modules/genericecs"
   name = "${local.prefix}0sh01"
-  secgrp_id = module.core.searchhead-secgrp_id
+  secgrp_id_list = [module.core.base-secgrp_id, module.core.searchhead-secgrp_id]
 }
 module "server-0sh02" {
   source = "../../modules/genericecs"
   name = "${local.prefix}0sh02"
-  secgrp_id = module.core.searchhead-secgrp_id
+  secgrp_id_list = [module.core.base-secgrp_id, module.core.searchhead-secgrp_id]
 }
 
 module "server-0cm00" {
   source = "../../modules/genericecs"
   name = "${local.prefix}0cm00"
-  secgrp_id = module.core.searchhead-secgrp_id
+  secgrp_id_list = [module.core.base-secgrp_id]
 }
 
 module "server-0ix00" {
   source = "../../modules/indexer"
   name = "${local.prefix}0ix00"
-  secgrp_id = module.core.searchhead-secgrp_id
+  secgrp_id_list = [module.core.base-secgrp_id, module.core.indexer-secgrp_id]
 }
 
 module "server-0ix01" {
   source = "../../modules/indexer"
   name = "${local.prefix}0ix01"
-  secgrp_id = module.core.searchhead-secgrp_id
+  secgrp_id_list = [module.core.base-secgrp_id, module.core.indexer-secgrp_id]
 }
 module "server-0ix02" {
   source = "../../modules/indexer"
   name = "${local.prefix}0ix02"
-  secgrp_id = module.core.searchhead-secgrp_id
+  secgrp_id_list = [module.core.base-secgrp_id, module.core.indexer-secgrp_id]
 }
 
 module "server-0ix03" {
   source = "../../modules/indexer"
   name = "${local.prefix}0ix03"
-  secgrp_id = module.core.searchhead-secgrp_id
+  secgrp_id_list = [module.core.base-secgrp_id, module.core.indexer-secgrp_id]
 }
 
 module "server-0hf00" {
   source = "../../modules/genericecs"
   name = "${local.prefix}0hf00"
-  secgrp_id = module.core.searchhead-secgrp_id
+  secgrp_id_list = [module.core.base-secgrp_id]
 }
 
 module "server-0hf01" {
   source = "../../modules/genericecs"
   name = "${local.prefix}0hf01"
-  secgrp_id = module.core.searchhead-secgrp_id
+  secgrp_id_list = [module.core.base-secgrp_id]
 }
 
 module "server-0sy00" {
   source = "../../modules/genericecs"
   name = "${local.prefix}0sy00"
-  secgrp_id = module.core.searchhead-secgrp_id
+  secgrp_id_list = [module.core.base-secgrp_id, module.core.parser-secgrp_id]
 }
 
 module "server-0sy01" {
   source = "../../modules/genericecs"
   name = "${local.prefix}0sy01"
-  secgrp_id = module.core.searchhead-secgrp_id
+  secgrp_id_list = [module.core.base-secgrp_id, module.core.parser-secgrp_id]
 }
