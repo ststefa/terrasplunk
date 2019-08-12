@@ -7,6 +7,6 @@ variable "name" {
   description = "Name of the instance"
 }
 
-variable "secgrp_id" {
-  description = "Security group id"
+variable "secgrp_id_list" {
+  description = "see generics/input.tf"
 }

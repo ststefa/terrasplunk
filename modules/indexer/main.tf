@@ -20,9 +20,9 @@ module "variables" {
 }
 
 module "idx-instance" {
-  source    = "../../modules/genericecs"
-  name      = var.name
-  secgrp_id = var.secgrp_id
+  source         = "../../modules/genericecs"
+  name           = var.name
+  secgrp_id_list = var.secgrp_id_list
 }
 
 resource "opentelekomcloud_blockstorage_volume_v2" "cold1" {

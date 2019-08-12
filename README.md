@@ -89,7 +89,7 @@ Basic terraform setup
 
 - Create shared resources first:
     - `cd shared`
-    - Work through README.md for required manual network setup
+    - Work through shared/README.md for required manual network setup
     - `terraform init`
     - `terraform plan`
     - `terraform apply`
@@ -103,7 +103,7 @@ Basic terraform setup
 
 - Create shared resources first:
     - `cd shared`
-    - Work through README.md for required manual network setup
+    - Work through shared/README.md for required manual network setup
     - `terraform workspace new production`
     - `terraform workspace select production`
     - `terraform init`
@@ -132,16 +132,24 @@ A key requirement is that arbitrary data from terraform can be passed to the pro
 
 I currently see two approaches to pass arbitrary data to the provisioning:
 
-- Keep the terraform step separate from the provisioning step by first building everything up with terraform and then using some code to use the terraform state as an input. The terraform state contains a complete description of all parameters. This has the drawback of having two separate processes which might complicate automation.
+- Keep the terraform step separate from the provisioning step by first building everything up with terraform and then using some code to use the terraform state as an input. The terraform state contains a complete description of all parameters. This has the drawback of having two separate processes which might complicate automation. Also it requires to execute steps in a specific, human-made order which is contrary to a declarative approach.
 
 - Uses terraform `local-exec` provisioners which create parameter files. Any resource can add to this parameter files. A separate provisioning process can use it as input data to perform the provisioning. While this might make it possible to couple terraforming and provisioning closer together it might also make the terraform code more complicated.
+
+# Contributing
+
+For any suggestion, improvment, correction, etc. open a branch with a descriptive name (which it explains the goal of the update) and assign it to a repo maintainer.
+
+Otherwise, if you don't feel brave to edit code (this shouldn't be the case :simple_smile:), open an [issue](https://gitlab-tss.sbb.ch/splunk/splunk_provisioning/issues) and assign it to a repo maintainer.
 
 # Open Points (notes to self)
 
 ## Handling tfstate between multiple developers
-Might use S3
+
+Might use S3 if it works on OTC.
 
 etcdv3 seems promising
 
 ## Asymetry between tenants
-The current logic does allow to have a different number of VMs between stages but not between tenants. Feature toggles based on existence of VM names in the variables module might solve this (https://medium.com/capital-one-tech/building-feature-toggles-into-terraform-d75806217647)
+
+The current logic does allow to have a different number of VMs between stages but not between tenants. Feature toggles based on existence of VM names defined in the variables module might solve this (https://medium.com/capital-one-tech/building-feature-toggles-into-terraform-d75806217647)

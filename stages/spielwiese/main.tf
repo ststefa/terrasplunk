@@ -1,5 +1,5 @@
 locals {
-  this_stage = "w"  # Substitute value for the environment ID
+  this_stage = "w0"  # Substitute value with stage name (e.g. "p0", "t1", ...) TODO try to get value from $path
   stage_map = {
     d : "development"
     p : "production"
@@ -8,7 +8,7 @@ locals {
     u : "universal"
     w : "spielwiese"
   }
-  stage   = local.stage_map[local.this_stage]
+  stage   = local.stage_map["w"] #TODO refactor, stage == this.stage
   prefix  = "spl${local.this_stage}"
 }
 
@@ -36,38 +36,38 @@ module "core" {
   stage  = local.stage
 }
 
-module "server-0sh00" {
+module "server-sh00" {
   source = "../../modules/genericecs"
-  name = "${local.prefix}0sh00"
-  secgrp_id = module.core.searchhead-secgrp_id
+  name = "${local.prefix}sh00"
+  secgrp_id_list = [module.core.base-secgrp_id, module.core.searchhead-secgrp_id]
 }
 
-module "server-0sh01" {
+module "server-sh01" {
   source = "../../modules/genericecs"
-  name = "${local.prefix}0sh01"
-  secgrp_id = module.core.searchhead-secgrp_id
+  name = "${local.prefix}sh01"
+  secgrp_id_list = [module.core.base-secgrp_id, module.core.searchhead-secgrp_id]
 }
 
-module "server-0ix00" {
+module "server-ix00" {
   source = "../../modules/indexer"
-  name = "${local.prefix}0ix00"
-  secgrp_id = module.core.indexer-secgrp_id
+  name = "${local.prefix}ix00"
+  secgrp_id_list = [module.core.base-secgrp_id, module.core.indexer-secgrp_id]
 }
 
-module "server-0ix01" {
+module "server-ix01" {
   source = "../../modules/indexer"
-  name = "${local.prefix}0ix01"
-  secgrp_id = module.core.indexer-secgrp_id
+  name = "${local.prefix}ix01"
+  secgrp_id_list = [module.core.base-secgrp_id, module.core.indexer-secgrp_id]
 }
 
-module "server-0ix01" {
+module "server-sy00" {
   source = "../../modules/genericecs"
-  name = "${local.prefix}0sy00"
-  secgrp_id = module.core.parser-secgrp_id
+  name = "${local.prefix}sy00"
+  secgrp_id_list = [module.core.base-secgrp_id, module.core.parser-secgrp_id]
 }
 
-module "server-0ix01" {
+module "server-sy01" {
   source = "../../modules/genericecs"
-  name = "${local.prefix}0sy01"
-  secgrp_id = module.core.parser-secgrp_id
+  name = "${local.prefix}sy01"
+  secgrp_id_list = [module.core.base-secgrp_id, module.core.parser-secgrp_id]
 }

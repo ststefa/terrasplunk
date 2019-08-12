@@ -12,6 +12,6 @@ variable "name" {
   description = "Name of the instance"
 }
 
-variable "secgrp_id" {
-  description = "Security group id"
+variable "secgrp_id_list" {
+  description = "List of security group id (currently using name property is preferred)"
 }
