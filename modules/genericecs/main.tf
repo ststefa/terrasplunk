@@ -1,5 +1,5 @@
 locals {
-  stage_map = {
+  stage_map = { #TODO refactor, stage == var.name
     d : "development"
     p : "production"
     q : "qa"
@@ -47,7 +47,7 @@ resource "opentelekomcloud_compute_instance_v2" "instance" {
   key_pair          = data.terraform_remote_state.shared.outputs["keypair-tss_id"]
   # Attention! Any change (even comments) to user_data will rebuild the VM. Use only for the most stable and basic tasks!
   #user_data         = "${data.template_file.provtest.rendered}"
-  security_groups = var.secgrp_id_list
+  security_groups = setunion([data.terraform_remote_state.shared.outputs["base-secgrp_id"]], var.secgrp_id_list)
   auto_recovery   = var.autorecover
   # Give OS daemons time to shutdown
   stop_before_destroy = true

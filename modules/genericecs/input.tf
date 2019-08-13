@@ -5,7 +5,7 @@
 
 variable "autorecover" {
   description = "Whether the VM should do magic OTC failover"
-  default = "false"
+  default     = "false"
 }
 
 variable "name" {
@@ -13,5 +13,7 @@ variable "name" {
 }
 
 variable "secgrp_id_list" {
-  description = "List of security group id (currently using name property is preferred)"
+  type        = set(string)
+  description = "Optional additional security group ids (currently using name property is preferred)"
+  default     = []
 }
