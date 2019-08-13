@@ -1,15 +1,15 @@
 locals {
-  this_stage = "w0"  # Substitute value with stage name (e.g. "p0", "t1", ...) TODO try to get value from $path
+  this_stage = basename(abspath("${path.root}")) #TODO refactor, this.stage == basename("${path.root}")
   stage_map = {
-    d : "development"
-    p : "production"
-    q : "qa"
-    t : "test"
-    u : "universal"
-    w : "spielwiese"
+    development : "d0"
+    production : "p0"
+    qa : "q0"
+    test : "t0"
+    universal : "u0"
+    spielwiese : "w0"
   }
-  stage   = local.stage_map["w"] #TODO refactor, stage == this.stage
-  prefix  = "spl${local.this_stage}"
+  stage  = local.stage_map[local.this_stage] #TODO refactor, stage == this.stage
+  prefix = "spl${local.stage}"
 }
 
 terraform {
@@ -28,46 +28,51 @@ provider "opentelekomcloud" {
 module "variables" {
   source    = "../../modules/variables"
   workspace = terraform.workspace
-  stage     = local.stage
+  stage     = local.this_stage #TODO refactor, stage == this.stage
 }
 
 module "core" {
   source = "../../modules/core"
-  stage  = local.stage
+  stage  = local.this_stage #TODO refactor, stage == this.stage
+}
+
+data "terraform_remote_state" "shared" {
+  backend = "local"
+  config = {
+    path = module.variables.shared_statefile
+  }
 }
 
 module "server-sh00" {
-  source = "../../modules/genericecs"
-  name = "${local.prefix}sh00"
-  secgrp_id_list = [module.core.base-secgrp_id, module.core.searchhead-secgrp_id]
+  source         = "../../modules/genericecs"
+  name           = "${local.prefix}sh00"
+  secgrp_id_list = [data.terraform_remote_state.shared.outputs["searchhead-secgrp_id"]]
 }
 
 module "server-sh01" {
-  source = "../../modules/genericecs"
-  name = "${local.prefix}sh01"
-  secgrp_id_list = [module.core.base-secgrp_id, module.core.searchhead-secgrp_id]
+  source         = "../../modules/genericecs"
+  name           = "${local.prefix}sh01"
+  secgrp_id_list = [data.terraform_remote_state.shared.outputs["searchhead-secgrp_id"]]
 }
 
 module "server-ix00" {
   source = "../../modules/indexer"
-  name = "${local.prefix}ix00"
-  secgrp_id_list = [module.core.base-secgrp_id, module.core.indexer-secgrp_id]
+  name   = "${local.prefix}ix00"
 }
 
 module "server-ix01" {
   source = "../../modules/indexer"
-  name = "${local.prefix}ix01"
-  secgrp_id_list = [module.core.base-secgrp_id, module.core.indexer-secgrp_id]
+  name   = "${local.prefix}ix01"
 }
 
 module "server-sy00" {
-  source = "../../modules/genericecs"
-  name = "${local.prefix}sy00"
-  secgrp_id_list = [module.core.base-secgrp_id, module.core.parser-secgrp_id]
+  source         = "../../modules/genericecs"
+  name           = "${local.prefix}sy00"
+  secgrp_id_list = [data.terraform_remote_state.shared.outputs["parser-secgrp_id"]]
 }
 
 module "server-sy01" {
-  source = "../../modules/genericecs"
-  name = "${local.prefix}sy01"
-  secgrp_id_list = [module.core.base-secgrp_id, module.core.parser-secgrp_id]
+  source         = "../../modules/genericecs"
+  name           = "${local.prefix}sy01"
+  secgrp_id_list = [data.terraform_remote_state.shared.outputs["parser-secgrp_id"]]
 }

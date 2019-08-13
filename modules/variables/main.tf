@@ -21,6 +21,9 @@
 #  value = var.stage_letter_map[var.stage]
 #}
 
+#TODO refactor, stages = d0, p0,...
+#TODO refactor, use tenant names instead of workspace names or make terraform.workspace == tenantname
+
 variable "tenant_map" {
   description = "Each stage must be represented by a single letter"
   type        = "map"

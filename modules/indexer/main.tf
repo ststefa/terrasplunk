@@ -1,6 +1,4 @@
 locals {
-  #hot_size  = 5
-  #cold_size = 10
   stage_map = {
     d : "development"
     t : "test"
@@ -19,10 +17,17 @@ module "variables" {
   stage     = local.stage
 }
 
+data "terraform_remote_state" "shared" {
+  backend = "local"
+  config = {
+    path = module.variables.shared_statefile
+  }
+}
+
 module "idx-instance" {
   source         = "../../modules/genericecs"
   name           = var.name
-  secgrp_id_list = var.secgrp_id_list
+  secgrp_id_list = [data.terraform_remote_state.shared.outputs["indexer-secgrp_id"]]
 }
 
 resource "opentelekomcloud_blockstorage_volume_v2" "cold1" {
