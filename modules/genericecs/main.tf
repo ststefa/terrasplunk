@@ -1,13 +1,5 @@
 locals {
-  stage_map = { #TODO refactor, stage == var.name
-    d : "development"
-    p : "production"
-    q : "qa"
-    t : "test"
-    u : "universal"
-    w : "spielwiese"
-  }
-  stage             = local.stage_map[substr(var.name, 3, 1)]
+  stage             = substr(var.name, 3, 2)
   hostnumber        = tonumber(substr(var.name, -2, 2))
   availability_zone = local.hostnumber % 2 == 0 ? "eu-ch-01" : "eu-ch-02"
   netname           = local.stage == "production" ? "netA" : "netC"
