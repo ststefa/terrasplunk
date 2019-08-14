@@ -1,19 +1,10 @@
-locals {
-  this_stage = "p0" # Substitute value for the environment ID
-  stage_map = {
-    d0 : "development"
-    p0 : "production"
-    q0 : "qa"
-    t0 : "test"
-    u0 : "universal"
-    w0 : "spielwiese"
-  }
-  stage  = local.stage_map[local.this_stage]
-  prefix = "spl${local.this_stage}"
+terraform {
+  required_version = ">= 0.12.4"
 }
 
-terraform {
-  required_version = ">= 0.12"
+locals {
+  stage  = basename(abspath("${path.root}"))
+  prefix = "spl${local.stage}"
 }
 
 provider "opentelekomcloud" {
@@ -71,21 +62,21 @@ module "server-0cm00" {
 }
 
 module "server-0ix00" {
-  source = "../../modules/indexer"
+  source = "../../modules/ix"
   name   = "${local.prefix}ix00"
 }
 
 module "server-0ix01" {
-  source = "../../modules/indexer"
+  source = "../../modules/ix"
   name   = "${local.prefix}ix01"
 }
 module "server-0ix02" {
-  source = "../../modules/indexer"
+  source = "../../modules/ix"
   name   = "${local.prefix}ix02"
 }
 
 module "server-0ix03" {
-  source = "../../modules/indexer"
+  source = "../../modules/ix"
   name   = "${local.prefix}ix03"
 }
 

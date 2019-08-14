@@ -1,19 +1,10 @@
-locals {
-  this_stage = basename(abspath("${path.root}")) #TODO refactor, this.stage == basename("${path.root}")
-  stage_map = {
-    development : "d0"
-    production : "p0"
-    qa : "q0"
-    test : "t0"
-    universal : "u0"
-    spielwiese : "w0"
-  }
-  stage  = local.stage_map[local.this_stage] #TODO refactor, stage == this.stage
-  prefix = "spl${local.stage}"
+terraform {
+  required_version = ">= 0.12.4"
 }
 
-terraform {
-  required_version = ">= 0.12"
+locals {
+  stage  = basename(abspath("${path.root}"))
+  prefix = "spl${local.stage}"
 }
 
 provider "opentelekomcloud" {
@@ -28,12 +19,12 @@ provider "opentelekomcloud" {
 module "variables" {
   source    = "../../modules/variables"
   workspace = terraform.workspace
-  stage     = local.this_stage #TODO refactor, stage == this.stage
+  stage     = local.stage
 }
 
 module "core" {
   source = "../../modules/core"
-  stage  = local.this_stage #TODO refactor, stage == this.stage
+  stage  = local.stage
 }
 
 data "terraform_remote_state" "shared" {
@@ -44,24 +35,22 @@ data "terraform_remote_state" "shared" {
 }
 
 module "server-sh00" {
-  source         = "../../modules/genericecs"
-  name           = "${local.prefix}sh00"
-  secgrp_id_list = [data.terraform_remote_state.shared.outputs["searchhead-secgrp_id"]]
+  source = "../../modules/sh"
+  name   = "${local.prefix}sh00"
 }
 
 module "server-sh01" {
-  source         = "../../modules/genericecs"
-  name           = "${local.prefix}sh01"
-  secgrp_id_list = [data.terraform_remote_state.shared.outputs["searchhead-secgrp_id"]]
+  source = "../../modules/sh"
+  name   = "${local.prefix}sh01"
 }
 
 module "server-ix00" {
-  source = "../../modules/indexer"
+  source = "../../modules/ix"
   name   = "${local.prefix}ix00"
 }
 
 module "server-ix01" {
-  source = "../../modules/indexer"
+  source = "../../modules/ix"
   name   = "${local.prefix}ix01"
 }
 

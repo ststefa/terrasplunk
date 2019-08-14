@@ -1,12 +1,12 @@
 output "id" {
   description = "vm id"
-  value       = module.idx-instance.id
+  value       = module.ix-instance.id
 }
 output "ip" {
   description = "access ip"
-  value       = module.idx-instance.ip
+  value       = module.ix-instance.ip
 }
 output "name" {
   description = "instance name"
-  value       = module.idx-instance.name
+  value       = module.ix-instance.name
 }
