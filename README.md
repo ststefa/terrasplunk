@@ -124,11 +124,14 @@ Don't break stuff on the production tenant! Feel free to break everything on the
 As an additional security net you should use different credentials on the test and prod tenant. This will safe you from accidentally using the wrong workspace.
 
 # Provisioning
+
+## Thoughts on provisioning
+
 Once the base infrastructure has been created with terraform the next most important step is the provisioning. Provisioing is a term commonly used for the process of turning the empty infrastructure into its real, usable state. It encompasses all the steps required from installing and configuring software, through configuring the relations between instances, to finally setting up and managing entry- and exit-points of the platform. A key point must be to ensure that this entire process is automated without exception so that rebuilds can be fluent and without human intervention.
 
-Multiple approaches how this can be done are available and there is (afaik) currently no proven and generally applicable "best of breed" solution. Oftentimes state definition tools like salt or puppet are used. Some prefer a more procedural way using ansible or plain bash. There are also tools like `packer` (https://www.packer.io/) which aim to use preconfigured images. Each of these have their pros and cons which are outside of the scope of this README.
+Multiple approaches how this can be done are available and there is (afaik) currently no proven and generally applicable "best of breed" solution. Some use state definition tools like salt or puppet which correspond to the declarative nature of terraform. Some prefer a more procedural way using ansible or plain bash. There are also tools like `packer` (https://www.packer.io/) which aim to use preconfigured images. Each of these have their pros and cons which are outside of the scope of this readme.
 
-A key requirement is that arbitrary data from terraform can be passed to the provisioning step, e.g. disk device names and instance names. This is very important because it is likely that the provisioning will need arbitrary and not yet known pieces of information about the "terraformed" infrastructure. A good solution will thus have to use a generic mechanism which is capable of transferring arbitrary data to the provisioning process.
+A key requirement is that arbitrary data from terraform can be passed to the provisioning step, e.g. disk device names and instance names. This is very important because it is likely that the provisioning will need arbitrary and not yet known pieces of information about the terraformed infrastructure. A good solution will thus have to use a generic mechanism which is capable of transferring arbitrary data to the provisioning process.
 
 I currently see two approaches to pass arbitrary data to the provisioning:
 
@@ -136,11 +139,48 @@ I currently see two approaches to pass arbitrary data to the provisioning:
 
 - Uses terraform `local-exec` provisioners which create parameter files. Any resource can add to this parameter files. A separate provisioning process can use it as input data to perform the provisioning. While this might make it possible to couple terraforming and provisioning closer together it might also make the terraform code more complicated.
 
+## Implementation
+
+For now we've chosen to build a mechanism which fully exposes the complete terraform state including all tenants as a single json structure. It is then up to the provisioning process to extract the relevant information. While this sure is not the most efficient approach it is the simplest one and still allows maximum flexibility on the provisioner side. Optimizations could be implemented (e.g. just passing parts of the full state) if this becomes necessary. Tests have shown that this will probably not be necessary for what we have planned.
+
+To obtain the terraform data a provisioner uses the `bin/build_state.py` executable which will write the full terraform state as a json structure to stdout. The structure looks like this
+
+```
+{
+    shared: {
+        <shared state>
+    }
+    tenant1: {
+        stage1: {
+            <stage1 state>
+        },
+        stage2: {
+            <stage2 state>
+        },
+        ...
+    },
+    tenant2: {
+        stage1: {
+            <stage1 state>
+        },
+        stage2: {
+            <stage2 state>
+        },
+        ...
+    },
+    ...
+}
+```
+
+While the structure is deterministic the sort order is not. I.e. there is no guarantee in which order the tenants, shared or stages will appear in the output.
+
+The provisioner can then read this json data from stdin and apply his parsing logic to extract required information.
+
 # Contributing
 
 For any suggestion, improvment, correction, etc. open a branch with a descriptive name (which it explains the goal of the update) and assign it to a repo maintainer.
 
-Otherwise, if you don't feel brave to edit code (this shouldn't be the case :simple_smile:), open an [issue](https://gitlab-tss.sbb.ch/splunk/splunk_provisioning/issues) and assign it to a repo maintainer.
+Otherwise, if you don't feel brave enough to edit code (this shouldn't be the case :simple_smile:), open an [issue](https://gitlab-tss.sbb.ch/splunk/splunk_provisioning/issues) and assign it to a repo maintainer.
 
 # Open Points (notes to self)
 
