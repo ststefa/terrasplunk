@@ -5,5 +5,5 @@ variable "workspace" {
 }
 
 variable "stage" {
-  description = "One of 'spielwiese', 'dev', 'test', 'qa',  or 'production'"
+  description = "Stage abbreviation, e.g. p0, w0,..."
 }

@@ -1,5 +1,5 @@
 variable "stage" {
-  description = "dev / test / ..."
+  description = "w0 / p0 / ..."
 }
 
 

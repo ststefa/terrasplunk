@@ -1,9 +1,10 @@
-locals {
-  stage = "development"
+terraform {
+  required_version = ">= 0.12.4"
 }
 
-terraform {
-  required_version = ">= 0.12"
+locals {
+  stage  = basename(abspath("${path.root}"))
+  prefix = "spl${local.stage}"
 }
 
 provider "opentelekomcloud" {
@@ -19,4 +20,16 @@ module "variables" {
   source    = "../../modules/variables"
   workspace = terraform.workspace
   stage     = local.stage
+}
+
+module "core" {
+  source = "../../modules/core"
+  stage  = local.stage
+}
+
+data "terraform_remote_state" "shared" {
+  backend = "local"
+  config = {
+    path = module.variables.shared_statefile
+  }
 }

@@ -1,13 +1,5 @@
 locals {
-  stage_map = { #TODO refactor, stage == var.name
-    d : "development"
-    p : "production"
-    q : "qa"
-    t : "test"
-    u : "universal"
-    w : "spielwiese"
-  }
-  stage             = local.stage_map[substr(var.name, 3, 1)]
+  stage             = substr(var.name, 3, 2)
   hostnumber        = tonumber(substr(var.name, -2, 2))
   availability_zone = local.hostnumber % 2 == 0 ? "eu-ch-01" : "eu-ch-02"
   netname           = local.stage == "production" ? "netA" : "netC"
@@ -33,6 +25,7 @@ data "opentelekomcloud_images_image_v2" "osimage" {
   most_recent = true
 }
 
+# see comment on nested instance blockstorage
 resource "opentelekomcloud_blockstorage_volume_v2" "root" {
   name              = "${var.name}-root"
   availability_zone = local.availability_zone
@@ -61,12 +54,10 @@ resource "opentelekomcloud_compute_instance_v2" "instance" {
   }
   #depends_on = [var.interface]
 
+  # using a nested blockstorage is also possible but resulted in mixed up vda/vdb assignments in some cases. Using externally defined blockstorage instead with additional dependencies for attach.opt
   block_device {
-    #uuid                  = data.opentelekomcloud_images_image_v2.osimage.id
     uuid        = opentelekomcloud_blockstorage_volume_v2.root.id
     source_type = "volume"
-    # This shouldN#t be necessary according to https://www.terraform.io/docs/providers/opentelekomcloud/r/compute_instance_v2.html. However terraform complains if not specified
-    #volume_size           = module.variables.pvsize_root
     boot_index            = 0
     destination_type      = "volume"
     delete_on_termination = true

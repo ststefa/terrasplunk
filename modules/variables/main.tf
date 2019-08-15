@@ -6,24 +6,6 @@
 #  }
 #}
 
-#variable "stage_letter_map" {
-#  description = "Each stage must be represented by a single letter"
-#  type = "map"
-#  default = {
-#    spielwiese   = "w"
-#    production   = "p"
-#    development  = "d"
-#    test         = "t"
-#    qa           = "q"
-#  }
-#}
-#output "stage_letter" {
-#  value = var.stage_letter_map[var.stage]
-#}
-
-#TODO refactor, stages = d0, p0,...
-#TODO refactor, use tenant names instead of workspace names or make terraform.workspace == tenantname
-
 variable "tenant_map" {
   description = "Each stage must be represented by a single letter"
   type        = "map"
@@ -83,22 +65,20 @@ variable "flavor_map" {
   type        = "map"
   default = {
     default = {
-      development : "s2.medium.4"
-      test : "s2.medium.4"
-      quality : "s2.medium.4"
-      production : "s2.medium.8"
-      spielwiese : "s2.medium.4"
-      universal : "s2.medium.4"
-      #dontcare: ""
+      d0 : "s2.medium.4"
+      t0 : "s2.medium.4"
+      u0 : "s2.medium.4"
+      p0 : "s2.medium.8"
+      w0 : "s2.medium.4"
+      #universal : "s2.medium.4"
     }
     production = {
-      development : "s2.medium.4"
-      test : "s2.xlarge.4"
-      quality : "s2.xlarge.4"
-      production : "s2.2xlarge.4"
-      spielwiese : "s2.medium.4"
-      universal : "s2.medium.4"
-      #dontcare: ""
+      d0 : "s2.medium.4"
+      t0 : "s2.xlarge.4"
+      u0 : "s2.xlarge.4"
+      p0 : "s2.2xlarge.4"
+      w0 : "s2.medium.4"
+      #universal : "s2.medium.4"
     }
   }
 }
@@ -120,20 +100,20 @@ variable "pvsize_hot_map" {
   type        = "map"
   default = {
     default = {
-      development : 50
-      test : 50
-      quality : 50
-      production : 50
-      spielwiese : 50
-      universal : 50
+      d0 : 50
+      t0 : 50
+      u0 : 50
+      p0 : 50
+      w0 : 50
+      #universal : 50
     }
     production = {
-      development : 50
-      test : 50
-      quality : 50
-      production : 100
-      spielwiese : 50
-      universal : 50
+      d0 : 50
+      t0 : 50
+      u0 : 50
+      p0 : 100
+      w0 : 50
+      #universal : 50
     }
   }
 }
@@ -146,20 +126,20 @@ variable "pvsize_cold_map" {
   type        = "map"
   default = {
     default = {
-      development : 50
-      test : 50
-      quality : 50
-      production : 50
-      spielwiese : 50
-      universal : 50
+      d0 : 50
+      t0 : 50
+      u0 : 50
+      p0 : 50
+      w0 : 50
+      #universal : 50
     }
     production = {
-      development : 50
-      test : 50
-      quality : 50
-      production : 100
-      spielwiese : 50
-      universal : 50
+      d0 : 50
+      t0 : 50
+      u0 : 50
+      p0 : 100
+      w0 : 50
+      #universal : 50
     }
   }
 }
