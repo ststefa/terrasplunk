@@ -70,7 +70,7 @@ resource "opentelekomcloud_compute_secgroup_v2" "base-secgrp" {
 resource "opentelekomcloud_compute_secgroup_v2" "indexer-secgrp" {
   # TODO: Extend/fix ports
   name        = "${local.project}-indexer-secgrp"
-  description = "${local.project} indexer ports"
+  description = "Specific rules for ${local.project} indexer instances"
 
   # indexr port
   rule {
@@ -85,7 +85,7 @@ resource "opentelekomcloud_compute_secgroup_v2" "indexer-secgrp" {
 resource "opentelekomcloud_compute_secgroup_v2" "searchhead-secgrp" {
   # TODO: Extend/fix ports
   name        = "${local.project}-searchhead-secgrp"
-  description = " ${local.project} searchhead ports"
+  description = "Specific rules for ${local.project} searchhead instances"
 
   # search gui
   rule {
@@ -113,7 +113,7 @@ resource "opentelekomcloud_compute_secgroup_v2" "searchhead-secgrp" {
 resource "opentelekomcloud_compute_secgroup_v2" "parser-secgrp" {
   # TODO: Extend/fix ports
   name        = "${local.project}-parser-secgrp"
-  description = "${local.project} parser ports"
+  description = "Specific rules for ${local.project} parser instances (sy, hf)"
 
   # syslog udp
   rule {
