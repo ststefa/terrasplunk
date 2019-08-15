@@ -55,7 +55,7 @@ resource "opentelekomcloud_compute_instance_v2" "instance" {
   }
   #depends_on = [var.interface]
 
-  # using a nested blockstorage is also possible but resulted in mixed up vda/vdb assignments in some cases. Using externally defined blockstorage instead with additional dependencies for attach.opt
+  # using a nested blockstorage is also possible but resulted in mixed up vda/vdb assignments in some cases (i.e. root=vdb, opt=vda). Using externally defined blockstorage instead with additional dependencies in opt_attach to make sure opt is not assigned before the root disk
   block_device {
     uuid        = opentelekomcloud_blockstorage_volume_v2.root.id
     source_type = "volume"
