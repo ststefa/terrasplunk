@@ -18,10 +18,12 @@ output "netC-az2_id" {
 }
 
 output "subnetA-az1_id" {
-  value = data.opentelekomcloud_vpc_subnet_v1.subnetA_az1.subnet_id
+  #value = data.opentelekomcloud_vpc_subnet_v1.subnetA_az1.subnet_id
+  value = opentelekomcloud_vpc_subnet_v1.subnetA-az1.id
 }
 output "subnetA-az2_id" {
-  value = data.opentelekomcloud_vpc_subnet_v1.subnetA_az2.subnet_id
+  #value = data.opentelekomcloud_vpc_subnet_v1.subnetA_az2.subnet_id
+  value = opentelekomcloud_vpc_subnet_v1.subnetA-az2.id
 }
 #output "subnetB-az1_id" {
 #  value = data.opentelekomcloud_vpc_subnet_v1.subnetB_az1.subnet_id
@@ -30,10 +32,12 @@ output "subnetA-az2_id" {
 #  value = data.opentelekomcloud_vpc_subnet_v1.subnetB_az2.subnet_id
 #}
 output "subnetC-az1_id" {
-  value = data.opentelekomcloud_vpc_subnet_v1.subnetC_az1.subnet_id
+  #value = data.opentelekomcloud_vpc_subnet_v1.subnetC_az1.subnet_id
+  value = opentelekomcloud_vpc_subnet_v1.subnetC-az1.id
 }
 output "subnetC-az2_id" {
-  value = data.opentelekomcloud_vpc_subnet_v1.subnetC_az2.subnet_id
+  #value = data.opentelekomcloud_vpc_subnet_v1.subnetC_az2.subnet_id
+  value = opentelekomcloud_vpc_subnet_v1.subnetC-az2.id
 }
 
 #output "interface1" {
