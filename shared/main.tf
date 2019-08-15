@@ -15,6 +15,7 @@ provider "opentelekomcloud" {
   auth_url = "https://iam.eu-ch.o13bb.otc.t-systems.com/v3"
 }
 
+# TODO: refactor variables in two mods, see TODO there
 module "variables" {
   source    = "../modules/variables"
   workspace = terraform.workspace

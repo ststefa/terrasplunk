@@ -35,6 +35,7 @@ resource "opentelekomcloud_blockstorage_volume_v2" "root" {
 
 resource "opentelekomcloud_compute_instance_v2" "instance" {
   availability_zone = local.availability_zone
+  #TODO: make flavor an input var to allow splitting based on ecs role
   flavor_name       = module.variables.flavor
   name              = var.name
   key_pair          = data.terraform_remote_state.shared.outputs["keypair-tss_id"]

@@ -58,7 +58,6 @@ data "opentelekomcloud_vpc_subnet_v1" "subnetC_az2" {
 #  vpc_id = data.opentelekomcloud_vpc_v1.vpc.id
 #}
 
-# do not manage nets but use datasources because its
 #resource "opentelekomcloud_vpc_subnet_v1" "netA-az1" {
 #  name = "${local.project}-prod-az1"
 #  cidr              = module.variables.subnet_cidr["prod-az1"]

@@ -193,3 +193,7 @@ etcdv3 seems promising
 ## Asymetry between tenants
 
 The current logic does allow to have a different number of VMs between stages but not between tenants. Feature toggles based on existence of VM names defined in the variables module might solve this (https://medium.com/capital-one-tech/building-feature-toggles-into-terraform-d75806217647)
+
+## Duplicate hostnames
+
+The current logic uses the same hostnames on both tenants. While this is fine for now it might lead to conflicts should we decide to register the names in a DNS server for _both_ tenants. Currently none are registered but it might well be that registering prod-tenant-vms will be requested. Maybe this could be solved using subdomains for tenants. Otherwise the vm namimg concept must be changed.
