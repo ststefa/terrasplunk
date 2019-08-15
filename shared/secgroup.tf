@@ -68,7 +68,7 @@ resource "opentelekomcloud_compute_secgroup_v2" "base-secgrp" {
 }
 
 resource "opentelekomcloud_compute_secgroup_v2" "indexer-secgrp" {
-  # TODO: Extend/fix ports
+  # TODO: Extend/fix ports, see splunk doc above
   name        = "${local.project}-indexer-secgrp"
   description = "Specific rules for ${local.project} indexer instances"
 
@@ -83,7 +83,7 @@ resource "opentelekomcloud_compute_secgroup_v2" "indexer-secgrp" {
 }
 
 resource "opentelekomcloud_compute_secgroup_v2" "searchhead-secgrp" {
-  # TODO: Extend/fix ports
+  # TODO: Extend/fix ports, see splunk doc above
   name        = "${local.project}-searchhead-secgrp"
   description = "Specific rules for ${local.project} searchhead instances"
 
@@ -111,7 +111,7 @@ resource "opentelekomcloud_compute_secgroup_v2" "searchhead-secgrp" {
 }
 
 resource "opentelekomcloud_compute_secgroup_v2" "parser-secgrp" {
-  # TODO: Extend/fix ports
+  # TODO: Extend/fix ports, see splunk doc above
   name        = "${local.project}-parser-secgrp"
   description = "Specific rules for ${local.project} parser instances (sy, hf)"
 
