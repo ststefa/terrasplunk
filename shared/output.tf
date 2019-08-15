@@ -60,5 +60,5 @@ output "parser-secgrp_id" {
 }
 
 output "keypair-tss_id" {
-  value = opentelekomcloud_compute_keypair_v2.keypair-tss.name
+  value = opentelekomcloud_compute_keypair_v2.keypair-tss.id
 }
