@@ -1,11 +1,18 @@
 #!/usr/bin/env python3
 
+"""
+This collects all available terraform state and writes it to stdout as a json
+structure. Further doc on the structure of the output can be found in the
+toplevel README
+"""
+
 import os
 import re
 import sys
 import argparse
 import json
 
+# noinspection PyCompatibility
 import pathlib
 
 import logging
@@ -98,7 +105,10 @@ def main():
         base_path = args.root_dir
     log.debug('base_path: %s' % base_path)
 
+    # The final result to poulate
     result = {}
+
+    # Any stages/* dir which matches this regex is considered a stage dir
     reg_stagename = re.compile("..")
 
     for workspace in workspace_tenant_map.keys():
