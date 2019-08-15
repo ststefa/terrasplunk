@@ -26,6 +26,7 @@ resource "opentelekomcloud_blockstorage_volume_v2" "cold1" {
   availability_zone = module.ix-instance.az
   name              = "${module.ix-instance.name}-cold1"
   size              = module.variables.pvsize_cold
+  #TODO: add lifecycle {prevent_destroy = true} for all pvs
 }
 resource "opentelekomcloud_blockstorage_volume_v2" "cold2" {
   availability_zone = module.ix-instance.az
