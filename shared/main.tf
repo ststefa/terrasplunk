@@ -1,5 +1,6 @@
 locals {
-  project = "splunk"
+  project     = "splunk"
+  tenant_name = terraform.workspace == "default" ? "tsch_rz_t_001" : "tsch_rz_p_001"
 }
 
 terraform {
