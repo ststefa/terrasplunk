@@ -85,8 +85,8 @@ data "opentelekomcloud_networking_network_v2" "netA-az2" {
   matching_subnet_cidr = module.variables.subnet_cidr["netA-az2"]
 }
 
+# cannot currently have spare (sub)netB-az1 on test tenant because no room left
 resource "opentelekomcloud_vpc_subnet_v1" "subnetB-az1" {
-  # cannot currently have spare net on test tenant because no room left
   count             = local.tenant_name == "tsch_rz_p_001" ? 1 : 0
   name              = "${local.project}-subnetB-az1"
   cidr              = module.variables.subnet_cidr["netB-az1"]
@@ -101,6 +101,7 @@ data "opentelekomcloud_networking_network_v2" "netB-az1" {
   matching_subnet_cidr = module.variables.subnet_cidr["netB-az1"]
 }
 
+# cannot currently have spare (sub)netB-az2 on test tenant because no room left
 resource "opentelekomcloud_vpc_subnet_v1" "subnetB-az2" {
   count             = local.tenant_name == "tsch_rz_p_001" ? 1 : 0
   name              = "${local.project}-subnetB-az2"
