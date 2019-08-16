@@ -16,7 +16,7 @@ output "netB-az1_id" {
   #value = data.opentelekomcloud_networking_network_v2.netB-az1[0].id ? data.opentelekomcloud_networking_network_v2.netB-az1[0].id : "no-netB-az1"
   # simpler form also works, it seems terraform omits nonexisting count output by itself
   # TODO: verify behaviour on prod-tnt, cannot test this on test-tnt
-  value = data.opentelekomcloud_networking_network_v2.netB-az1[1].id
+  value = data.opentelekomcloud_networking_network_v2.netB-az1[0].id
 }
 output "subnetB-az1_id" {
   value = opentelekomcloud_vpc_subnet_v1.subnetB-az1[0].id
