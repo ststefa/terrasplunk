@@ -13,21 +13,20 @@ output "subnetA-az2_id" {
 }
 
 output "netB-az1_id" {
-  count = local.tenant_name == "tsch_rz_p_001" ? 1 : 0
-  value = data.opentelekomcloud_networking_network_v2.netB-az1.id
+  #value = data.opentelekomcloud_networking_network_v2.netB-az1[0].id ? data.opentelekomcloud_networking_network_v2.netB-az1[0].id : "no-netB-az1"
+  # simpler form also works, it seems terraform omits nonexisting count output by itself
+  # TODO: verify behaviour on prod-tnt, cannot test this on test-tnt
+  value = data.opentelekomcloud_networking_network_v2.netB-az1[1].id
 }
 output "subnetB-az1_id" {
-  count = local.tenant_name == "tsch_rz_p_001" ? 1 : 0
-  value = opentelekomcloud_vpc_subnet_v1.subnetB-az1.id
+  value = opentelekomcloud_vpc_subnet_v1.subnetB-az1[0].id
 }
 
 output "netB-az2_id" {
-  count = local.tenant_name == "tsch_rz_p_001" ? 1 : 0
-  value = data.opentelekomcloud_networking_network_v2.netB-az2.id
+  value = data.opentelekomcloud_networking_network_v2.netB-az2[0].id
 }
 output "subnetB-az2_id" {
-  count = local.tenant_name == "tsch_rz_p_001" ? 1 : 0
-  value = opentelekomcloud_vpc_subnet_v1.subnetB-az2.id
+  value = opentelekomcloud_vpc_subnet_v1.subnetB-az2[0].id
 }
 
 output "netC-az1_id" {
