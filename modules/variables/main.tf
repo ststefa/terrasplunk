@@ -87,7 +87,7 @@ variable "flavor_map" {
       d0 : "s2.medium.4"
       t0 : "s2.xlarge.4"
       u0 : "s2.xlarge.4"
-      p0 : "s2.2xlarge.4"
+      p0 : "s2.4xlarge.8"
       w0 : "s2.medium.4"
     }
   }
@@ -98,6 +98,8 @@ output "flavor" {
   value = contains(keys(var.flavor_map[var.workspace]), var.stage) ? var.flavor_map[var.workspace][var.stage] : ""
 }
 
+# search flavor: s2.4xlarge.4
+
 output "pvsize_root" {
   description = "Size of (ephemeral) root pv"
   value = 20
@@ -106,6 +108,16 @@ output "pvsize_root" {
 output "pvsize_opt" {
   description = "Size of /opt pv"
   value = 20
+}
+
+output "primary_dns" {
+  description = "Terraform state filename for current workspace"
+  value = "10.124.216.29"
+}
+
+output "secondary_dns" {
+  description = "Terraform state filename for current workspace"
+  value = "10.124.217.29"
 }
 
 variable "pvsize_hot_map" {
@@ -123,7 +135,7 @@ variable "pvsize_hot_map" {
       d0 : 50
       t0 : 50
       u0 : 50
-      p0 : 100
+      p0 : 400
       w0 : 50
     }
   }
@@ -148,7 +160,7 @@ variable "pvsize_cold_map" {
       d0 : 50
       t0 : 50
       u0 : 50
-      p0 : 100
+      p0 : 4096
       w0 : 50
     }
   }

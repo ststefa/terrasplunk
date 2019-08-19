@@ -26,6 +26,9 @@
 #Indexer, Receiving data from forwarders (ssl)
 #    outbound: N/A
 #    inbound:  TCP/9998
+#HEC Indexer, Receiving data from HTTP (ssl)
+#    outbound: N/A
+#    inbound:  TCP/8088
 #Indexer cluster peer node / Search head cluster member, Cluster replication
 #    outbound: N/A
 #    inbound:  TCP/9887
@@ -74,12 +77,19 @@ resource "opentelekomcloud_compute_secgroup_v2" "indexer-secgrp" {
 
   # indexr port
   rule {
-    from_port   = 9997
+    from_port   = 9998
     to_port     = 9998
     ip_protocol = "tcp"
     cidr        = "0.0.0.0/0"
   }
 
+  # HEC Indexer, Receiving data from HTTP (ssl)
+  rule {
+    from_port   = 8088
+    to_port     = 8088
+    ip_protocol = "tcp"
+    cidr        = "0.0.0.0/0"
+  }
 }
 
 resource "opentelekomcloud_compute_secgroup_v2" "searchhead-secgrp" {
@@ -88,12 +98,6 @@ resource "opentelekomcloud_compute_secgroup_v2" "searchhead-secgrp" {
   description = "Specific rules for ${local.project} searchhead instances"
 
   # search gui
-  rule {
-    from_port   = 443
-    to_port     = 443
-    ip_protocol = "tcp"
-    cidr        = "0.0.0.0/0"
-  }
   rule {
     from_port   = 8000
     to_port     = 8000
