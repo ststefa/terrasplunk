@@ -44,7 +44,6 @@ module "server-0sh00" {
   name           = "${local.prefix}sh00"
   secgrp_id_list = [data.terraform_remote_state.shared.outputs["searchhead-secgrp_id"]]
 }
-
 module "server-0sh01" {
   source         = "../../modules/genericecs"
   name           = "${local.prefix}sh01"
@@ -55,17 +54,25 @@ module "server-0sh02" {
   name           = "${local.prefix}sh02"
   secgrp_id_list = [data.terraform_remote_state.shared.outputs["searchhead-secgrp_id"]]
 }
+module "server-0sh03" {
+  source         = "../../modules/genericecs"
+  name           = "${local.prefix}sh03"
+  secgrp_id_list = [data.terraform_remote_state.shared.outputs["searchhead-secgrp_id"]]
+}
+module "server-0sh04" {
+  source         = "../../modules/genericecs"
+  name           = "${local.prefix}sh04"
+  secgrp_id_list = [data.terraform_remote_state.shared.outputs["searchhead-secgrp_id"]]
+}
 
 module "server-0cm00" {
   source = "../../modules/genericecs"
   name   = "${local.prefix}cm00"
 }
-
 module "server-0ix00" {
   source = "../../modules/ix"
   name   = "${local.prefix}ix00"
 }
-
 module "server-0ix01" {
   source = "../../modules/ix"
   name   = "${local.prefix}ix01"
@@ -74,10 +81,25 @@ module "server-0ix02" {
   source = "../../modules/ix"
   name   = "${local.prefix}ix02"
 }
-
 module "server-0ix03" {
   source = "../../modules/ix"
   name   = "${local.prefix}ix03"
+}
+module "server-0ix04" {
+  source = "../../modules/ix"
+  name   = "${local.prefix}ix04"
+}
+module "server-0ix05" {
+  source = "../../modules/ix"
+  name   = "${local.prefix}ix05"
+}
+module "server-0ix06" {
+  source = "../../modules/ix"
+  name   = "${local.prefix}ix06"
+}
+module "server-0ix07" {
+  source = "../../modules/ix"
+  name   = "${local.prefix}ix07"
 }
 
 module "server-0hf00" {
