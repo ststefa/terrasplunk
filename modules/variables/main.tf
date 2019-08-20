@@ -195,7 +195,7 @@ output "pvsize_cold" {
   value = contains(keys(var.pvsize_cold_map[var.workspace]), var.stage) ? var.pvsize_cold_map[var.workspace][var.stage] : ""
 }
 
-variable "subnet_cidr_map" {
+variable "subnet_cidr_list_map" {
   description = "Subnet CIDRs (split by tenant)"
   type        = "map"
   default = {
@@ -216,12 +216,12 @@ variable "subnet_cidr_map" {
     }
   }
 }
-output "subnet_cidr" {
+output "subnet_cidr_list" {
   description = "Subnet CIDR for current tenant"
-  value = var.subnet_cidr_map[var.workspace]
+  value = var.subnet_cidr_list_map[var.workspace]
 }
 
-variable "gateway_map" {
+variable "gateway_list_map" {
   description = "Network gateways (split by tenant)"
   type        = "map"
   default = {
@@ -242,9 +242,9 @@ variable "gateway_map" {
     }
   }
 }
-output "gateway" {
-  description = "Network gateway for current tenant"
-  value = var.gateway_map[var.workspace]
+output "gateway_list" {
+  description = "Network gateways for current tenant"
+  value = var.gateway_list_map[var.workspace]
 }
 
 

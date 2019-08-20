@@ -61,30 +61,30 @@ data "opentelekomcloud_vpc_v1" "vpc" {
 
 resource "opentelekomcloud_vpc_subnet_v1" "subnetA-az1" {
   name              = "${local.project}-subnetA-az1"
-  cidr              = module.variables.subnet_cidr["netA-az1"]
-  gateway_ip        = module.variables.gateway["netA-az1"]
+  cidr              = module.variables.subnet_cidr_list["netA-az1"]
+  gateway_ip        = module.variables.gateway_list["netA-az1"]
   vpc_id            = data.opentelekomcloud_vpc_v1.vpc.id
   availability_zone = "eu-ch-01"
   primary_dns       = module.variables.primary_dns
   secondary_dns     = module.variables.secondary_dns
 }
 data "opentelekomcloud_networking_network_v2" "netA-az1" {
-  matching_subnet_cidr = module.variables.subnet_cidr["netA-az1"]
+  matching_subnet_cidr = module.variables.subnet_cidr_list["netA-az1"]
   # Add a dependency to make sure the subnet is created first. This is required because the OTC vpc_subnet implicitly creates the net
   depends_on = [opentelekomcloud_vpc_subnet_v1.subnetA-az1]
 }
 
 resource "opentelekomcloud_vpc_subnet_v1" "subnetA-az2" {
   name              = "${local.project}-subnetA-az2"
-  cidr              = module.variables.subnet_cidr["netA-az2"]
-  gateway_ip        = module.variables.gateway["netA-az2"]
+  cidr              = module.variables.subnet_cidr_list["netA-az2"]
+  gateway_ip        = module.variables.gateway_list["netA-az2"]
   vpc_id            = data.opentelekomcloud_vpc_v1.vpc.id
   availability_zone = "eu-ch-02"
   primary_dns       = module.variables.primary_dns
   secondary_dns     = module.variables.secondary_dns
 }
 data "opentelekomcloud_networking_network_v2" "netA-az2" {
-  matching_subnet_cidr = module.variables.subnet_cidr["netA-az2"]
+  matching_subnet_cidr = module.variables.subnet_cidr_list["netA-az2"]
   depends_on = [opentelekomcloud_vpc_subnet_v1.subnetA-az2]
 }
 
@@ -92,8 +92,8 @@ data "opentelekomcloud_networking_network_v2" "netA-az2" {
 resource "opentelekomcloud_vpc_subnet_v1" "subnetB-az1" {
   count             = local.tenant_name == "tsch_rz_p_001" ? 1 : 0
   name              = "${local.project}-subnetB-az1"
-  cidr              = module.variables.subnet_cidr["netB-az1"]
-  gateway_ip        = module.variables.gateway["netB-az1"]
+  cidr              = module.variables.subnet_cidr_list["netB-az1"]
+  gateway_ip        = module.variables.gateway_list["netB-az1"]
   vpc_id            = data.opentelekomcloud_vpc_v1.vpc.id
   availability_zone = "eu-ch-01"
   primary_dns       = module.variables.primary_dns
@@ -101,7 +101,7 @@ resource "opentelekomcloud_vpc_subnet_v1" "subnetB-az1" {
 }
 data "opentelekomcloud_networking_network_v2" "netB-az1" {
   count                = local.tenant_name == "tsch_rz_p_001" ? 1 : 0
-  matching_subnet_cidr = module.variables.subnet_cidr["netB-az1"]
+  matching_subnet_cidr = module.variables.subnet_cidr_list["netB-az1"]
   depends_on = [opentelekomcloud_vpc_subnet_v1.subnetB-az1]
 }
 
@@ -109,8 +109,8 @@ data "opentelekomcloud_networking_network_v2" "netB-az1" {
 resource "opentelekomcloud_vpc_subnet_v1" "subnetB-az2" {
   count             = local.tenant_name == "tsch_rz_p_001" ? 1 : 0
   name              = "${local.project}-subnetB-az2"
-  cidr              = module.variables.subnet_cidr["netB-az2"]
-  gateway_ip        = module.variables.gateway["netB-az2"]
+  cidr              = module.variables.subnet_cidr_list["netB-az2"]
+  gateway_ip        = module.variables.gateway_list["netB-az2"]
   vpc_id            = data.opentelekomcloud_vpc_v1.vpc.id
   availability_zone = "eu-ch-02"
   primary_dns       = module.variables.primary_dns
@@ -118,35 +118,35 @@ resource "opentelekomcloud_vpc_subnet_v1" "subnetB-az2" {
 }
 data "opentelekomcloud_networking_network_v2" "netB-az2" {
   count                = local.tenant_name == "tsch_rz_p_001" ? 1 : 0
-  matching_subnet_cidr = module.variables.subnet_cidr["netB-az2"]
+  matching_subnet_cidr = module.variables.subnet_cidr_list["netB-az2"]
   depends_on = [opentelekomcloud_vpc_subnet_v1.subnetB-az2]
 }
 
 resource "opentelekomcloud_vpc_subnet_v1" "subnetC-az1" {
   name              = "${local.project}-subnetC-az1"
-  cidr              = module.variables.subnet_cidr["netC-az1"]
-  gateway_ip        = module.variables.gateway["netC-az1"]
+  cidr              = module.variables.subnet_cidr_list["netC-az1"]
+  gateway_ip        = module.variables.gateway_list["netC-az1"]
   vpc_id            = data.opentelekomcloud_vpc_v1.vpc.id
   availability_zone = "eu-ch-01"
   primary_dns       = module.variables.primary_dns
   secondary_dns     = module.variables.secondary_dns
 }
 data "opentelekomcloud_networking_network_v2" "netC-az1" {
-  matching_subnet_cidr = module.variables.subnet_cidr["netC-az1"]
+  matching_subnet_cidr = module.variables.subnet_cidr_list["netC-az1"]
   depends_on = [opentelekomcloud_vpc_subnet_v1.subnetC-az1]
 }
 
 resource "opentelekomcloud_vpc_subnet_v1" "subnetC-az2" {
   name              = "${local.project}-subnetC-az2"
-  cidr              = module.variables.subnet_cidr["netC-az2"]
-  gateway_ip        = module.variables.gateway["netC-az2"]
+  cidr              = module.variables.subnet_cidr_list["netC-az2"]
+  gateway_ip        = module.variables.gateway_list["netC-az2"]
   vpc_id            = data.opentelekomcloud_vpc_v1.vpc.id
   availability_zone = "eu-ch-02"
   primary_dns       = module.variables.primary_dns
   secondary_dns     = module.variables.secondary_dns
 }
 data "opentelekomcloud_networking_network_v2" "netC-az2" {
-  matching_subnet_cidr = module.variables.subnet_cidr["netC-az2"]
+  matching_subnet_cidr = module.variables.subnet_cidr_list["netC-az2"]
   depends_on = [opentelekomcloud_vpc_subnet_v1.subnetC-az2]
 }
 
