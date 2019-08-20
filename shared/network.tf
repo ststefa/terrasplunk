@@ -70,6 +70,7 @@ resource "opentelekomcloud_vpc_subnet_v1" "subnetA-az1" {
 }
 data "opentelekomcloud_networking_network_v2" "netA-az1" {
   matching_subnet_cidr = module.variables.subnet_cidr["netA-az1"]
+  # Add a dependency to make sure the subnet is created first. This is required because the OTC vpc_subnet implicitly creates the net
   depends_on = [opentelekomcloud_vpc_subnet_v1.subnetA-az1]
 }
 
