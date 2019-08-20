@@ -34,34 +34,34 @@ data "terraform_remote_state" "shared" {
   }
 }
 
-module "server-sh00" {
+module "server-sh000" {
   source        = "../../modules/sh"
   instance_name = "${local.prefix}sh000"
 }
 
-module "server-sh01" {
+module "server-sh001" {
   source        = "../../modules/sh"
   instance_name = "${local.prefix}sh001"
 }
 
-module "server-ix00" {
+module "server-ix000" {
   source        = "../../modules/ix"
   instance_name = "${local.prefix}ix000"
 }
 
-module "server-ix01" {
+module "server-ix001" {
   source        = "../../modules/ix"
   instance_name = "${local.prefix}ix001"
 }
 
-module "server-sy00" {
+module "server-sy000" {
   source         = "../../modules/genericecs"
   instance_name  = "${local.prefix}sy000"
   flavor         = "s2.medium.4"
   secgrp_id_list = [data.terraform_remote_state.shared.outputs["parser-secgrp_id"]]
 }
 
-module "server-sy01" {
+module "server-sy001" {
   source         = "../../modules/genericecs"
   instance_name  = "${local.prefix}sy001"
   flavor         = "s2.medium.4"
