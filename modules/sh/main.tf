@@ -1,5 +1,5 @@
 locals {
-  stage = substr(var.name, 3, 2)
+  stage = substr(var.instance_name, 3, 2)
 }
 
 module "variables" {
@@ -18,7 +18,7 @@ data "terraform_remote_state" "shared" {
 
 module "sh-instance" {
   source         = "../../modules/genericecs"
-  name           = var.name
+  instance_name  = var.instance_name
   flavor         = module.variables.flavor_sh
   secgrp_id_list = [data.terraform_remote_state.shared.outputs["searchhead-secgrp_id"]]
 }

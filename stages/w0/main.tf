@@ -35,35 +35,35 @@ data "terraform_remote_state" "shared" {
 }
 
 module "server-sh00" {
-  source = "../../modules/sh"
-  name   = "${local.prefix}sh00"
+  source        = "../../modules/sh"
+  instance_name = "${local.prefix}sh000"
 }
 
 module "server-sh01" {
-  source = "../../modules/sh"
-  name   = "${local.prefix}sh01"
+  source        = "../../modules/sh"
+  instance_name = "${local.prefix}sh001"
 }
 
 module "server-ix00" {
-  source = "../../modules/ix"
-  name   = "${local.prefix}ix00"
+  source        = "../../modules/ix"
+  instance_name = "${local.prefix}ix000"
 }
 
 module "server-ix01" {
-  source = "../../modules/ix"
-  name   = "${local.prefix}ix01"
+  source        = "../../modules/ix"
+  instance_name = "${local.prefix}ix001"
 }
 
 module "server-sy00" {
   source         = "../../modules/genericecs"
-  name           = "${local.prefix}sy00"
+  instance_name  = "${local.prefix}sy000"
   flavor         = "s2.medium.4"
   secgrp_id_list = [data.terraform_remote_state.shared.outputs["parser-secgrp_id"]]
 }
 
 module "server-sy01" {
   source         = "../../modules/genericecs"
-  name           = "${local.prefix}sy01"
+  instance_name  = "${local.prefix}sy001"
   flavor         = "s2.medium.4"
   secgrp_id_list = [data.terraform_remote_state.shared.outputs["parser-secgrp_id"]]
 }

@@ -1,8 +1,8 @@
 locals {
   # Take stage from hostname (e.g. "w0")
-  stage             = substr(var.name, 3, 2)
+  stage             = substr(var.instance_name, 3, 2)
   # Host number are the last two digits from hostname (e.g. "00") #TODO: refactor when going to three digits!
-  hostnumber        = tonumber(substr(var.name, -2, 2))
+  hostnumber        = tonumber(substr(var.instance_name, -2, 2))
   # Even numbers are placed in AZ1 (openstack name eu-ch-01). Odd numbers are placed in AZ2 (openstack name eu-ch-02).
   availability_zone = local.hostnumber % 2 == 0 ? "eu-ch-01" : "eu-ch-02"
   # p0 is in netA, everything else in netC. More logic required if we extend to netB
@@ -32,7 +32,7 @@ data "opentelekomcloud_images_image_v2" "osimage" {
 
 # see comment on nested instance blockstorage
 resource "opentelekomcloud_blockstorage_volume_v2" "root" {
-  name              = "${var.name}-root"
+  name              = "${var.instance_name}-root"
   availability_zone = local.availability_zone
   size              = module.variables.pvsize_root
   image_id          = data.opentelekomcloud_images_image_v2.osimage.id
@@ -42,7 +42,7 @@ resource "opentelekomcloud_compute_instance_v2" "instance" {
   availability_zone = local.availability_zone
   #TODO: make flavor an input var to allow splitting based on ecs role
   flavor_name       = var.flavor
-  name              = var.name
+  name              = var.instance_name
   key_pair          = data.terraform_remote_state.shared.outputs["keypair-tss_id"]
   # Attention! Any change (even comments) to user_data will rebuild the VM. Use only for the most stable and basic tasks!
   #user_data         = "${data.template_file.provtest.rendered}"
@@ -56,7 +56,7 @@ resource "opentelekomcloud_compute_instance_v2" "instance" {
 
   network {
     uuid        = local.network_id
-    fixed_ip_v4 = module.variables.pmdns[var.name]
+    fixed_ip_v4 = module.variables.pmdns[var.instance_name]
   }
   #depends_on = [var.interface]
 
@@ -72,7 +72,7 @@ resource "opentelekomcloud_compute_instance_v2" "instance" {
 
 resource "opentelekomcloud_blockstorage_volume_v2" "opt" {
   availability_zone = local.availability_zone
-  name              = "${var.name}-opt"
+  name              = "${var.instance_name}-opt"
   size              = module.variables.pvsize_opt
 }
 
@@ -88,7 +88,7 @@ data "template_file" "provtest" {
   template = "${file("${path.module}/templates/cloudinit.tpl")}"
 
   vars = {
-    fqdn     = "${var.name}.sbb.ch"
-    hostname = "${var.name}"
+    fqdn     = "${var.instance_name}.sbb.ch"
+    hostname = "${var.instance_name}"
   }
 }

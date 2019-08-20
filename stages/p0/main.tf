@@ -34,94 +34,94 @@ data "terraform_remote_state" "shared" {
   }
 }
 
-module "server-0mt00" {
-  source = "../../modules/genericecs"
-  name   = "${local.prefix}mt00"
-  flavor = "s2.medium.4"
+module "server-mt00" {
+  source        = "../../modules/genericecs"
+  instance_name = "${local.prefix}mt000"
+  flavor        = "s2.medium.4"
 }
 
-module "server-0sh00" {
-  source         = "../../modules/sh"
-  name           = "${local.prefix}sh00"
+module "server-sh00" {
+  source        = "../../modules/sh"
+  instance_name = "${local.prefix}sh000"
 }
-module "server-0sh01" {
-  source         = "../../modules/sh"
-  name           = "${local.prefix}sh01"
+module "server-sh01" {
+  source        = "../../modules/sh"
+  instance_name = "${local.prefix}sh001"
 }
-module "server-0sh02" {
-  source         = "../../modules/sh"
-  name           = "${local.prefix}sh02"
+module "server-sh02" {
+  source        = "../../modules/sh"
+  instance_name = "${local.prefix}sh002"
 }
-module "server-0sh03" {
-  source         = "../../modules/sh"
-  name           = "${local.prefix}sh03"
+module "server-sh03" {
+  source        = "../../modules/sh"
+  instance_name = "${local.prefix}sh003"
 }
-module "server-0sh04" {
-  source         = "../../modules/sh"
-  name           = "${local.prefix}sh04"
-}
-
-module "server-0cm00" {
-  source = "../../modules/genericecs"
-  name   = "${local.prefix}cm00"
-  flavor = "s2.medium.4"
+module "server-sh04" {
+  source        = "../../modules/sh"
+  instance_name = "${local.prefix}sh004"
 }
 
-module "server-0ix00" {
-  source = "../../modules/ix"
-  name   = "${local.prefix}ix00"
-}
-module "server-0ix01" {
-  source = "../../modules/ix"
-  name   = "${local.prefix}ix01"
-}
-module "server-0ix02" {
-  source = "../../modules/ix"
-  name   = "${local.prefix}ix02"
-}
-module "server-0ix03" {
-  source = "../../modules/ix"
-  name   = "${local.prefix}ix03"
-}
-module "server-0ix04" {
-  source = "../../modules/ix"
-  name   = "${local.prefix}ix04"
-}
-module "server-0ix05" {
-  source = "../../modules/ix"
-  name   = "${local.prefix}ix05"
-}
-module "server-0ix06" {
-  source = "../../modules/ix"
-  name   = "${local.prefix}ix06"
-}
-module "server-0ix07" {
-  source = "../../modules/ix"
-  name   = "${local.prefix}ix07"
+module "server-cm00" {
+  source        = "../../modules/genericecs"
+  instance_name = "${local.prefix}cm000"
+  flavor        = "s2.medium.4"
 }
 
-module "server-0hf00" {
-  source = "../../modules/genericecs"
-  name   = "${local.prefix}hf00"
-  flavor = "s2.medium.4"
+module "server-ix00" {
+  source        = "../../modules/ix"
+  instance_name = "${local.prefix}ix000"
+}
+module "server-ix01" {
+  source        = "../../modules/ix"
+  instance_name = "${local.prefix}ix001"
+}
+module "server-ix02" {
+  source        = "../../modules/ix"
+  instance_name = "${local.prefix}ix002"
+}
+module "server-ix03" {
+  source        = "../../modules/ix"
+  instance_name = "${local.prefix}ix003"
+}
+module "server-ix04" {
+  source        = "../../modules/ix"
+  instance_name = "${local.prefix}ix004"
+}
+module "server-ix05" {
+  source        = "../../modules/ix"
+  instance_name = "${local.prefix}ix005"
+}
+module "server-ix06" {
+  source        = "../../modules/ix"
+  instance_name = "${local.prefix}ix006"
+}
+module "server-ix07" {
+  source        = "../../modules/ix"
+  instance_name = "${local.prefix}ix007"
 }
 
-module "server-0hf01" {
-  source = "../../modules/genericecs"
-  name   = "${local.prefix}hf01"
-  flavor = "s2.medium.4"
+module "server-hf00" {
+  source        = "../../modules/genericecs"
+  instance_name = "${local.prefix}hf000"
+  flavor        = "s2.medium.4"
 }
 
-module "server-0sy00" {
+module "server-hf01" {
+  source        = "../../modules/genericecs"
+  instance_name = "${local.prefix}hf001"
+  flavor        = "s2.medium.4"
+}
+
+module "server-sy00" {
   source         = "../../modules/genericecs"
-  name           = "${local.prefix}sy00"
+  instance_name  = "${local.prefix}sy000"
   secgrp_id_list = [data.terraform_remote_state.shared.outputs["parser-secgrp_id"]]
   flavor         = "s2.medium.4"
 }
 
-module "server-0sy01" {
+module "server-sy01" {
   source         = "../../modules/genericecs"
-  name           = "${local.prefix}sy01"
+  instance_name  = "${local.prefix}sy001"
   secgrp_id_list = [data.terraform_remote_state.shared.outputs["parser-secgrp_id"]]
   flavor         = "s2.medium.4"
 }
