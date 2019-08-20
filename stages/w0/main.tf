@@ -57,11 +57,13 @@ module "server-ix01" {
 module "server-sy00" {
   source         = "../../modules/genericecs"
   name           = "${local.prefix}sy00"
+  flavor         = "s2.medium.4"
   secgrp_id_list = [data.terraform_remote_state.shared.outputs["parser-secgrp_id"]]
 }
 
 module "server-sy01" {
   source         = "../../modules/genericecs"
   name           = "${local.prefix}sy01"
+  flavor         = "s2.medium.4"
   secgrp_id_list = [data.terraform_remote_state.shared.outputs["parser-secgrp_id"]]
 }

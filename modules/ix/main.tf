@@ -19,6 +19,7 @@ data "terraform_remote_state" "shared" {
 module "ix-instance" {
   source         = "../../modules/genericecs"
   name           = var.name
+  flavor         = module.variables.flavor_ix
   secgrp_id_list = [data.terraform_remote_state.shared.outputs["indexer-secgrp_id"]]
 }
 

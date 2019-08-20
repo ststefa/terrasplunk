@@ -12,6 +12,10 @@ variable "name" {
   description = "Name of the instance"
 }
 
+variable "flavor" {
+  description = "Flavor (aka sizing) of the instance"
+}
+
 variable "secgrp_id_list" {
   type        = set(string)
   description = "Optional additional security group ids (currently using name property is preferred)"

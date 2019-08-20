@@ -42,7 +42,7 @@ output "shared_statefile" {
 # TODO: Needs more granularity based on server role but maybe not for stages
 #  - Either create separate <role>_flavor_map vars (ix_flavor_map,...)
 #  - Or generally introduce third axis tenant/stage/role
-variable "flavor_map" {
+variable "flavor_ix_map" {
   #$ openstack --os-cloud otc-sbb-p flavor list
   #+--------------+--------------+--------+------+-----------+-------+-----------+
   #| ID           | Name         |    RAM | Disk | Ephemeral | VCPUs | Is Public |
@@ -73,7 +73,7 @@ variable "flavor_map" {
   #| s2.xlarge.8  | s2.xlarge.8  |  32768 |    0 |         0 |     4 | True      |
   #+--------------+--------------+--------+------+-----------+-------+-----------+
 
-  description = "VM sizes (split by tenant and stage)"
+  description = "Indexer VM sizes (split by tenant and stage)"
   type        = "map"
   default = {
     default = {
@@ -92,13 +92,36 @@ variable "flavor_map" {
     }
   }
 }
-output "flavor" {
+output "flavor_ix" {
   # note that this behaviour is not perfect. It returns a reasonably wrong value in case a stage does not exist. Instead terraform should abort with failure
-  description = "VM size for current tenant/stage"
-  value = contains(keys(var.flavor_map[var.workspace]), var.stage) ? var.flavor_map[var.workspace][var.stage] : ""
+  description = "Indexer VM size for current tenant/stage"
+  value = contains(keys(var.flavor_ix_map[var.workspace]), var.stage) ? var.flavor_ix_map[var.workspace][var.stage] : ""
 }
 
-# search flavor: s2.4xlarge.4
+variable "flavor_sh_map" {
+  description = "Searchhead VM sizes (split by tenant and stage)"
+  type        = "map"
+  default = {
+    default = {
+      d0 : "s2.medium.4"
+      t0 : "s2.medium.4"
+      u0 : "s2.medium.4"
+      p0 : "s2.medium.8"
+      w0 : "s2.medium.4"
+    }
+    production = {
+      d0 : "s2.medium.4"
+      t0 : "s2.xlarge.4"
+      u0 : "s2.xlarge.4"
+      p0 : "s2.4xlarge.4"
+      w0 : "s2.medium.4"
+    }
+  }
+}
+output "flavor_sh" {
+  description = "Searchhead VM size for current tenant/stage"
+  value = contains(keys(var.flavor_sh_map[var.workspace]), var.stage) ? var.flavor_sh_map[var.workspace][var.stage] : ""
+}
 
 output "pvsize_root" {
   description = "Size of (ephemeral) root pv"
@@ -135,7 +158,8 @@ variable "pvsize_hot_map" {
       d0 : 50
       t0 : 50
       u0 : 50
-      p0 : 400
+      #p0 : 400 #original sizing as of 2019-08-20, downsized due to lack of capacity on OTC for now
+      p0 : 40
       w0 : 50
     }
   }
@@ -160,7 +184,8 @@ variable "pvsize_cold_map" {
       d0 : 50
       t0 : 50
       u0 : 50
-      p0 : 4096
+      #p0 : 4096 #original sizing as of 2019-08-20, downsized due to lack of capacity on OTC for now
+      p0 : 410
       w0 : 50
     }
   }
@@ -300,9 +325,9 @@ variable "pmdns_map" {
       splp0sh00 : "10.104.146.7",
       splp0sh02 : "10.104.146.8",
       splp0sy00 : "10.104.146.9",
-      ######### : "10.104.146.10",
-      ######### : "10.104.146.11",
-      ######### : "10.104.146.12",
+      splp0ix04 : "10.104.146.10",
+      splp0ix06 : "10.104.146.11",
+      splp0sh04 : "10.104.146.12",
       ######### : "10.104.146.13",
       ######### : "10.104.146.14",
       ######### : "10.104.146.15",
@@ -363,9 +388,9 @@ variable "pmdns_map" {
       splp0ix03 : "10.104.146.68",
       splp0sh01 : "10.104.146.69",
       splp0sy01 : "10.104.146.70",
-      ######### : "10.104.146.71",
-      ######### : "10.104.146.72",
-      ######### : "10.104.146.73",
+      splp0ix05 : "10.104.146.71",
+      splp0ix07 : "10.104.146.72",
+      splp0sh03 : "10.104.146.73",
       ######### : "10.104.146.74",
       ######### : "10.104.146.75",
       ######### : "10.104.146.76",

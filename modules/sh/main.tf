@@ -19,5 +19,6 @@ data "terraform_remote_state" "shared" {
 module "sh-instance" {
   source         = "../../modules/genericecs"
   name           = var.name
+  flavor         = module.variables.flavor_sh
   secgrp_id_list = [data.terraform_remote_state.shared.outputs["searchhead-secgrp_id"]]
 }
