@@ -4,7 +4,8 @@
 #set -x
 
 BASE_DIR="$(cd "$(dirname "$0")"/.. && pwd)" || exit "$(false)"
-CODE_DIRS="${BASE_DIR}/modules ${BASE_DIR}/shared ${BASE_DIR}/stages"
+STAE_DIRS="${BASE_DIR}/shared ${BASE_DIR}/stages"
+CODE_DIRS="${STAE_DIRS} ${BASE_DIR}/modules"
 
 # Unfortunately tflint is quite useless on non-AWS. Anyway...
 echo "Linting..."
@@ -16,6 +17,18 @@ for D in $(find ${CODE_DIRS} -type d |grep -v "\..*") ; do
         echo $D
         cd $D
         tflint --module --deep
+        cd - > /dev/null
+    fi
+done
+
+echo "Validating..."
+shopt -s nullglob dotglob
+for D in $(find ${STAE_DIRS} -type d |grep -v "\..*") ; do
+    FILES=($D/*.tf)
+    if [ ${#FILES[@]} -gt 0 ] ; then
+        echo $D
+        cd $D
+        terraform validate
         cd - > /dev/null
     fi
 done
