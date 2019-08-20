@@ -134,12 +134,12 @@ output "pvsize_opt" {
 }
 
 output "primary_dns" {
-  description = "Terraform state filename for current workspace"
+  description = "Primary DNS server"
   value = "10.124.216.29"
 }
 
 output "secondary_dns" {
-  description = "Terraform state filename for current workspace"
+  description = "Secondary DNS server"
   value = "10.124.217.29"
 }
 
