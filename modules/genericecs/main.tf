@@ -1,8 +1,13 @@
 locals {
+  # Take stage from hostname (e.g. "w0")
   stage             = substr(var.name, 3, 2)
+  # Host number are the last two digits from hostname (e.g. "00") #TODO: refactor when going to three digits!
   hostnumber        = tonumber(substr(var.name, -2, 2))
+  # Even numbers are placed in AZ1 (openstack name eu-ch-01). Odd numbers are placed in AZ2 (openstack name eu-ch-02).
   availability_zone = local.hostnumber % 2 == 0 ? "eu-ch-01" : "eu-ch-02"
-  netname           = local.stage == "production" ? "netA" : "netC"
+  # p0 is in netA, everything else in netC. More logic required if we extend to netB
+  netname           = local.stage == "p0" ? "netA" : "netC"
+  # The remote shared state exports the nets by these names
   network_id        = local.hostnumber % 2 == 0 ? data.terraform_remote_state.shared.outputs["${local.netname}-az1_id"] : data.terraform_remote_state.shared.outputs["${local.netname}-az2_id"]
 }
 
@@ -35,7 +40,8 @@ resource "opentelekomcloud_blockstorage_volume_v2" "root" {
 
 resource "opentelekomcloud_compute_instance_v2" "instance" {
   availability_zone = local.availability_zone
-  flavor_name       = module.variables.flavor
+  #TODO: make flavor an input var to allow splitting based on ecs role
+  flavor_name       = var.flavor
   name              = var.name
   key_pair          = data.terraform_remote_state.shared.outputs["keypair-tss_id"]
   # Attention! Any change (even comments) to user_data will rebuild the VM. Use only for the most stable and basic tasks!
@@ -54,7 +60,7 @@ resource "opentelekomcloud_compute_instance_v2" "instance" {
   }
   #depends_on = [var.interface]
 
-  # using a nested blockstorage is also possible but resulted in mixed up vda/vdb assignments in some cases. Using externally defined blockstorage instead with additional dependencies for attach.opt
+  # using a nested blockstorage is also possible but resulted in mixed up vda/vdb assignments in some cases (i.e. root=vdb, opt=vda). Using externally defined blockstorage instead with additional dependencies in opt_attach to make sure opt is not assigned before the root disk
   block_device {
     uuid        = opentelekomcloud_blockstorage_volume_v2.root.id
     source_type = "volume"

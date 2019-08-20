@@ -3,7 +3,7 @@
 """
 This collects all available terraform state and writes it to stdout as a json
 structure. Further doc on the structure of the output can be found in the
-toplevel README
+top-level README
 """
 
 import os

@@ -1,5 +1,6 @@
 locals {
-  project = "splunk"
+  project     = "splunk"
+  tenant_name = terraform.workspace == "default" ? "tsch_rz_t_001" : "tsch_rz_p_001"
 }
 
 terraform {
@@ -15,6 +16,7 @@ provider "opentelekomcloud" {
   auth_url = "https://iam.eu-ch.o13bb.otc.t-systems.com/v3"
 }
 
+# TODO: refactor variables in two mods, see TODO there
 module "variables" {
   source    = "../modules/variables"
   workspace = terraform.workspace
@@ -26,4 +28,4 @@ resource "opentelekomcloud_compute_keypair_v2" "keypair-tss" {
   public_key = file("../lib/splunk-otc.pub")
 }
 
-# network and security group settings were moved to seperate files to aid readability
+# network and security group settings were moved to separate files to aid readability

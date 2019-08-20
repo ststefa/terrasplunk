@@ -1,3 +1,4 @@
+# This idea has been dropped in favor of a fixed 1:1 relation. Keeping for reference
 #variable stage_map {
 #  description = "Assign workspace names (lval) to stage names (rval). There might be more workspaces than stages!"
 #  type = "map"
@@ -6,8 +7,13 @@
 #  }
 #}
 
+# TODO: Using mod.variables in both stages and shared causes quirks. Maybe refactor into two separate variable modules.
+# - One which takes tenant/stage as input and is (exclusively) used in stages
+# - Another one which takes tenant as input and is (exclusively) used in shared. Shared currently only really uses it for provider auth to get tenant name
+
 variable "tenant_map" {
-  description = "Each stage must be represented by a single letter"
+  # TODO: The workspace idea seems to confuse people, esp. because tf.workspace != tenant.name
+  description = "1:1 assignment from workspace name to tenant name"
   type        = "map"
   default = {
     default    = "tsch_rz_t_001"
@@ -15,11 +21,13 @@ variable "tenant_map" {
   }
 }
 output "tenant" {
+  description = "Tenant name for current workspace"
   value = var.tenant_map[var.workspace]
 }
 
 variable "shared_statefile_map" {
-  description = "Each stage must be represented by a single letter"
+  # T: needs different concept if we go to remote state
+  description = "1:1 assignment from workspace name to terraform state filename"
   type        = "map"
   default = {
     default    = "../../shared/terraform.tfstate"
@@ -27,11 +35,15 @@ variable "shared_statefile_map" {
   }
 }
 output "shared_statefile" {
+  description = "Terraform state filename for current workspace"
   value = var.shared_statefile_map[var.workspace]
 }
 
-variable "flavor_map" {
-  #$ openstack --os-cloud otc-sbb-t flavor list
+# TODO: Needs more granularity based on server role but maybe not for stages
+#  - Either create separate <role>_flavor_map vars (ix_flavor_map,...)
+#  - Or generally introduce third axis tenant/stage/role
+variable "flavor_ix_map" {
+  #$ openstack --os-cloud otc-sbb-p flavor list
   #+--------------+--------------+--------+------+-----------+-------+-----------+
   #| ID           | Name         |    RAM | Disk | Ephemeral | VCPUs | Is Public |
   #+--------------+--------------+--------+------+-----------+-------+-----------+
@@ -61,7 +73,7 @@ variable "flavor_map" {
   #| s2.xlarge.8  | s2.xlarge.8  |  32768 |    0 |         0 |     4 | True      |
   #+--------------+--------------+--------+------+-----------+-------+-----------+
 
-  description = "VM sizes to use"
+  description = "Indexer VM sizes (split by tenant and stage)"
   type        = "map"
   default = {
     default = {
@@ -70,33 +82,69 @@ variable "flavor_map" {
       u0 : "s2.medium.4"
       p0 : "s2.medium.8"
       w0 : "s2.medium.4"
-      #universal : "s2.medium.4"
     }
     production = {
       d0 : "s2.medium.4"
       t0 : "s2.xlarge.4"
       u0 : "s2.xlarge.4"
-      p0 : "s2.2xlarge.4"
+      p0 : "s2.4xlarge.8"
       w0 : "s2.medium.4"
-      #universal : "s2.medium.4"
     }
   }
 }
-output "flavor" {
-  # note that this behaviour is not perfect. It returns a reasonably wrong value in case a stage does not exist. Instead terraform should really abort with failure
-  value = contains(keys(var.flavor_map[var.workspace]), var.stage) ? var.flavor_map[var.workspace][var.stage] : ""
+output "flavor_ix" {
+  # note that this behaviour is not perfect. It returns a reasonably wrong value in case a stage does not exist. Instead terraform should abort with failure
+  description = "Indexer VM size for current tenant/stage"
+  value = contains(keys(var.flavor_ix_map[var.workspace]), var.stage) ? var.flavor_ix_map[var.workspace][var.stage] : ""
+}
+
+variable "flavor_sh_map" {
+  description = "Searchhead VM sizes (split by tenant and stage)"
+  type        = "map"
+  default = {
+    default = {
+      d0 : "s2.medium.4"
+      t0 : "s2.medium.4"
+      u0 : "s2.medium.4"
+      p0 : "s2.medium.8"
+      w0 : "s2.medium.4"
+    }
+    production = {
+      d0 : "s2.medium.4"
+      t0 : "s2.xlarge.4"
+      u0 : "s2.xlarge.4"
+      p0 : "s2.4xlarge.4"
+      w0 : "s2.medium.4"
+    }
+  }
+}
+output "flavor_sh" {
+  description = "Searchhead VM size for current tenant/stage"
+  value = contains(keys(var.flavor_sh_map[var.workspace]), var.stage) ? var.flavor_sh_map[var.workspace][var.stage] : ""
 }
 
 output "pvsize_root" {
+  description = "Size of (ephemeral) root pv"
   value = 20
 }
 
 output "pvsize_opt" {
+  description = "Size of /opt pv"
   value = 20
 }
 
+output "primary_dns" {
+  description = "Terraform state filename for current workspace"
+  value = "10.124.216.29"
+}
+
+output "secondary_dns" {
+  description = "Terraform state filename for current workspace"
+  value = "10.124.217.29"
+}
+
 variable "pvsize_hot_map" {
-  description = "Size of Hot-warm Splunk buckets phisical volume (pv)"
+  description = "hot bucket pv sizes (split by tenant and stage)"
   type        = "map"
   default = {
     default = {
@@ -105,24 +153,24 @@ variable "pvsize_hot_map" {
       u0 : 50
       p0 : 50
       w0 : 50
-      #universal : 50
     }
     production = {
       d0 : 50
       t0 : 50
       u0 : 50
-      p0 : 100
+      #p0 : 400 #original sizing as of 2019-08-20, downsized due to lack of capacity on OTC for now
+      p0 : 40
       w0 : 50
-      #universal : 50
     }
   }
 }
 output "pvsize_hot" {
+  description = "Size of a single splunk hot/warm bucket pv for current tenant/stage"
   value = contains(keys(var.pvsize_hot_map[var.workspace]), var.stage) ? var.pvsize_hot_map[var.workspace][var.stage] : ""
 }
 
 variable "pvsize_cold_map" {
-  description = "Size of Cold Splunk buckets phisical volume (pv)"
+  description = "cold bucket pv sizes (split by tenant and stage)"
   type        = "map"
   default = {
     default = {
@@ -131,30 +179,30 @@ variable "pvsize_cold_map" {
       u0 : 50
       p0 : 50
       w0 : 50
-      #universal : 50
     }
     production = {
       d0 : 50
       t0 : 50
       u0 : 50
-      p0 : 100
+      #p0 : 4096 #original sizing as of 2019-08-20, downsized due to lack of capacity on OTC for now
+      p0 : 410
       w0 : 50
-      #universal : 50
     }
   }
 }
 output "pvsize_cold" {
+  description = "Size of a single splunk cold bucket pv for current tenant/stage"
   value = contains(keys(var.pvsize_cold_map[var.workspace]), var.stage) ? var.pvsize_cold_map[var.workspace][var.stage] : ""
 }
 
-variable "subnet_cidr_map" {
-  description = "Subnet CIDRs"
+variable "subnet_cidr_list_map" {
+  description = "Subnet CIDRs (split by tenant)"
   type        = "map"
   default = {
     default = {
       netA-az1 = "10.104.198.192/28",
       netA-az2 = "10.104.198.208/28",
-      # no space for buffer :-(
+      # no space for buffer netB :-(
       netC-az1 = "10.104.198.224/28",
       netC-az2 = "10.104.198.240/28",
     }
@@ -168,12 +216,13 @@ variable "subnet_cidr_map" {
     }
   }
 }
-output "subnet_cidr" {
-  value = var.subnet_cidr_map[var.workspace]
+output "subnet_cidr_list" {
+  description = "Subnet CIDR for current tenant"
+  value = var.subnet_cidr_list_map[var.workspace]
 }
 
-variable "gateway_map" {
-  description = "List of fixed IPs for searchhead instances"
+variable "gateway_list_map" {
+  description = "Network gateways (split by tenant)"
   type        = "map"
   default = {
     default = {
@@ -193,15 +242,16 @@ variable "gateway_map" {
     }
   }
 }
-output "gateway" {
-  value = var.gateway_map[var.workspace]
+output "gateway_list" {
+  description = "Network gateways for current tenant"
+  value = var.gateway_list_map[var.workspace]
 }
 
 
-# poor mans DNS
+# Poor Mans DNS
 variable "pmdns_map" {
-  description = "Where others use rocket science we do it by hand"
-  # For servers name nomenclature refert to http://wiki.t-systems.ch/x/ieMLAg
+  description = "Where others use rocket science, we do it by hand"
+  # For servers name nomenclature refer to http://wiki.t-systems.ch/x/ieMLAg
 
   default = {
     default = {
@@ -275,9 +325,9 @@ variable "pmdns_map" {
       splp0sh00 : "10.104.146.7",
       splp0sh02 : "10.104.146.8",
       splp0sy00 : "10.104.146.9",
-      ######### : "10.104.146.10",
-      ######### : "10.104.146.11",
-      ######### : "10.104.146.12",
+      splp0ix04 : "10.104.146.10",
+      splp0ix06 : "10.104.146.11",
+      splp0sh04 : "10.104.146.12",
       ######### : "10.104.146.13",
       ######### : "10.104.146.14",
       ######### : "10.104.146.15",
@@ -338,9 +388,9 @@ variable "pmdns_map" {
       splp0ix03 : "10.104.146.68",
       splp0sh01 : "10.104.146.69",
       splp0sy01 : "10.104.146.70",
-      ######### : "10.104.146.71",
-      ######### : "10.104.146.72",
-      ######### : "10.104.146.73",
+      splp0ix05 : "10.104.146.71",
+      splp0ix07 : "10.104.146.72",
+      splp0sh03 : "10.104.146.73",
       ######### : "10.104.146.74",
       ######### : "10.104.146.75",
       ######### : "10.104.146.76",
@@ -467,5 +517,6 @@ variable "pmdns_map" {
   }
 }
 output "pmdns" {
+  description = "List of (name:ip) tuples for current tenant"
   value = var.pmdns_map[var.workspace]
 }
