@@ -4,8 +4,8 @@
 #set -x
 
 BASE_DIR="$(cd "$(dirname "$0")"/.. && pwd)" || exit "$(false)"
-STAE_DIRS="${BASE_DIR}/shared ${BASE_DIR}/stages"
-CODE_DIRS="${STAE_DIRS} ${BASE_DIR}/modules"
+STATE_DIRS="${BASE_DIR}/shared ${BASE_DIR}/stages"
+CODE_DIRS="${STATE_DIRS} ${BASE_DIR}/modules"
 
 # Unfortunately tflint is quite useless on non-AWS. Anyway...
 echo "Linting..."
@@ -23,7 +23,7 @@ done
 
 echo "Validating..."
 shopt -s nullglob dotglob
-for D in $(find ${STAE_DIRS} -type d |grep -v "\..*") ; do
+for D in $(find ${STATE_DIRS} -type d |grep -v "\..*") ; do
     FILES=($D/*.tf)
     if [ ${#FILES[@]} -gt 0 ] ; then
         echo $D
