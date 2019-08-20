@@ -148,19 +148,19 @@ variable "pvsize_hot_map" {
   type        = "map"
   default = {
     default = {
-      d0 : 50
-      t0 : 50
-      u0 : 50
-      p0 : 50
-      w0 : 50
+      d0 : 2
+      t0 : 2
+      u0 : 2
+      p0 : 2
+      w0 : 2
     }
     production = {
-      d0 : 50
-      t0 : 50
-      u0 : 50
+      d0 : 5
+      t0 : 5
+      u0 : 5
       #p0 : 400 #original sizing as of 2019-08-20, downsized due to lack of capacity on OTC for now
       p0 : 40
-      w0 : 50
+      w0 : 5
     }
   }
 }
@@ -174,11 +174,11 @@ variable "pvsize_cold_map" {
   type        = "map"
   default = {
     default = {
-      d0 : 50
-      t0 : 50
-      u0 : 50
-      p0 : 50
-      w0 : 50
+      d0 : 20
+      t0 : 20
+      u0 : 20
+      p0 : 20
+      w0 : 20
     }
     production = {
       d0 : 50
