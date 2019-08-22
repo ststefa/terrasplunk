@@ -37,7 +37,6 @@ data "terraform_remote_state" "shared" {
 module "server-mt000" {
   source        = "../../modules/genericecs"
   instance_name = "${local.prefix}mt000"
-  flavor        = "s2.medium.4"
 }
 
 module "server-sh000" {
@@ -64,7 +63,6 @@ module "server-sh004" {
 module "server-cm000" {
   source        = "../../modules/genericecs"
   instance_name = "${local.prefix}cm000"
-  flavor        = "s2.medium.4"
 }
 
 module "server-ix000" {
@@ -103,25 +101,17 @@ module "server-ix007" {
 module "server-hf000" {
   source        = "../../modules/genericecs"
   instance_name = "${local.prefix}hf000"
-  flavor        = "s2.medium.4"
 }
-
 module "server-hf001" {
   source        = "../../modules/genericecs"
   instance_name = "${local.prefix}hf001"
-  flavor        = "s2.medium.4"
 }
 
 module "server-sy000" {
-  source         = "../../modules/genericecs"
+  source         = "../../modules/sy"
   instance_name  = "${local.prefix}sy000"
-  secgrp_id_list = [data.terraform_remote_state.shared.outputs["parser-secgrp_id"]]
-  flavor         = "s2.medium.4"
 }
-
 module "server-sy001" {
-  source         = "../../modules/genericecs"
+  source         = "../../modules/sy"
   instance_name  = "${local.prefix}sy001"
-  secgrp_id_list = [data.terraform_remote_state.shared.outputs["parser-secgrp_id"]]
-  flavor         = "s2.medium.4"
 }
