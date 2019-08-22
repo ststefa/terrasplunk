@@ -198,3 +198,7 @@ The current logic does allow to have a different number of VMs between stages bu
 ## Duplicate hostnames
 
 The current logic uses the same hostnames on both tenants. While this is fine for now it might lead to conflicts should we decide to register the names in a DNS server for _both_ tenants. Currently none are registered but it might well be that registering prod-tenant-vms will be requested. Maybe this could be solved using subdomains for tenants. Otherwise the vm namimg concept must be changed.
+
+## New resource-level for_each meta-argument
+
+The introduction of the for_each on resources-level might allow for a complete redesign of the code and arrange it aroung a cusotm map of server definitions.

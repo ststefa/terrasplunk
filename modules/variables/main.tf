@@ -39,56 +39,65 @@ output "shared_statefile" {
   value = var.shared_statefile_map[var.workspace]
 }
 
-# TODO: Needs more granularity based on server role but maybe not for stages
-#  - Either create separate <role>_flavor_map vars (ix_flavor_map,...)
-#  - Or generally introduce third axis tenant/stage/role
+# Concept of sizing:
+# Each flavor_<type>_map contains sizing for an instance type divided by tenant
+# and stage. flavor_default_map is used as a default for all instance types
+# which do not have specific requirements. If an instance type turns out to
+# have specific requirements then an additional flavor_<type>(_map) is created.
+# In such a case...
+# - ... (if this instance type has additional requirements like additional disks)
+#   an additional <type> module should also be created which then uses this.
+#   For an example see modules/sh/main.tf
+# - ... (if this instance type has no additional requirements)
+#   no module should be created but the flavor should be passed to genericecs
+#   from <stage>/main.tf
 variable "flavor_ix_map" {
-  #$ openstack --os-cloud otc-sbb-p flavor list
-  #+--------------+--------------+--------+------+-----------+-------+-----------+
-  #| ID           | Name         |    RAM | Disk | Ephemeral | VCPUs | Is Public |
-  #+--------------+--------------+--------+------+-----------+-------+-----------+
-  #| s2.2xlarge.1 | s2.2xlarge.1 |   8192 |    0 |         0 |     8 | True      |
-  #| s2.2xlarge.2 | s2.2xlarge.2 |  16384 |    0 |         0 |     8 | True      |
-  #| s2.2xlarge.4 | s2.2xlarge.4 |  32768 |    0 |         0 |     8 | True      |
-  #| s2.2xlarge.8 | s2.2xlarge.8 |  65536 |    0 |         0 |     8 | True      |
-  #| s2.4xlarge.1 | s2.4xlarge.1 |  16384 |    0 |         0 |    16 | True      |
-  #| s2.4xlarge.2 | s2.4xlarge.2 |  32768 |    0 |         0 |    16 | True      |
-  #| s2.4xlarge.4 | s2.4xlarge.4 |  65536 |    0 |         0 |    16 | True      |
-  #| s2.4xlarge.8 | s2.4xlarge.8 | 131072 |    0 |         0 |    16 | True      |
-  #| s2.8xlarge.1 | s2.8xlarge.1 |  32768 |    0 |         0 |    32 | True      |
-  #| s2.8xlarge.2 | s2.8xlarge.2 |  65536 |    0 |         0 |    32 | True      |
-  #| s2.8xlarge.4 | s2.8xlarge.4 | 131072 |    0 |         0 |    32 | True      |
-  #| s2.8xlarge.8 | s2.8xlarge.8 | 262144 |    0 |         0 |    32 | True      |
-  #| s2.large.1   | s2.large.1   |   2048 |    0 |         0 |     2 | True      |
-  #| s2.large.2   | s2.large.2   |   4096 |    0 |         0 |     2 | True      |
-  #| s2.large.4   | s2.large.4   |   8192 |    0 |         0 |     2 | True      |
-  #| s2.large.8   | s2.large.8   |  16384 |    0 |         0 |     2 | True      |
-  #| s2.medium.1  | s2.medium.1  |   1024 |    0 |         0 |     1 | True      |
-  #| s2.medium.2  | s2.medium.2  |   2048 |    0 |         0 |     1 | True      |
-  #| s2.medium.4  | s2.medium.4  |   4096 |    0 |         0 |     1 | True      |
-  #| s2.medium.8  | s2.medium.8  |   8192 |    0 |         0 |     1 | True      |
-  #| s2.xlarge.1  | s2.xlarge.1  |   4096 |    0 |         0 |     4 | True      |
-  #| s2.xlarge.2  | s2.xlarge.2  |   8192 |    0 |         0 |     4 | True      |
-  #| s2.xlarge.4  | s2.xlarge.4  |  16384 |    0 |         0 |     4 | True      |
-  #| s2.xlarge.8  | s2.xlarge.8  |  32768 |    0 |         0 |     4 | True      |
-  #+--------------+--------------+--------+------+-----------+-------+-----------+
+  #$ openstack --os-cloud otc-sbb-p flavor list #excerpt
+  #+--------------+--------+--------+
+  #| ID           |    RAM |  VCPUs |
+  #+--------------+--------+--------+
+  #| s2.2xlarge.1 |   8192 |      8 |
+  #| s2.2xlarge.2 |  16384 |      8 |
+  #| s2.2xlarge.4 |  32768 |      8 |
+  #| s2.2xlarge.8 |  65536 |      8 |
+  #| s2.4xlarge.1 |  16384 |     16 |
+  #| s2.4xlarge.2 |  32768 |     16 |
+  #| s2.4xlarge.4 |  65536 |     16 |
+  #| s2.4xlarge.8 | 131072 |     16 |
+  #| s2.8xlarge.1 |  32768 |     32 |
+  #| s2.8xlarge.2 |  65536 |     32 |
+  #| s2.8xlarge.4 | 131072 |     32 |
+  #| s2.8xlarge.8 | 262144 |     32 |
+  #| s2.large.1   |   2048 |      2 |
+  #| s2.large.2   |   4096 |      2 |
+  #| s2.large.4   |   8192 |      2 |
+  #| s2.large.8   |  16384 |      2 |
+  #| s2.medium.1  |   1024 |      1 |
+  #| s2.medium.2  |   2048 |      1 |
+  #| s2.medium.4  |   4096 |      1 |
+  #| s2.medium.8  |   8192 |      1 |
+  #| s2.xlarge.1  |   4096 |      4 |
+  #| s2.xlarge.2  |   8192 |      4 |
+  #| s2.xlarge.4  |  16384 |      4 |
+  #| s2.xlarge.8  |  32768 |      4 |
+  #+--------------+--------+--------+
 
   description = "Indexer VM sizes (split by tenant and stage)"
   type        = "map"
   default = {
     default = {
-      d0 : "s2.medium.4"
-      t0 : "s2.medium.4"
-      u0 : "s2.medium.4"
-      p0 : "s2.medium.8"
-      w0 : "s2.medium.4"
+      d0 : "s2.large.4"
+      t0 : "s2.large.4"
+      u0 : "s2.large.4"
+      p0 : "s2.large.4"
+      w0 : "s2.large.4"
     }
     production = {
-      d0 : "s2.medium.4"
+      d0 : "s2.xlarge.2"
       t0 : "s2.xlarge.4"
       u0 : "s2.xlarge.4"
       p0 : "s2.4xlarge.8"
-      w0 : "s2.medium.4"
+      w0 : "s2.xlarge.2"
     }
   }
 }
@@ -103,18 +112,18 @@ variable "flavor_sh_map" {
   type        = "map"
   default = {
     default = {
-      d0 : "s2.medium.4"
-      t0 : "s2.medium.4"
-      u0 : "s2.medium.4"
-      p0 : "s2.medium.8"
-      w0 : "s2.medium.4"
+      d0 : "s2.large.4"
+      t0 : "s2.large.4"
+      u0 : "s2.large.4"
+      p0 : "s2.large.4"
+      w0 : "s2.large.4"
     }
     production = {
-      d0 : "s2.medium.4"
+      d0 : "s2.xlarge.2"
       t0 : "s2.xlarge.4"
       u0 : "s2.xlarge.4"
       p0 : "s2.4xlarge.4"
-      w0 : "s2.medium.4"
+      w0 : "s2.xlarge.2"
     }
   }
 }
@@ -123,24 +132,54 @@ output "flavor_sh" {
   value = contains(keys(var.flavor_sh_map[var.workspace]), var.stage) ? var.flavor_sh_map[var.workspace][var.stage] : ""
 }
 
-output "pvsize_root" {
-  description = "Size of (ephemeral) root pv"
-  value = 20
+variable "flavor_default_map" {
+  description = "Default VM sizes (split by tenant and stage)"
+  type        = "map"
+  default = {
+    default = {
+      d0 : "s2.large.2"
+      t0 : "s2.large.2"
+      u0 : "s2.large.2"
+      p0 : "s2.large.2"
+      w0 : "s2.large.2"
+    }
+    production = {
+      d0 : "s2.xlarge.1"
+      t0 : "s2.xlarge.1"
+      u0 : "s2.xlarge.1"
+      p0 : "s2.xlarge.2"
+      w0 : "s2.xlarge.1"
+    }
+  }
 }
-
-output "pvsize_opt" {
-  description = "Size of /opt pv"
-  value = 20
+output "flavor_default" {
+  description = "Default VM size for current tenant/stage"
+  value = contains(keys(var.flavor_default_map[var.workspace]), var.stage) ? var.flavor_default_map[var.workspace][var.stage] : ""
 }
 
 output "primary_dns" {
-  description = "Terraform state filename for current workspace"
+  description = "Primary DNS server"
   value = "10.124.216.29"
 }
 
 output "secondary_dns" {
-  description = "Terraform state filename for current workspace"
+  description = "Secondary DNS server"
   value = "10.124.217.29"
+}
+
+output "pvsize_root" {
+  description = "Size of (ephemeral) root pv"
+  value = 50
+}
+
+output "pvsize_opt" {
+  description = "Size of /opt pv"
+  value = 100
+}
+
+output "pvsize_var" {
+  description = "Size of /var pv"
+  value = 200
 }
 
 variable "pvsize_hot_map" {
@@ -148,19 +187,19 @@ variable "pvsize_hot_map" {
   type        = "map"
   default = {
     default = {
-      d0 : 50
-      t0 : 50
-      u0 : 50
-      p0 : 50
-      w0 : 50
+      d0 : 2
+      t0 : 2
+      u0 : 2
+      p0 : 2
+      w0 : 2
     }
     production = {
-      d0 : 50
-      t0 : 50
-      u0 : 50
+      d0 : 5
+      t0 : 5
+      u0 : 5
       #p0 : 400 #original sizing as of 2019-08-20, downsized due to lack of capacity on OTC for now
       p0 : 40
-      w0 : 50
+      w0 : 5
     }
   }
 }
@@ -174,11 +213,11 @@ variable "pvsize_cold_map" {
   type        = "map"
   default = {
     default = {
-      d0 : 50
-      t0 : 50
-      u0 : 50
-      p0 : 50
-      w0 : 50
+      d0 : 20
+      t0 : 20
+      u0 : 20
+      p0 : 20
+      w0 : 20
     }
     production = {
       d0 : 50
@@ -217,7 +256,7 @@ variable "subnet_cidr_list_map" {
   }
 }
 output "subnet_cidr_list" {
-  description = "Subnet CIDR for current tenant"
+  description = "List of subnet CIDRs for current tenant"
   value = var.subnet_cidr_list_map[var.workspace]
 }
 
@@ -243,13 +282,13 @@ variable "gateway_list_map" {
   }
 }
 output "gateway_list" {
-  description = "Network gateways for current tenant"
+  description = "List of network gateways for current tenant"
   value = var.gateway_list_map[var.workspace]
 }
 
 
 # Poor Mans DNS
-variable "pmdns_map" {
+variable "pmdns_list_map" {
   description = "Where others use rocket science, we do it by hand"
   # For servers name nomenclature refer to http://wiki.t-systems.ch/x/ieMLAg
 
@@ -516,7 +555,7 @@ variable "pmdns_map" {
     }
   }
 }
-output "pmdns" {
+output "pmdns_list" {
   description = "List of (name:ip) tuples for current tenant"
-  value = var.pmdns_map[var.workspace]
+  value = var.pmdns_list_map[var.workspace]
 }
