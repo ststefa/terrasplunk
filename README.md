@@ -181,7 +181,7 @@ The provisioner can then read this json data from stdin and apply his parsing lo
 
 For any suggestion, improvment, correction, etc. open a branch with a descriptive name (which it explains the goal of the update) and assign it to a repo maintainer.
 
-Otherwise, if you don't feel brave enough to edit code (this shouldn't be the case :simple_smile:), open an [issue](https://gitlab-tss.sbb.ch/splunk/splunk_provisioning/issues) and assign it to a repo maintainer.
+Otherwise, if you don't feel brave enough to edit code (this shouldn't be the case :simple_smile:), open an [issue](https://gitlab-tss.sbb.ch/splunk/terrasplunk/issues) and assign it to a repo maintainer.
 
 # Open Points (notes to self)
 
