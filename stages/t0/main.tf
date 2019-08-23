@@ -33,3 +33,30 @@ data "terraform_remote_state" "shared" {
     path = module.variables.shared_statefile
   }
 }
+
+module "server-sh000" {
+  source        = "../../modules/sh"
+  instance_name = "${local.prefix}sh000"
+}
+module "server-sh001" {
+  source        = "../../modules/sh"
+  instance_name = "${local.prefix}sh001"
+}
+
+module "server-ix000" {
+  source        = "../../modules/ix"
+  instance_name = "${local.prefix}ix000"
+}
+module "server-ix001" {
+  source        = "../../modules/ix"
+  instance_name = "${local.prefix}ix001"
+}
+
+module "server-sy000" {
+  source         = "../../modules/sy"
+  instance_name  = "${local.prefix}sy000"
+}
+module "server-sy001" {
+  source         = "../../modules/sy"
+  instance_name  = "${local.prefix}sy001"
+}
