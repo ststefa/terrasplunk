@@ -17,6 +17,7 @@ terraform.tfstate*
 terraform.tfstate.d/
 build/
 .crash.log
+.terraform.tfstate.lock.info
 
 # python
 .python_history
