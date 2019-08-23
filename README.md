@@ -82,7 +82,7 @@ Some places to visit:
 
 Basic terraform setup
 1. Download and install terraform on your computer
-1. Export your OTC credentials (see provider resource in any <stage>/input.tf)
+1. Export your OTC credentials (see provider resource in any \<stage\>/input.tf)
 
 ## To get started with this project...
 
@@ -172,7 +172,7 @@ To obtain the terraform data a provisioner uses the `bin/build_state.py` executa
     ...
 }
 ```
- 
+
 While the structure is deterministic the sort order is not. I.e. there is no guarantee in which order the tenants, shared or stages will appear in the output.
 
 The provisioner can then read this json data from stdin and apply his parsing logic to extract required information.
