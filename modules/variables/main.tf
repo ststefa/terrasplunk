@@ -86,11 +86,17 @@ variable "flavor_ix_map" {
   type        = "map"
   default = {
     default = {
-      d0 : "s2.large.4"
-      t0 : "s2.large.4"
-      u0 : "s2.large.4"
-      p0 : "s2.large.4"
-      w0 : "s2.large.4"
+      #d0 : "s2.large.4"
+      #t0 : "s2.large.4"
+      #u0 : "s2.large.4"
+      #p0 : "s2.large.4"
+      #w0 : "s2.large.4"
+      # size test like prodution, maybe better idea
+      d0 : "s2.xlarge.2"
+      t0 : "s2.xlarge.4"
+      u0 : "s2.xlarge.4"
+      p0 : "s2.4xlarge.8"
+      w0 : "s2.xlarge.2"
     }
     production = {
       d0 : "s2.xlarge.2"
@@ -112,11 +118,17 @@ variable "flavor_sh_map" {
   type        = "map"
   default = {
     default = {
-      d0 : "s2.large.4"
-      t0 : "s2.large.4"
-      u0 : "s2.large.4"
-      p0 : "s2.large.4"
-      w0 : "s2.large.4"
+      #d0 : "s2.large.4"
+      #t0 : "s2.large.4"
+      #u0 : "s2.large.4"
+      #p0 : "s2.large.4"
+      #w0 : "s2.large.4"
+      # size test like prodution, maybe better idea
+      d0 : "s2.xlarge.2"
+      t0 : "s2.xlarge.4"
+      u0 : "s2.xlarge.4"
+      p0 : "s2.4xlarge.4"
+      w0 : "s2.xlarge.2"
     }
     production = {
       d0 : "s2.xlarge.2"
@@ -137,12 +149,18 @@ variable "flavor_default_map" {
   type        = "map"
   default = {
     default = {
-      d0 : "s2.large.2"
-      t0 : "s2.large.2"
-      u0 : "s2.large.2"
-      p0 : "s2.large.2"
-      w0 : "s2.large.2"
-    }
+      #d0 : "s2.large.2"
+      #t0 : "s2.large.2"
+      #u0 : "s2.large.2"
+      #p0 : "s2.large.2"
+      #w0 : "s2.large.2"
+      # size test like prodution, maybe better idea
+      d0 : "s2.xlarge.1"
+      t0 : "s2.xlarge.1"
+      u0 : "s2.xlarge.1"
+      p0 : "s2.xlarge.2"
+      w0 : "s2.xlarge.1"
+   }
     production = {
       d0 : "s2.xlarge.1"
       t0 : "s2.xlarge.1"
@@ -178,7 +196,7 @@ output "pvsize_opt" {
 }
 
 output "pvsize_var" {
-  description = "Size of /var pv"
+  description = "Size of /var pv. This is only currently used for sy systems which receive a lot of data"
   value = 200
 }
 
