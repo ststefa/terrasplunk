@@ -91,11 +91,11 @@ variable "flavor_ix_map" {
       #u0 : "s2.large.4"
       #p0 : "s2.large.4"
       #w0 : "s2.large.4"
-      # size test like prodution, maybe better idea
+      # size test (almost) like prodution, maybe better idea anyway. The full size does not (currently 2019-08) fit and leads to errors
       d0 : "s2.xlarge.2"
       t0 : "s2.xlarge.4"
       u0 : "s2.xlarge.4"
-      p0 : "s2.4xlarge.8"
+      p0 : "s2.2xlarge.8"
       w0 : "s2.xlarge.2"
     }
     production = {
@@ -123,11 +123,11 @@ variable "flavor_sh_map" {
       #u0 : "s2.large.4"
       #p0 : "s2.large.4"
       #w0 : "s2.large.4"
-      # size test like prodution, maybe better idea
+      # size test (almost) like prodution, maybe better idea anyway. The full size does not (currently 2019-08) fit and leads to errors
       d0 : "s2.xlarge.2"
       t0 : "s2.xlarge.4"
       u0 : "s2.xlarge.4"
-      p0 : "s2.4xlarge.4"
+      p0 : "s2.2xlarge.8"
       w0 : "s2.xlarge.2"
     }
     production = {
@@ -154,7 +154,7 @@ variable "flavor_default_map" {
       #u0 : "s2.large.2"
       #p0 : "s2.large.2"
       #w0 : "s2.large.2"
-      # size test like prodution, maybe better idea
+      # size test like prodution, maybe better idea anyway
       d0 : "s2.xlarge.1"
       t0 : "s2.xlarge.1"
       u0 : "s2.xlarge.1"
