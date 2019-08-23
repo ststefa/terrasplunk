@@ -148,10 +148,10 @@ To obtain the terraform data a provisioner uses the `bin/build_state.py` executa
 
 ```
 {
-    shared: {
-        <shared state>
-    }
     tenant1: {
+        shared: {
+            <shared state>
+        }
         stage1: {
             <stage1 state>
         },
@@ -161,6 +161,9 @@ To obtain the terraform data a provisioner uses the `bin/build_state.py` executa
         ...
     },
     tenant2: {
+        shared: {
+            <shared state>
+        }
         stage1: {
             <stage1 state>
         },

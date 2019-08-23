@@ -74,7 +74,7 @@ def init_parser(base_path):
     parser = argparse.ArgumentParser(
         description='Create combined output of all the splunk infrastructure that terraform created. The result will be a json formatted dictionary consisting of all tenants and all stages.',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('-d', '--debug', action='store_true',
+    parser.add_argument('--debug', action='store_true',
                         help='Turn on console debug output')
     parser.add_argument('--root_dir', default=base_path, nargs='?',
                         help='The root path of the splunk terraform project')
@@ -105,16 +105,30 @@ def main():
         base_path = args.root_dir
     log.debug('base_path: %s' % base_path)
 
-    # The final result to poulate
+    # The final result to ppoulate
     result = {}
 
     # Any stages/* dir which matches this regex is considered a stage dir
     reg_stagename = re.compile("..")
 
+    # Iterate over tenants
     for workspace in workspace_tenant_map.keys():
         tenant = {}
         result[workspace_tenant_map[workspace]['tenant_name']] = tenant
 
+        # Add shared to tenant
+        tfstate_filename = os.path.join(shared_path, workspace_tenant_map[workspace]['tfstate_path'])
+        log.debug('shared tfstate_filename: %s' % tfstate_filename)
+        file = pathlib.Path(tfstate_filename)
+        if file.exists():
+            with file.open('r') as f:
+                tfstate = json.load(f)
+                f.close()
+            tenant["shared"] = tfstate
+        else:
+            log.warning("No shared state for tenant %s (workspace %s)" % (workspace_tenant_map[workspace]['tenant_name'], workspace))
+
+        # Add stages to tenant
         # dynamically get stages based on existing dirs
         stages = os.listdir(stage_path)
         for stage in stages:
@@ -126,6 +140,7 @@ def main():
                 stages.remove(stage)
         log.debug('stages: %s' % stages)
 
+        # iterate over stage dirs, adding their tfstate
         for stage_name in stages:
             this_stage_path = os.path.join(stage_path, stage_name)
             log.debug('this_stage_path: %s' % this_stage_path)
