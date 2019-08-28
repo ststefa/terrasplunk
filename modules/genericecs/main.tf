@@ -1,12 +1,16 @@
 locals {
   # Take stage from hostname (e.g. "w0")
   stage = substr(var.instance_name, 3, 2)
-  # Host number are the last two digits from hostname (e.g. "00") #TODO: refactor when going to three digits!
-  hostnumber = tonumber(substr(var.instance_name, -2, 2))
+
+  # Host number are the last three digits from hostname (e.g. "000)
+  hostnumber = tonumber(substr(var.instance_name, -3, 3))
+
   # Even numbers are placed in AZ1 (openstack name eu-ch-01). Odd numbers are placed in AZ2 (openstack name eu-ch-02).
   availability_zone = local.hostnumber % 2 == 0 ? "eu-ch-01" : "eu-ch-02"
+
   # p0 is in netA, everything else in netC. More logic required if we extend to netB
   netname = local.stage == "p0" ? "netA" : "netC"
+
   # The remote shared state exports the nets by these names
   network_id = local.hostnumber % 2 == 0 ? data.terraform_remote_state.shared.outputs["${local.netname}-az1_id"] : data.terraform_remote_state.shared.outputs["${local.netname}-az2_id"]
 }
