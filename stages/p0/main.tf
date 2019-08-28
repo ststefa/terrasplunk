@@ -35,7 +35,7 @@ data "terraform_remote_state" "shared" {
 }
 
 module "server-mt000" {
-  source        = "../../modules/genericecs"
+  source        = "../../modules/mt"
   instance_name = "${local.prefix}mt000"
 }
 
