@@ -1,0 +1,38 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"extensions": {
+		"recommendations": [
+			"mauve.terraform"
+		]
+	},
+	"settings": {
+		"terraform.languageServer": {
+			"enabled": true,
+			"args": []
+		},
+		"terraform.format": {
+			//"ignoreExtensionsOnSave": [
+			//	".tfsmurf"
+			//]
+		},
+		// disabled because author warns about interference with terraform.languageServer
+		"terraform.indexing": {
+			"enabled": true,
+			"liveIndexing": true,
+			"delay": 500,
+			//"exclude": [
+			//	".terraform/**/*",
+			//	"**/.terraform/**/*"
+			//]
+		},
+		//"terraform.path": "/home/linux/bin/terraform",
+		"terraform.paths": [
+			"shared/",
+			"stages/*",
+		]
+	},
+}
