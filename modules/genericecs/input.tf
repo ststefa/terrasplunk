@@ -4,7 +4,7 @@ variable "autorecover" {
 }
 
 variable "instance_name" {
-  description = "Name of the instance, e.g. splw0cm01"
+  description = "Name of the instance, e.g. splw0cm001"
 }
 
 variable "flavor" {

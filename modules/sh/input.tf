@@ -1,3 +1,3 @@
 variable "instance_name" {
-  description = "Name of the instance, e.g. splw0sh01"
+  description = "Name of the instance, e.g. splw0sh001"
 }
