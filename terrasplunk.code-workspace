@@ -6,7 +6,8 @@
 	],
 	"extensions": {
 		"recommendations": [
-			"mauve.terraform"
+			"mauve.terraform",
+			"ms-python.python",
 		]
 	},
 	"settings": {

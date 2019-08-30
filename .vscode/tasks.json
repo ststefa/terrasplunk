@@ -1,0 +1,30 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "apply-t-w0",
+            "type": "shell",
+            "group": "build",
+            //TODO: pending credential problem to be solved, suspend for now
+            "command": "cd stages/w0 ; terraform workspace select default ; terraform apply",
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated"
+            },
+            "problemMatcher": [],
+        },
+        {
+            "label": "apply-p-w0",
+            "type": "shell",
+            "group": "build",
+            "command": "cd stages/w0 ; terraform workspace select production ; terraform apply",
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated"
+            },
+            "problemMatcher": [],
+        },
+    ]
+}
