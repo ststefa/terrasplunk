@@ -4,27 +4,40 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "apply-t-w0",
+            "label": "terraform-apply",
             "type": "shell",
             "group": "build",
             //TODO: pending credential problem to be solved, suspend for now
-            "command": "cd stages/w0 ; terraform workspace select default ; terraform apply",
+            "command": "cd stages/${input:stage} && terraform workspace select ${input:worksapce} && terraform apply",
             "presentation": {
                 "reveal": "always",
-                "panel": "dedicated"
+                "panel": "shared",
             },
             "problemMatcher": [],
+        },
+    ],
+    "inputs": [
+        {
+            "type": "pickString",
+            "id": "worksapce",
+            "description": "Choose workspace (default=tsch_rz_t_001, production=tsch_rz_p_001)",
+            "options": [
+                "default",
+                "production",
+            ],
+            "default": "default",
         },
         {
-            "label": "apply-p-w0",
-            "type": "shell",
-            "group": "build",
-            "command": "cd stages/w0 ; terraform workspace select production ; terraform apply",
-            "presentation": {
-                "reveal": "always",
-                "panel": "dedicated"
-            },
-            "problemMatcher": [],
+            "type": "pickString",
+            "id": "stage",
+            "description": "Choose stage",
+            "options": [
+                "p0",
+                "t0",
+                "u0",
+                "w0",
+            ],
+            "default": "w0",
         },
-    ]
+    ],
 }
