@@ -11,6 +11,7 @@
 		]
 	},
 	"settings": {
+		"python.pythonPath": "/usr/bin/python3",
 		"terraform.languageServer": {
 			"enabled": true,
 			"args": []
@@ -33,7 +34,7 @@
 		//"terraform.path": "/home/linux/bin/terraform",
 		"terraform.paths": [
 			"shared/",
-			"stages/*",
+			"stages/*/",
 		]
 	},
 }
