@@ -22,7 +22,7 @@ variable "tenant_map" {
 }
 output "tenant" {
   description = "Tenant name for current workspace"
-  value = var.tenant_map[var.workspace]
+  value       = var.tenant_map[var.workspace]
 }
 
 variable "shared_statefile_map" {
@@ -36,7 +36,7 @@ variable "shared_statefile_map" {
 }
 output "shared_statefile" {
   description = "Terraform state filename for current workspace"
-  value = var.shared_statefile_map[var.workspace]
+  value       = var.shared_statefile_map[var.workspace]
 }
 
 # Concept of sizing:
@@ -110,7 +110,7 @@ variable "flavor_ix_map" {
 output "flavor_ix" {
   # note that this behaviour is not perfect. It returns a reasonably wrong value in case a stage does not exist. Instead terraform should abort with failure
   description = "Indexer VM size for current tenant/stage"
-  value = contains(keys(var.flavor_ix_map[var.workspace]), var.stage) ? var.flavor_ix_map[var.workspace][var.stage] : ""
+  value       = contains(keys(var.flavor_ix_map[var.workspace]), var.stage) ? var.flavor_ix_map[var.workspace][var.stage] : ""
 }
 
 variable "flavor_sh_map" {
@@ -141,7 +141,7 @@ variable "flavor_sh_map" {
 }
 output "flavor_sh" {
   description = "Searchhead VM size for current tenant/stage"
-  value = contains(keys(var.flavor_sh_map[var.workspace]), var.stage) ? var.flavor_sh_map[var.workspace][var.stage] : ""
+  value       = contains(keys(var.flavor_sh_map[var.workspace]), var.stage) ? var.flavor_sh_map[var.workspace][var.stage] : ""
 }
 
 variable "flavor_default_map" {
@@ -160,7 +160,7 @@ variable "flavor_default_map" {
       u0 : "s2.xlarge.1"
       p0 : "s2.xlarge.2"
       w0 : "s2.xlarge.1"
-   }
+    }
     production = {
       d0 : "s2.xlarge.1"
       t0 : "s2.xlarge.1"
@@ -172,32 +172,40 @@ variable "flavor_default_map" {
 }
 output "flavor_default" {
   description = "Default VM size for current tenant/stage"
-  value = contains(keys(var.flavor_default_map[var.workspace]), var.stage) ? var.flavor_default_map[var.workspace][var.stage] : ""
+  value       = contains(keys(var.flavor_default_map[var.workspace]), var.stage) ? var.flavor_default_map[var.workspace][var.stage] : ""
 }
 
 output "primary_dns" {
   description = "Primary DNS server"
-  value = "10.124.216.29"
+  value       = "10.124.216.29"
 }
 
 output "secondary_dns" {
   description = "Secondary DNS server"
-  value = "10.124.217.29"
+  value       = "10.124.217.29"
 }
 
 output "pvsize_root" {
   description = "Size of (ephemeral) root pv"
-  value = 50
+  value       = 50
 }
 
 output "pvsize_opt" {
   description = "Size of /opt pv"
-  value = 100
+  value       = 100
 }
 
+variable "pvsize_var_map" {
+  description = "Size of /var/x pv (split by tenant)"
+  type        = "map"
+  default = {
+    default    = 20
+    production = 200
+  }
+}
 output "pvsize_var" {
-  description = "Size of /var pv. This is only currently used for sy systems which receive a lot of data"
-  value = 200
+  description = "Size of /var/x pv. This is only currently used for sy systems which receive a lot of data"
+  value       = var.pvsize_var_map[var.workspace]
 }
 
 variable "pvsize_hot_map" {
@@ -205,11 +213,11 @@ variable "pvsize_hot_map" {
   type        = "map"
   default = {
     default = {
-      d0 : 2
-      t0 : 2
-      u0 : 2
-      p0 : 2
-      w0 : 2
+      d0 : 4
+      t0 : 4
+      u0 : 4
+      p0 : 6
+      w0 : 4
     }
     production = {
       d0 : 5
@@ -223,7 +231,7 @@ variable "pvsize_hot_map" {
 }
 output "pvsize_hot" {
   description = "Size of a single splunk hot/warm bucket pv for current tenant/stage"
-  value = contains(keys(var.pvsize_hot_map[var.workspace]), var.stage) ? var.pvsize_hot_map[var.workspace][var.stage] : ""
+  value       = contains(keys(var.pvsize_hot_map[var.workspace]), var.stage) ? var.pvsize_hot_map[var.workspace][var.stage] : ""
 }
 
 variable "pvsize_cold_map" {
@@ -231,11 +239,11 @@ variable "pvsize_cold_map" {
   type        = "map"
   default = {
     default = {
-      d0 : 20
-      t0 : 20
-      u0 : 20
-      p0 : 20
-      w0 : 20
+      d0 : 40
+      t0 : 40
+      u0 : 40
+      p0 : 60
+      w0 : 40
     }
     production = {
       d0 : 50
@@ -249,7 +257,7 @@ variable "pvsize_cold_map" {
 }
 output "pvsize_cold" {
   description = "Size of a single splunk cold bucket pv for current tenant/stage"
-  value = contains(keys(var.pvsize_cold_map[var.workspace]), var.stage) ? var.pvsize_cold_map[var.workspace][var.stage] : ""
+  value       = contains(keys(var.pvsize_cold_map[var.workspace]), var.stage) ? var.pvsize_cold_map[var.workspace][var.stage] : ""
 }
 
 variable "subnet_cidr_list_map" {
@@ -275,7 +283,7 @@ variable "subnet_cidr_list_map" {
 }
 output "subnet_cidr_list" {
   description = "List of subnet CIDRs for current tenant"
-  value = var.subnet_cidr_list_map[var.workspace]
+  value       = var.subnet_cidr_list_map[var.workspace]
 }
 
 variable "gateway_list_map" {
@@ -301,7 +309,7 @@ variable "gateway_list_map" {
 }
 output "gateway_list" {
   description = "List of network gateways for current tenant"
-  value = var.gateway_list_map[var.workspace]
+  value       = var.gateway_list_map[var.workspace]
 }
 
 
@@ -575,5 +583,5 @@ variable "pmdns_list_map" {
 }
 output "pmdns_list" {
   description = "List of (name:ip) tuples for current tenant"
-  value = var.pmdns_list_map[var.workspace]
+  value       = var.pmdns_list_map[var.workspace]
 }
