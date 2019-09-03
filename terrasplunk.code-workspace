@@ -23,8 +23,8 @@
 		},
 		// disabled because author warns about interference with terraform.languageServer
 		"terraform.indexing": {
-			"enabled": true,
-			"liveIndexing": true,
+			"enabled": false
+			"liveIndexing": false,
 			"delay": 500,
 			//"exclude": [
 			//	".terraform/**/*",
