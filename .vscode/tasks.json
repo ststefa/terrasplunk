@@ -4,7 +4,19 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "terraform-apply",
+            "label": "terraform-apply-shared",
+            "type": "shell",
+            "group": "build",
+            //TODO: pending credential problem to be solved, suspend for now
+            "command": "cd shared && terraform workspace select ${input:worksapce} && terraform apply",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared",
+            },
+            "problemMatcher": [],
+        },
+        {
+            "label": "terraform-apply-stage",
             "type": "shell",
             "group": "build",
             //TODO: pending credential problem to be solved, suspend for now
