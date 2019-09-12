@@ -188,12 +188,6 @@ Otherwise, if you don't feel brave enough to edit code (this shouldn't be the ca
 
 # Open Points (notes to self)
 
-## Handling tfstate between multiple developers
-
-Might use S3 if it works on OTC.
-
-etcdv3 seems promising
-
 ## Asymetry between tenants
 
 The current logic does allow to have a different number of VMs between stages but not between tenants. Feature toggles based on existence of VM names defined in the variables module might solve this (https://medium.com/capital-one-tech/building-feature-toggles-into-terraform-d75806217647)
