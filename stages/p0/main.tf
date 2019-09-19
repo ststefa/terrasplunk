@@ -39,6 +39,11 @@ module "server-mt000" {
   instance_name = "${local.prefix}mt000"
 }
 
+module "server-cm000" {
+  source        = "../../modules/genericecs"
+  instance_name = "${local.prefix}cm000"
+}
+
 module "server-sh000" {
   source        = "../../modules/sh"
   instance_name = "${local.prefix}sh000"
@@ -50,19 +55,6 @@ module "server-sh001" {
 module "server-sh002" {
   source        = "../../modules/sh"
   instance_name = "${local.prefix}sh002"
-}
-module "server-sh003" {
-  source        = "../../modules/sh"
-  instance_name = "${local.prefix}sh003"
-}
-module "server-sh004" {
-  source        = "../../modules/sh"
-  instance_name = "${local.prefix}sh004"
-}
-
-module "server-cm000" {
-  source        = "../../modules/genericecs"
-  instance_name = "${local.prefix}cm000"
 }
 
 module "server-ix000" {
@@ -80,22 +72,6 @@ module "server-ix002" {
 module "server-ix003" {
   source        = "../../modules/ix"
   instance_name = "${local.prefix}ix003"
-}
-module "server-ix004" {
-  source        = "../../modules/ix"
-  instance_name = "${local.prefix}ix004"
-}
-module "server-ix005" {
-  source        = "../../modules/ix"
-  instance_name = "${local.prefix}ix005"
-}
-module "server-ix006" {
-  source        = "../../modules/ix"
-  instance_name = "${local.prefix}ix006"
-}
-module "server-ix007" {
-  source        = "../../modules/ix"
-  instance_name = "${local.prefix}ix007"
 }
 
 module "server-hf000" {

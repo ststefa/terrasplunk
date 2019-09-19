@@ -39,6 +39,11 @@ module "server-mt000" {
   instance_name = "${local.prefix}mt000"
 }
 
+module "server-cm000" {
+  source        = "../../modules/genericecs"
+  instance_name = "${local.prefix}cm000"
+}
+
 module "server-sh000" {
   source        = "../../modules/sh"
   instance_name = "${local.prefix}sh000"

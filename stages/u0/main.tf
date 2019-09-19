@@ -33,3 +33,17 @@ data "terraform_remote_state" "shared" {
     path = module.variables.shared_statefile
   }
 }
+
+module "server-mt000" {
+  source        = "../../modules/mt"
+  instance_name = "${local.prefix}mt000"
+}
+
+module "server-sh000" {
+  source        = "../../modules/sh"
+  instance_name = "${local.prefix}sh000"
+}
+module "server-sh001" {
+  source        = "../../modules/sh"
+  instance_name = "${local.prefix}sh001"
+}
