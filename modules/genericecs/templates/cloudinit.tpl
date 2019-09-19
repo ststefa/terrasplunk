@@ -7,4 +7,3 @@ packages:
 runcmd:
  - systemctl stop firewalld
  - systemctl disable firewalld
-
