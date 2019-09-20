@@ -86,23 +86,18 @@ variable "flavor_ix_map" {
   type        = "map"
   default = {
     default = {
-      #d0 : "s2.large.4"
-      #t0 : "s2.large.4"
-      #u0 : "s2.large.4"
-      #p0 : "s2.large.4"
-      #w0 : "s2.large.4"
       # size test (almost) like prodution, maybe better idea anyway. The full size does not (currently 2019-08) fit and leads to errors
       d0 : "s2.xlarge.2"
-      t0 : "s2.xlarge.4"
-      u0 : "s2.xlarge.4"
-      p0 : "s2.2xlarge.8"
+      t0 : "s2.xlarge.2"
+      u0 : "s2.xlarge.2"
+      p0 : "s2.2xlarge.2"
       w0 : "s2.xlarge.2"
     }
     production = {
       d0 : "s2.xlarge.2"
-      t0 : "s2.xlarge.4"
-      u0 : "s2.xlarge.4"
-      p0 : "s2.4xlarge.8"
+      t0 : "s2.xlarge.2"
+      u0 : "s2.xlarge.2"
+      p0 : "s2.4xlarge.2" #splunk says we should at least use 8xlarge (32HT cores = 16 "real" cores)
       w0 : "s2.xlarge.2"
     }
   }
@@ -118,24 +113,19 @@ variable "flavor_sh_map" {
   type        = "map"
   default = {
     default = {
-      #d0 : "s2.large.4"
-      #t0 : "s2.large.4"
-      #u0 : "s2.large.4"
-      #p0 : "s2.large.4"
-      #w0 : "s2.large.4"
       # size test (almost) like prodution, maybe better idea anyway. The full size does not (currently 2019-08) fit and leads to errors
-      d0 : "s2.xlarge.2"
+      d0 : "s2.xlarge.4"
       t0 : "s2.xlarge.4"
       u0 : "s2.xlarge.4"
-      p0 : "s2.2xlarge.8"
-      w0 : "s2.xlarge.2"
+      p0 : "s2.xlarge.4"
+      w0 : "s2.xlarge.4"
     }
     production = {
-      d0 : "s2.xlarge.2"
+      d0 : "s2.xlarge.4"
       t0 : "s2.xlarge.4"
       u0 : "s2.xlarge.4"
-      p0 : "s2.4xlarge.4"
-      w0 : "s2.xlarge.2"
+      p0 : "s2.4xlarge.2"
+      w0 : "s2.xlarge.4"
     }
   }
 }
@@ -149,16 +139,11 @@ variable "flavor_default_map" {
   type        = "map"
   default = {
     default = {
-      #d0 : "s2.large.2"
-      #t0 : "s2.large.2"
-      #u0 : "s2.large.2"
-      #p0 : "s2.large.2"
-      #w0 : "s2.large.2"
       # size test like prodution, maybe better idea anyway
       d0 : "s2.xlarge.1"
       t0 : "s2.xlarge.1"
       u0 : "s2.xlarge.1"
-      p0 : "s2.xlarge.2"
+      p0 : "s2.xlarge.1"
       w0 : "s2.xlarge.1"
     }
     production = {
@@ -213,18 +198,17 @@ variable "pvsize_hot_map" {
   type        = "map"
   default = {
     default = {
-      d0 : 4
-      t0 : 4
-      u0 : 4
-      p0 : 6
-      w0 : 4
+      d0 : 5
+      t0 : 5
+      u0 : 5
+      p0 : 5
+      w0 : 5
     }
     production = {
       d0 : 5
       t0 : 5
       u0 : 5
-      #p0 : 400 #original sizing as of 2019-08-20, downsized due to lack of capacity on OTC for now
-      p0 : 40
+      p0 : 250
       w0 : 5
     }
   }
@@ -239,18 +223,17 @@ variable "pvsize_cold_map" {
   type        = "map"
   default = {
     default = {
-      d0 : 40
-      t0 : 40
-      u0 : 40
-      p0 : 60
-      w0 : 40
+      d0 : 50
+      t0 : 50
+      u0 : 50
+      p0 : 50
+      w0 : 50
     }
     production = {
       d0 : 50
       t0 : 50
       u0 : 50
-      #p0 : 4096 #original sizing as of 2019-08-20, downsized due to lack of capacity on OTC for now
-      p0 : 410
+      p0 : 2500
       w0 : 50
     }
   }
@@ -329,9 +312,9 @@ variable "pmdns_list_map" {
       splp0sh000 : "10.104.198.199",
       splp0sh002 : "10.104.198.200",
       splp0sy000 : "10.104.198.201",
-      splp0ix004 : "10.104.198.202",
-      splp0ix006 : "10.104.198.203",
-      splp0sh004 : "10.104.198.204",
+      ########## : "10.104.198.202",
+      ########## : "10.104.198.203",
+      ########## : "10.104.198.204",
       ########## : "10.104.198.205",
       #--------- : "10.104.198.206", OTC System interface
 
@@ -341,9 +324,9 @@ variable "pmdns_list_map" {
       splp0ix003 : "10.104.198.212",
       splp0sh001 : "10.104.198.213",
       splp0sy001 : "10.104.198.214",
-      splp0ix005 : "10.104.198.215",
-      splp0ix007 : "10.104.198.216",
-      splp0sh003 : "10.104.198.217",
+      ########## : "10.104.198.215",
+      ########## : "10.104.198.216",
+      ########## : "10.104.198.217",
       ########## : "10.104.198.218",
       ########## : "10.104.198.219",
       ########## : "10.104.198.220",
@@ -361,7 +344,7 @@ variable "pmdns_list_map" {
       splt0ix000 : "10.104.198.233",
       splt0sy000 : "10.104.198.234",
       splt0mt000 : "10.104.198.235",
-      splt0mt000 : "10.104.198.236",
+      splt0cm000 : "10.104.198.236",
       splu0mt000 : "10.104.198.237",
       #--------- : "10.104.198.238", OTC System interface
 
@@ -390,9 +373,9 @@ variable "pmdns_list_map" {
       splp0sh000 : "10.104.146.7",
       splp0sh002 : "10.104.146.8",
       splp0sy000 : "10.104.146.9",
-      splp0ix004 : "10.104.146.10",
-      splp0ix006 : "10.104.146.11",
-      splp0sh004 : "10.104.146.12",
+      ########## : "10.104.146.10",
+      ########## : "10.104.146.11",
+      ########## : "10.104.146.12",
       ########## : "10.104.146.13",
       ########## : "10.104.146.14",
       ########## : "10.104.146.15",
@@ -453,9 +436,9 @@ variable "pmdns_list_map" {
       splp0ix003 : "10.104.146.68",
       splp0sh001 : "10.104.146.69",
       splp0sy001 : "10.104.146.70",
-      splp0ix005 : "10.104.146.71",
-      splp0ix007 : "10.104.146.72",
-      splp0sh003 : "10.104.146.73",
+      ########## : "10.104.146.71",
+      ########## : "10.104.146.72",
+      ########## : "10.104.146.73",
       ########## : "10.104.146.74",
       ########## : "10.104.146.75",
       ########## : "10.104.146.76",
@@ -528,8 +511,8 @@ variable "pmdns_list_map" {
       splt0sy000 : "10.104.146.202",
       splt0mt000 : "10.104.146.203",
       splu0mt000 : "10.104.146.204",
-      ########## : "10.104.146.205",
-      ########## : "10.104.146.206",
+      splt0cm000 : "10.104.146.205",
+      splu0sh000 : "10.104.146.206",
       ########## : "10.104.146.207",
       ########## : "10.104.146.208",
       ########## : "10.104.146.209",
@@ -555,8 +538,8 @@ variable "pmdns_list_map" {
       splt0sh001 : "10.104.146.229",
       splt0ix001 : "10.104.146.230",
       splt0sy001 : "10.104.146.231",
-      ########## : "10.104.146.232",
-      ########## : "10.104.146.233",
+      splu0sh001 : "10.104.146.232",
+      splw0hf001 : "10.104.146.233",
       ########## : "10.104.146.234",
       ########## : "10.104.146.235",
       ########## : "10.104.146.236",

@@ -49,7 +49,7 @@ resource "opentelekomcloud_compute_instance_v2" "instance" {
   name        = var.instance_name
   key_pair    = data.terraform_remote_state.shared.outputs["keypair-tss_id"]
   # Attention! Any change (even comments) to user_data will rebuild the VM. Use only for the most stable and basic tasks!
-  #user_data         = "${data.template_file.provtest.rendered}"
+  user_data         = "${data.template_file.provtest.rendered}"
   security_groups = setunion([
   data.terraform_remote_state.shared.outputs["base-secgrp_id"]], var.secgrp_id_list)
   auto_recovery = var.autorecover
@@ -95,7 +95,7 @@ data "template_file" "provtest" {
   template = "${file("${path.module}/templates/cloudinit.tpl")}"
 
   vars = {
-    fqdn     = "${var.instance_name}.sbb.ch"
+    fqdn     = "${var.instance_name}.splunk.sbb.ch"
     hostname = "${var.instance_name}"
   }
 }
