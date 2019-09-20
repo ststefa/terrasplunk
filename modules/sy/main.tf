@@ -26,6 +26,7 @@ resource "opentelekomcloud_blockstorage_volume_v2" "var" {
   availability_zone = module.sy-instance.az
   name              = "${module.sy-instance.name}-var"
   size              = module.variables.pvsize_var
+  volume_type       = "SSD"
 }
 
 resource "opentelekomcloud_compute_volume_attach_v2" "var_attach" {
