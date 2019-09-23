@@ -62,11 +62,12 @@ module "server-ix001" {
   instance_name = "${local.prefix}ix001"
 }
 
+module "server-hf000" {
+  source        = "../../modules/genericecs"
+  instance_name = "${local.prefix}hf000"
+}
+
 module "server-sy000" {
   source         = "../../modules/sy"
   instance_name  = "${local.prefix}sy000"
-}
-module "server-sy001" {
-  source         = "../../modules/sy"
-  instance_name  = "${local.prefix}sy001"
 }
