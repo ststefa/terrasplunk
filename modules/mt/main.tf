@@ -20,4 +20,5 @@ module "mt-instance" {
   source         = "../../modules/genericecs"
   instance_name  = var.instance_name
   secgrp_id_list = [data.terraform_remote_state.shared.outputs.searchhead-secgrp_id]
+  autorecover    = "true"
 }
