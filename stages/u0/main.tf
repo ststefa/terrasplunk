@@ -47,3 +47,7 @@ module "server-sh001" {
   source        = "../../modules/sh"
   instance_name = "${local.prefix}sh001"
 }
+module "server-sh002" {
+  source        = "../../modules/sh"
+  instance_name = "${local.prefix}sh002"
+}
