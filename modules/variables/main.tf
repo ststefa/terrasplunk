@@ -208,7 +208,7 @@ variable "pvsize_hot_map" {
       d0 : 5
       t0 : 5
       u0 : 5
-      p0 : 200
+      p0 : 250
       w0 : 5
     }
   }
@@ -233,7 +233,7 @@ variable "pvsize_cold_map" {
       d0 : 50
       t0 : 50
       u0 : 50
-      p0 : 2000
+      p0 : 2500
       w0 : 50
     }
   }
