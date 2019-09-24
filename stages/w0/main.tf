@@ -50,11 +50,11 @@ module "server-sh000" {
 }
 module "server-sh001" {
   source        = "../../modules/sh"
-  instance_name = "${local.prefix}sh000"
+  instance_name = "${local.prefix}sh001"
 }
 module "server-sh002" {
   source        = "../../modules/sh"
-  instance_name = "${local.prefix}sh000"
+  instance_name = "${local.prefix}sh002"
 }
 
 module "server-ix000" {
