@@ -67,7 +67,3 @@ module "server-sy000" {
   source         = "../../modules/sy"
   instance_name  = "${local.prefix}sy000"
 }
-module "server-sy001" {
-  source         = "../../modules/sy"
-  instance_name  = "${local.prefix}sy001"
-}
