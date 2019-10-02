@@ -87,18 +87,18 @@ variable "flavor_ix_map" {
   default = {
     default = {
       # size test (almost) like prodution, maybe better idea anyway. The full size does not (currently 2019-08) fit and leads to errors
-      d0 : "s2.xlarge.2"
-      t0 : "s2.xlarge.2"
-      u0 : "s2.xlarge.2"
-      p0 : "s2.2xlarge.2"
-      w0 : "s2.xlarge.2"
+      d0 : "s2.4xlarge.1"
+      t0 : "s2.4xlarge.1"
+      u0 : "s2.4xlarge.1"
+      p0 : "s2.4xlarge.1"
+      w0 : "s2.4xlarge.1"
     }
     production = {
-      d0 : "s2.xlarge.2"
-      t0 : "s2.xlarge.2"
-      u0 : "s2.xlarge.2"
+      d0 : "s2.4xlarge.1"
+      t0 : "s2.4xlarge.1"
+      u0 : "s2.4xlarge.1"
       p0 : "s2.4xlarge.2" #splunk says we should at least use 8xlarge (32HT cores = 16 "real" cores)
-      w0 : "s2.xlarge.2"
+      w0 : "s2.4xlarge.1"
     }
   }
 }
@@ -114,18 +114,18 @@ variable "flavor_sh_map" {
   default = {
     default = {
       # size test (almost) like prodution, maybe better idea anyway. The full size does not (currently 2019-08) fit and leads to errors
-      d0 : "s2.xlarge.4"
-      t0 : "s2.xlarge.4"
-      u0 : "s2.xlarge.4"
-      p0 : "s2.xlarge.4"
-      w0 : "s2.xlarge.4"
+      d0 : "s2.4xlarge.1"
+      t0 : "s2.4xlarge.1"
+      u0 : "s2.4xlarge.1"
+      p0 : "s2.4xlarge.1"
+      w0 : "s2.4xlarge.1"
     }
     production = {
-      d0 : "s2.xlarge.4"
-      t0 : "s2.xlarge.4"
-      u0 : "s2.xlarge.4"
+      d0 : "s2.4xlarge.1"
+      t0 : "s2.4xlarge.1"
+      u0 : "s2.4xlarge.1"
       p0 : "s2.4xlarge.2"
-      w0 : "s2.xlarge.4"
+      w0 : "s2.4xlarge.1"
     }
   }
 }
@@ -139,19 +139,18 @@ variable "flavor_default_map" {
   type        = "map"
   default = {
     default = {
-      # size test like prodution, maybe better idea anyway
-      d0 : "s2.xlarge.1"
-      t0 : "s2.xlarge.1"
-      u0 : "s2.xlarge.1"
-      p0 : "s2.xlarge.1"
-      w0 : "s2.xlarge.1"
+      d0 : "s2.4xlarge.1"
+      t0 : "s2.4xlarge.1"
+      u0 : "s2.4xlarge.1"
+      p0 : "s2.4xlarge.1"
+      w0 : "s2.4xlarge.1"
     }
     production = {
-      d0 : "s2.xlarge.1"
-      t0 : "s2.xlarge.1"
-      u0 : "s2.xlarge.1"
-      p0 : "s2.xlarge.2"
-      w0 : "s2.xlarge.1"
+      d0 : "s2.4xlarge.1"
+      t0 : "s2.4xlarge.1"
+      u0 : "s2.4xlarge.1"
+      p0 : "s2.4xlarge.1"
+      w0 : "s2.4xlarge.1"
     }
   }
 }
