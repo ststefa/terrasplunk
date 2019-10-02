@@ -97,7 +97,7 @@ variable "flavor_ix_map" {
       d0 : "s2.4xlarge.1"
       t0 : "s2.4xlarge.1"
       u0 : "s2.4xlarge.1"
-      p0 : "s2.4xlarge.2" #splunk says we should at least use 8xlarge (32HT cores = 16 "real" cores)
+      p0 : "s2.4xlarge.2"
       w0 : "s2.4xlarge.1"
     }
   }
