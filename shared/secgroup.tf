@@ -40,6 +40,7 @@ resource "opentelekomcloud_compute_secgroup_v2" "base-secgrp" {
   name        = "${local.project}-base-secgrp"
   description = "Base rules for all ${local.project} compute instances"
 
+  # allow free communication among all our splunk ecs's in the tenant
   rule {
     from_port   = 1
     to_port     = 65535
@@ -76,6 +77,14 @@ resource "opentelekomcloud_compute_secgroup_v2" "indexer-secgrp" {
   description = "Specific rules for ${local.project} indexer instances"
 
   # indexr port
+  rule {
+    from_port   = 9997
+    to_port     = 9997
+    ip_protocol = "tcp"
+    cidr        = "0.0.0.0/0"
+  }
+
+  # indexr port SSL
   rule {
     from_port   = 9998
     to_port     = 9998
