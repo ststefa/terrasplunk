@@ -1,0 +1,16 @@
+# systemd unit file. Place as /etc/systemd/system/wsrv.service, enable and start
+
+[Unit]
+Description=Splunk admin interface
+After=network.target
+
+[Service]
+User=linux
+Group=linux
+ExecStart=/home/linux/terrasplunk/bin/wsrv.py
+Restart=on-failure
+RestartSec=10s
+Type=simple
+
+[Install]
+WantedBy=multi-user.target
