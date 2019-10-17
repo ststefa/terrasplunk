@@ -62,6 +62,14 @@ resource "opentelekomcloud_compute_secgroup_v2" "base-secgrp" {
     cidr        = "0.0.0.0/0"
   }
 
+  # allow node exporter scraping inside rz network
+  rule {
+    from_port   = 9100
+    to_port     = 9100
+    ip_protocol = "tcp"
+    cidr        = "10.104.0.0/16"
+  }
+
   # allow icmp
   rule {
     from_port   = -1
@@ -142,5 +150,13 @@ resource "opentelekomcloud_compute_secgroup_v2" "parser-secgrp" {
     to_port     = 6514
     ip_protocol = "tcp"
     cidr        = "0.0.0.0/0"
+  }
+
+  # allow inbound rsyslog exporter scraping inside rz network
+  rule {
+    from_port   = 9101
+    to_port     = 9101
+    ip_protocol = "tcp"
+    cidr        = "10.104.0.0/16"
   }
 }
