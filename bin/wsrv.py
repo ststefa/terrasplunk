@@ -82,7 +82,6 @@ class TerraformServer(BaseHTTPRequestHandler):
         self.send_response(200)
         log.debug('self.path:%s' % self.path)
         if self.path == '/raw':
-            pass
             self.send_header("Content-type", "application/json")
             self.end_headers()
             self.do_raw(build_state.get_state(base_path))
