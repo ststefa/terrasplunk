@@ -59,6 +59,13 @@ resource "opentelekomcloud_compute_instance_v2" "instance" {
   # However: "Error: Unsupported argument" although documented on https://www.terraform.io/docs/providers/opentelekomcloud/r/compute_instance_v2.html
   #force_delete        = true
 
+  # Attempting to tag results in:
+  # Error: Error fetching OpenTelekomCloud instance tags: Resource not found: [GET https://ecs.eu-ch.o13bb.otc.t-systems.com/v1/530ba6eaa121424fa485c4b983d81924/servers/c57f7b80-a5de-4b0a-9786-7121c22f126e/tags], error message: {"message":"API not found","request_id":"0d04f437a9062ae60dbe2e1281fc7aa0"}
+  # ATTENTION! The attempt to add a tag resulted in unusable terraform statefile. All tag sections had to be manually null-ed
+  #tag = {
+  #  application = "splunk"
+  #}
+
   network {
     uuid        = local.network_id
     fixed_ip_v4 = module.variables.pmdns_list[var.instance_name]
