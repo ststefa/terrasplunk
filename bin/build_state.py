@@ -44,25 +44,6 @@ except:
     raise
 
 
-class _StateCache():
-    _state = {}
-    _last_update = 0
-
-    def valid(self):
-        is_valid = (round(time.time()) - self._last_update) < 60
-        return is_valid
-
-    def update(self, new_state):
-        if not self.valid():
-            self._state = new_state
-
-    def get(self):
-        return self._state
-
-
-cache = _StateCache()
-
-
 class TfstateError(Exception):
     pass
 
@@ -112,67 +93,63 @@ def init_parser(base_path):
 
 
 def get_state(base_path):
-    if not cache.valid():
-        log.debug('rebuilding cache')
-        stage_path = os.path.join(base_path, 'stages')
-        shared_path = os.path.join(base_path, 'shared')
-        result = {}
-        # Any stages/* dir which matches this regex is considered a stage dir
-        reg_stagename = re.compile("..")
+    stage_path = os.path.join(base_path, 'stages')
+    shared_path = os.path.join(base_path, 'shared')
+    result = {}
+    # Any stages/* dir which matches this regex is considered a stage dir
+    reg_stagename = re.compile("..")
 
-        # Iterate over tenants
-        for workspace in workspace_tenant_map.keys():
-            tenant = {}
-            result[workspace_tenant_map[workspace]['tenant_name']] = tenant
+    # Iterate over tenants
+    for workspace in workspace_tenant_map.keys():
+        tenant = {}
+        result[workspace_tenant_map[workspace]['tenant_name']] = tenant
 
-            # Add shared to tenant
+        # Add shared to tenant
+        tfstate_filename = os.path.join(
+            shared_path, workspace_tenant_map[workspace]['tfstate_path'])
+        log.debug('shared tfstate_filename: %s' % tfstate_filename)
+        file = pathlib.Path(tfstate_filename)
+        if file.exists():
+            with file.open('r') as f:
+                tfstate = json.load(f)
+                f.close()
+            tenant["shared"] = tfstate
+        else:
+            log.warning("No shared state for tenant %s (workspace %s)" % (
+                workspace_tenant_map[workspace]['tenant_name'], workspace))
+
+        # Add stages to tenant
+        # dynamically get stages based on existing dirs
+        stages = os.listdir(stage_path)
+        for stage in stages:
+            log.debug('stage: %s' % stage)
+            stagedir = os.path.join(base_path, stage)
+            if os.path.isdir(stagedir):
+                stages.remove(stage)
+            if not reg_stagename.fullmatch(stage):
+                stages.remove(stage)
+        log.debug('stages: %s' % stages)
+
+        # iterate over stage dirs, adding their tfstate
+        for stage_name in stages:
+            this_stage_path = os.path.join(stage_path, stage_name)
+            log.debug('this_stage_path: %s' % this_stage_path)
+
             tfstate_filename = os.path.join(
-                shared_path, workspace_tenant_map[workspace]['tfstate_path'])
-            log.debug('shared tfstate_filename: %s' % tfstate_filename)
+                this_stage_path, workspace_tenant_map[workspace]['tfstate_path'])
+            log.debug('tfstate_filename: %s' % tfstate_filename)
             file = pathlib.Path(tfstate_filename)
             if file.exists():
                 with file.open('r') as f:
                     tfstate = json.load(f)
                     f.close()
-                tenant["shared"] = tfstate
+                tenant[stage_name] = tfstate
             else:
-                log.warning("No shared state for tenant %s (workspace %s)" % (
-                    workspace_tenant_map[workspace]['tenant_name'], workspace))
-
-            # Add stages to tenant
-            # dynamically get stages based on existing dirs
-            stages = os.listdir(stage_path)
-            for stage in stages:
-                log.debug('stage: %s' % stage)
-                stagedir = os.path.join(base_path, stage)
-                if os.path.isdir(stagedir):
-                    stages.remove(stage)
-                if not reg_stagename.fullmatch(stage):
-                    stages.remove(stage)
-            log.debug('stages: %s' % stages)
-
-            # iterate over stage dirs, adding their tfstate
-            for stage_name in stages:
-                this_stage_path = os.path.join(stage_path, stage_name)
-                log.debug('this_stage_path: %s' % this_stage_path)
-
-                tfstate_filename = os.path.join(
-                    this_stage_path, workspace_tenant_map[workspace]['tfstate_path'])
-                log.debug('tfstate_filename: %s' % tfstate_filename)
-                file = pathlib.Path(tfstate_filename)
-                if file.exists():
-                    with file.open('r') as f:
-                        tfstate = json.load(f)
-                        f.close()
-                    tenant[stage_name] = tfstate
-                else:
-                    log.debug("No state for stage %s, workspace %s" % (
-                        stage_name, workspace))
-                    tenant[stage_name] = {}
-                    continue
-
-        cache.update(result)
-    return cache.get()
+                log.debug("No state for stage %s, workspace %s" % (
+                    stage_name, workspace))
+                tenant[stage_name] = {}
+                continue
+    return result
 
 
 def main(base_path):
