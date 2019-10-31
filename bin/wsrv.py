@@ -77,8 +77,33 @@ def start_server():
     return webServer
 
 
+class StateCache():
+    def __init__(self):
+        self._state = {}
+        self._last_update = 0
+
+    def valid(self):
+        is_valid = (round(time.time()) - self._last_update) < 15
+        return is_valid
+
+    def update(self, new_state):
+        self._state = new_state
+        self._last_update = round(time.time())
+
+    def issue(self):
+        return self._last_update
+
+    def get(self):
+        return self._state
+
+
 class TerraformServer(BaseHTTPRequestHandler):
+    _state_cache = StateCache()
+
     def do_GET(self):
+        if not TerraformServer._state_cache.valid():
+            TerraformServer._state_cache.update(
+                build_state.get_state(build_state.base_path))
         self.send_response(200)
         log.debug('self.path:%s' % self.path)
         if self.path == '/raw':
@@ -93,7 +118,7 @@ class TerraformServer(BaseHTTPRequestHandler):
             self.send_header("Content-type", "text/html")
             self.end_headers()
             self.wfile.write(bytes(
-                "<!DOCTYPE html><html><body>Cannot handle this. Use one of /topology or /raw</body></html>", "utf-8"))
+                "<!DOCTYPE html><html><body>Cannot handle this. Humans please use <a href='/topology'>/topology</a>, machines use <a href='/tfstate'>/tfstate</a></body></html>", "utf-8"))
 
     def do_raw(self, data):
         self.wfile.write(bytes(json.dumps(data), "utf-8"))
@@ -122,7 +147,8 @@ class TerraformServer(BaseHTTPRequestHandler):
         self.wfile.write(bytes("<body>", "utf-8"))
 
         self.wfile.write(
-            bytes("<h1>Splunk environment overview</h1>", "utf-8"))
+            bytes("<h1>Splunk environment overview as of %s</h1>" %
+                  time.asctime(time.localtime(round(TerraformServer._state_cache.issue()))), "utf-8"))
         for tenant in sorted(data.keys()):
             self.wfile.write(bytes("<h2>Tenant %s</h2>" % tenant, "utf-8"))
 
@@ -183,13 +209,13 @@ if __name__ == "__main__":
     log.debug('sys.argv: %s' % sys.argv)
     log.debug('args: %s' % args)
 
-    server = webServer = HTTPServer((hostName, serverPort), TerraformServer)
+    web_server = HTTPServer((hostName, serverPort), TerraformServer)
     log.info("Server started http://%s:%s" % (hostName, serverPort))
 
     try:
-        webServer.serve_forever()
+        web_server.serve_forever()
     except KeyboardInterrupt:
         pass
 
-    webServer.server_close()
+    web_server.server_close()
     log.info("Server stopped.")
