@@ -7,6 +7,7 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 import time
 
 import os
+import copy
 import sys
 import argparse
 import json
@@ -94,7 +95,7 @@ class StateCache():
         return self._last_update
 
     def get(self):
-        return self._state
+        return copy.deepcopy(self._state)
 
 
 class TerraformServer(BaseHTTPRequestHandler):
@@ -106,14 +107,14 @@ class TerraformServer(BaseHTTPRequestHandler):
                 build_state.get_state(build_state.base_path))
         self.send_response(200)
         log.debug('self.path:%s' % self.path)
-        if self.path == '/raw':
+        if self.path == '/tfstate':
             self.send_header("Content-type", "application/json")
             self.end_headers()
-            self.do_raw(build_state.get_state(base_path))
+            self.do_raw(TerraformServer._state_cache.get())
         elif self.path == '/topology':
             self.send_header("Content-type", "text/html")
             self.end_headers()
-            self.do_html(build_state.get_state(base_path))
+            self.do_html(TerraformServer._state_cache.get())
         else:
             self.send_header("Content-type", "text/html")
             self.end_headers()
