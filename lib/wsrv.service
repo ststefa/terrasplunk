@@ -11,6 +11,8 @@ ExecStart=/home/linux/terrasplunk/bin/wsrv.py
 Restart=on-failure
 RestartSec=10s
 Type=simple
+StandardOutput=syslog
+StandardError=syslog
 
 [Install]
 WantedBy=multi-user.target
