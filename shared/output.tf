@@ -13,20 +13,20 @@ output "subnetA-az2_id" {
 }
 
 output "netB-az1_id" {
-  #value = data.opentelekomcloud_networking_network_v2.netB-az1[0].id ? data.opentelekomcloud_networking_network_v2.netB-az1[0].id : "no-netB-az1"
-  # simpler form also works, it seems terraform omits nonexisting count output by itself
-  # TODO: verify behaviour on prod-tnt, cannot test this on test-tnt
-  value = data.opentelekomcloud_networking_network_v2.netB-az1[0].id
+  # If there is an instance of it (i.e. count=1, see network.tf), then return it, else return a non-id literal intentionally causing terraform to fail on access
+  value = length(data.opentelekomcloud_networking_network_v2.netB-az1[*].id) == 1 ? data.opentelekomcloud_networking_network_v2.netB-az1[0].id : "no-netB-az1"
+  # simpler form does no longer work as of terraform 0.12.13
+  #value = data.opentelekomcloud_networking_network_v2.netB-az1[0].id
 }
 output "subnetB-az1_id" {
-  value = opentelekomcloud_vpc_subnet_v1.subnetB-az1[0].id
+  value = length(opentelekomcloud_vpc_subnet_v1.subnetB-az1[*].id) == 1 ? opentelekomcloud_vpc_subnet_v1.subnetB-az1[0].id : "no-subnetB-az1"
 }
 
 output "netB-az2_id" {
-  value = data.opentelekomcloud_networking_network_v2.netB-az2[0].id
+  value = length(data.opentelekomcloud_networking_network_v2.netB-az2[*].id) == 1 ? data.opentelekomcloud_networking_network_v2.netB-az2[0].id : "no-netB-az2"
 }
 output "subnetB-az2_id" {
-  value = opentelekomcloud_vpc_subnet_v1.subnetB-az2[0].id
+  value = length(opentelekomcloud_vpc_subnet_v1.subnetB-az2[*].id) == 1 ? opentelekomcloud_vpc_subnet_v1.subnetB-az2[0].id : "no-subnetB-az2"
 }
 
 output "netC-az1_id" {
