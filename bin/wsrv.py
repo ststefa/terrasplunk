@@ -12,6 +12,7 @@ import sys
 import argparse
 import json
 import logging
+import socket
 
 import build_state
 
@@ -132,11 +133,12 @@ class TerraformServer(BaseHTTPRequestHandler):
         self.wfile.write(bytes("<title>Splunk Overview</title>", "utf-8"))
         self.wfile.write(bytes("\
             <style>\
-                body {font-family: verdana;}\
+                body       {font-family: verdana;}\
                 h1         {color: green;}\
                 table      {border-collapse: collapse; font-size: small;}\
                 tr, th, td {text-align: left; vertical-align: top; border: 1px solid; padding: 2px; padding-left: 30px;; padding-right: 30px;}\
                 tr         {text-align: left; vertical-align: top; border: 1px solid;}\
+                footer     {padding: 10px; color: lightgrey; font-size: small;}\
             </style>", "utf-8"))
         self.wfile.write(bytes("</head>", "utf-8"))
 
@@ -148,12 +150,15 @@ class TerraformServer(BaseHTTPRequestHandler):
         self.wfile.write(bytes("<body>", "utf-8"))
 
         self.wfile.write(
-            bytes("<h1>Splunk environment overview as of %s</h1>" %
-                  time.asctime(time.localtime(round(TerraformServer._state_cache.issue()))), "utf-8"))
+            bytes("<h1>Splunk environment overview</h1>", "utf-8"))
         for tenant in sorted(data.keys()):
             self.wfile.write(bytes("<h2>Tenant %s</h2>" % tenant, "utf-8"))
 
             self.do_tenant(data[tenant])
+
+        self.wfile.write(
+            bytes("<footer>Created with &hearts; on %s at %s</footer>" %
+                  (socket.gethostname(), time.asctime(time.localtime(round(TerraformServer._state_cache.issue())))), "utf-8"))
 
         self.wfile.write(bytes("</body>", "utf-8"))
 
