@@ -33,6 +33,7 @@ except:
 
 sys.path.append(os.path.realpath(__file__))
 
+
 def method_trace(fn):
     from functools import wraps
 
@@ -45,6 +46,7 @@ def method_trace(fn):
         return out
 
     return wrapper
+
 
 @method_trace
 def init_logging():
