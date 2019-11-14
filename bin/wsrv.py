@@ -68,6 +68,8 @@ def init_parser():
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('--debug', action='store_true',
                         help='Turn on debug output')
+    parser.add_argument('--listen', nargs='?', default=hostName,
+                        help='Listen on specified IP')
     parser.add_argument('--port', nargs='?', default=serverPort,
                         type=int, help='Listen on specified TCP port')
     return parser
@@ -211,6 +213,8 @@ if __name__ == "__main__":
         log.setLevel(logging.DEBUG)
     if args.port:
         serverPort = args.port
+    if args.listen:
+        hostName = args.listen
 
     log.debug('sys.argv: %s' % sys.argv)
     log.debug('args: %s' % args)
