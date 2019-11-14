@@ -69,7 +69,7 @@ def init_parser():
     parser.add_argument('--debug', action='store_true',
                         help='Turn on debug output')
     parser.add_argument('--port', nargs='?', default=serverPort,
-                        type=int, help='Listen on TCP port')
+                        type=int, help='Listen on specified TCP port')
     return parser
 
 
@@ -157,7 +157,7 @@ class TerraformServer(BaseHTTPRequestHandler):
             self.do_tenant(data[tenant])
 
         self.wfile.write(
-            bytes("<footer>Created with &hearts; on %s at %s</footer>" %
+            bytes("<footer>Created with &hearts; on %s showing live terraform data as of  %s</footer>" %
                   (socket.gethostname(), time.asctime(time.localtime(round(TerraformServer._state_cache.issue())))), "utf-8"))
 
         self.wfile.write(bytes("</body>", "utf-8"))
@@ -216,7 +216,7 @@ if __name__ == "__main__":
     log.debug('args: %s' % args)
 
     web_server = HTTPServer((hostName, serverPort), TerraformServer)
-    log.info("Server started http://%s:%s" % (hostName, serverPort))
+    log.info("Server listening on %s:%s" % (hostName, serverPort))
 
     try:
         web_server.serve_forever()
