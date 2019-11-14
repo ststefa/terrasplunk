@@ -4,15 +4,16 @@
 
 import jsonpath
 from http.server import BaseHTTPRequestHandler, HTTPServer
-import time
 
-import os
-import copy
-import sys
 import argparse
+import copy
+import inspect
 import json
 import logging
+import os
 import socket
+import sys
+import time
 
 import build_state
 
@@ -32,7 +33,20 @@ except:
 
 sys.path.append(os.path.realpath(__file__))
 
+def method_trace(fn):
+    from functools import wraps
 
+    @wraps(fn)
+    def wrapper(*my_args, **my_kwargs):
+        log.debug(
+            '>>> %s(%s ; %s ; %s)' % (fn.__name__, inspect.getargspec(fn), my_args, my_kwargs))
+        out = fn(*my_args, **my_kwargs)
+        log.debug('<<< %s' % fn.__name__)
+        return out
+
+    return wrapper
+
+@method_trace
 def init_logging():
     # write INFO to stdout and anything else to stderr
     # see https://stackoverflow.com/questions/2302315/how-can-info-and-debug-logging-message-be-sent-to-stdout-and-higher-level-messag
@@ -62,17 +76,21 @@ def init_logging():
     log.addHandler(logging_handler_err)
 
 
+@method_trace
 def init_parser():
     parser = argparse.ArgumentParser(
         description='Serve terraform state over http',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('--debug', action='store_true',
                         help='Turn on debug output')
+    parser.add_argument('--listen', nargs='?', default=hostName,
+                        help='Listen on specified IP')
     parser.add_argument('--port', nargs='?', default=serverPort,
-                        type=int, help='Listen on TCP port')
+                        type=int, help='Listen on specified TCP port')
     return parser
 
 
+@method_trace
 def start_server():
     webServer = HTTPServer((hostName, serverPort), TerraformServer)
     print("Server started http://%s:%s" % (hostName, serverPort))
@@ -80,21 +98,26 @@ def start_server():
 
 
 class StateCache():
+    @method_trace
     def __init__(self):
         self._state = {}
         self._last_update = 0
 
+    @method_trace
     def valid(self):
         is_valid = (round(time.time()) - self._last_update) < 15
         return is_valid
 
+    @method_trace
     def update(self, new_state):
         self._state = new_state
         self._last_update = round(time.time())
 
+    @method_trace
     def issue(self):
         return self._last_update
 
+    @method_trace
     def get(self):
         return copy.deepcopy(self._state)
 
@@ -102,6 +125,7 @@ class StateCache():
 class TerraformServer(BaseHTTPRequestHandler):
     _state_cache = StateCache()
 
+    @method_trace
     def do_GET(self):
         if not TerraformServer._state_cache.valid():
             TerraformServer._state_cache.update(
@@ -122,9 +146,11 @@ class TerraformServer(BaseHTTPRequestHandler):
             self.wfile.write(bytes(
                 "<!DOCTYPE html><html><body>Cannot handle this. Humans please use <a href='/topology'>/topology</a>, machines use <a href='/tfstate'>/tfstate</a></body></html>", "utf-8"))
 
+    @method_trace
     def do_raw(self, data):
         self.wfile.write(bytes(json.dumps(data), "utf-8"))
 
+    @method_trace
     def do_html(self, data):
         self.wfile.write(bytes("<!DOCTYPE html>", "utf-8"))
         self.wfile.write(bytes("<html>", "utf-8"))
@@ -146,6 +172,7 @@ class TerraformServer(BaseHTTPRequestHandler):
 
         self.wfile.write(bytes("</html>", "utf-8"))
 
+    @method_trace
     def do_body(self, data):
         self.wfile.write(bytes("<body>", "utf-8"))
 
@@ -157,11 +184,12 @@ class TerraformServer(BaseHTTPRequestHandler):
             self.do_tenant(data[tenant])
 
         self.wfile.write(
-            bytes("<footer>Created with &hearts; on %s at %s</footer>" %
+            bytes("<footer>Created with &hearts; on %s showing live terraform data as of  %s</footer>" %
                   (socket.gethostname(), time.asctime(time.localtime(round(TerraformServer._state_cache.issue())))), "utf-8"))
 
         self.wfile.write(bytes("</body>", "utf-8"))
 
+    @method_trace
     def do_tenant(self, data):
         del data['shared']
         self.wfile.write(bytes("<table>", "utf-8"))
@@ -181,6 +209,7 @@ class TerraformServer(BaseHTTPRequestHandler):
 
         self.wfile.write(bytes("</table>", "utf-8"))
 
+    @method_trace
     def do_stage(self, data):
         self.wfile.write(bytes("<table>", "utf-8"))
 
@@ -211,12 +240,14 @@ if __name__ == "__main__":
         log.setLevel(logging.DEBUG)
     if args.port:
         serverPort = args.port
+    if args.listen:
+        hostName = args.listen
 
     log.debug('sys.argv: %s' % sys.argv)
     log.debug('args: %s' % args)
 
     web_server = HTTPServer((hostName, serverPort), TerraformServer)
-    log.info("Server started http://%s:%s" % (hostName, serverPort))
+    log.info("Server listening on %s:%s" % (hostName, serverPort))
 
     try:
         web_server.serve_forever()
