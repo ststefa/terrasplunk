@@ -1,7 +1,7 @@
 # This idea has been dropped in favor of a fixed 1:1 relation. Keeping for reference
 #variable stage_map {
 #  description = "Assign workspace names (lval) to stage names (rval). There might be more workspaces than stages!"
-#  type = "map"
+#  type = map
 #  default = {
 #    spielwiese     = "spielwiese"
 #  }
@@ -14,7 +14,7 @@
 variable "tenant_map" {
   # TODO: The workspace idea seems to confuse people, esp. because tf.workspace != tenant.name
   description = "1:1 assignment from workspace name to tenant name"
-  type        = "map"
+  type        = map
   default = {
     default    = "tsch_rz_t_001"
     production = "tsch_rz_p_001"
@@ -28,7 +28,7 @@ output "tenant" {
 variable "shared_statefile_map" {
   # T: needs different concept if we go to remote state
   description = "1:1 assignment from workspace name to terraform state filename"
-  type        = "map"
+  type        = map
   default = {
     default    = "../../shared/terraform.tfstate"
     production = "../../shared/terraform.tfstate.d/production/terraform.tfstate"
@@ -83,7 +83,7 @@ variable "flavor_ix_map" {
   #+--------------+--------+--------+
 
   description = "Indexer VM sizes (split by tenant and stage)"
-  type        = "map"
+  type        = map
   default = {
     default = {
       # size test (almost) like prodution, maybe better idea anyway. The full size does not (currently 2019-08) fit and leads to errors
@@ -110,7 +110,7 @@ output "flavor_ix" {
 
 variable "flavor_sh_map" {
   description = "Searchhead VM sizes (split by tenant and stage)"
-  type        = "map"
+  type        = map
   default = {
     default = {
       # size test (almost) like prodution, maybe better idea anyway. The full size does not (currently 2019-08) fit and leads to errors
@@ -136,7 +136,7 @@ output "flavor_sh" {
 
 variable "flavor_default_map" {
   description = "Default VM sizes (split by tenant and stage)"
-  type        = "map"
+  type        = map
   default = {
     default = {
       d0 : "s2.4xlarge.1"
@@ -181,7 +181,7 @@ output "pvsize_opt" {
 
 variable "pvsize_var_map" {
   description = "Size of /var/x pv (split by tenant)"
-  type        = "map"
+  type        = map
   default = {
     default    = 20
     production = 200
@@ -194,7 +194,7 @@ output "pvsize_var" {
 
 variable "pvsize_hot_map" {
   description = "hot bucket pv sizes (split by tenant and stage)"
-  type        = "map"
+  type        = map
   default = {
     default = {
       d0 : 5
@@ -219,7 +219,7 @@ output "pvsize_hot" {
 
 variable "pvsize_cold_map" {
   description = "cold bucket pv sizes (split by tenant and stage)"
-  type        = "map"
+  type        = map
   default = {
     default = {
       d0 : 50
@@ -244,7 +244,7 @@ output "pvsize_cold" {
 
 variable "subnet_cidr_list_map" {
   description = "Subnet CIDRs (split by tenant)"
-  type        = "map"
+  type        = map
   default = {
     default = {
       netA-az1 = "10.104.198.192/28",
@@ -270,7 +270,7 @@ output "subnet_cidr_list" {
 
 variable "gateway_list_map" {
   description = "Network gateways (split by tenant)"
-  type        = "map"
+  type        = map
   default = {
     default = {
       netA-az1 = "10.104.198.193",
