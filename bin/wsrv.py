@@ -215,24 +215,27 @@ class TerraformServer(BaseHTTPRequestHandler):
     def do_stage(self, data):
         self.wfile.write(bytes("<table>", "utf-8"))
 
-        instance_query = "$..resources[?(@.type=='opentelekomcloud_compute_instance_v2')]"
-        all_compute_instances = jsonpath.jsonpath(data, instance_query)
-        if all_compute_instances:
-            # create temp dict just for sorting
-            instance_dict = {}
-            for instance in all_compute_instances:
-                i_name = instance['instances'][0]['attributes']['name']
-                instance_dict[i_name] = {}
-                instance_dict[i_name]['ip'] = instance['instances'][0]['attributes']['access_ip_v4']
-                instance_dict[i_name]['az'] = instance['instances'][0]['attributes']['availability_zone']
-                instance_dict[i_name]['flavor'] = instance['instances'][0]['attributes']['flavor_id']
-            for i_name in sorted(instance_dict.keys()):
-                self.wfile.write(bytes("<tr><td>", "utf-8"))
-                self.wfile.write(bytes("<b>%s</b><br>" %i_name, "utf-8"))
-                self.wfile.write(bytes("%s<br>" %instance_dict[i_name]['ip'], "utf-8"))
-                self.wfile.write(bytes("%s<br>" %instance_dict[i_name]['az'], "utf-8"))
-                self.wfile.write(bytes("%s<br>" %instance_dict[i_name]['flavor'], "utf-8"))
-                self.wfile.write(bytes("</td></tr>", "utf-8"))
+        try:
+            instance_query = "$..resources[?(@.type=='opentelekomcloud_compute_instance_v2')]"
+            all_compute_instances = jsonpath.jsonpath(data, instance_query)
+            if all_compute_instances:
+                # create temp dict just for sorting
+                instance_dict = {}
+                for instance in all_compute_instances:
+                    i_name = instance['instances'][0]['attributes']['name']
+                    instance_dict[i_name] = {}
+                    instance_dict[i_name]['ip'] = instance['instances'][0]['attributes']['access_ip_v4']
+                    instance_dict[i_name]['az'] = instance['instances'][0]['attributes']['availability_zone']
+                    instance_dict[i_name]['flavor'] = instance['instances'][0]['attributes']['flavor_id']
+                for i_name in sorted(instance_dict.keys()):
+                    self.wfile.write(bytes("<tr><td>", "utf-8"))
+                    self.wfile.write(bytes("<b>%s</b><br>" %i_name, "utf-8"))
+                    self.wfile.write(bytes("%s<br>" %instance_dict[i_name]['ip'], "utf-8"))
+                    self.wfile.write(bytes("%s<br>" %instance_dict[i_name]['az'], "utf-8"))
+                    self.wfile.write(bytes("%s<br>" %instance_dict[i_name]['flavor'], "utf-8"))
+                    self.wfile.write(bytes("</td></tr>", "utf-8"))
+        except e:
+            log.warn("Creating stage failed with %s" % e)
 
         self.wfile.write(bytes("</table>", "utf-8"))
 
