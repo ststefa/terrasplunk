@@ -11,6 +11,7 @@ import inspect
 import json
 import logging
 import os
+import requests
 import socket
 import sys
 import time
@@ -142,11 +143,15 @@ class TerraformServer(BaseHTTPRequestHandler):
             self.send_header("Content-type", "text/html")
             self.end_headers()
             self.do_html(TerraformServer._state_cache.get())
+        elif self.path == '/monitor/zabbix.html':
+            self.send_header("Content-type", "text/html")
+            self.end_headers()
+            self.do_monitor()
         else:
             self.send_header("Content-type", "text/html")
             self.end_headers()
             self.wfile.write(bytes(
-                "<!DOCTYPE html><html><body>Cannot handle this. Humans please use <a href='/topology'>/topology</a>, machines use <a href='/tfstate'>/tfstate</a></body></html>", "utf-8"))
+                "<!DOCTYPE html><html><body>Cannot handle this. Humans please use <a href='/topology'>/topology</a>, machines use <a href='/tfstate'>/tfstate</a> but Zabbix uses <a href='/monitor/zabbix.html'>/monitor/zabbix.html</a></body></html>", "utf-8"))
 
     @method_trace
     def do_raw(self, data):
@@ -170,6 +175,40 @@ class TerraformServer(BaseHTTPRequestHandler):
             </style>", "utf-8"))
         self.wfile.write(bytes("</head>", "utf-8"))
 
+        self.do_body(data)
+
+        self.wfile.write(bytes("</html>", "utf-8"))
+
+    @method_trace
+    def do_monitor(self, data):
+        user = 'functional_user_monitor'
+        password = 'functional_user_monitor'
+        splunk_app = 'itsi'
+        splunk_auth = requests.auth.HTTPBasicAuth(user, password)
+        splunk_search = 'monitorSplunkHealth'
+        splunk_search_params = {'output_mode': 'json', 'search': f'savedsearch {splunk_search}'}
+        splunkREST_savedSearches = f'/servicesNS/{user}/{splunk_app}/search/jobs/export'
+        splunkURL = f'https://search.splunk.sbb.ch:8089{splunkREST_savedSearches}'
+        data = ''
+
+        try:
+            resp = requests.get(splunkURL, auth=splunk_auth, params=splunk_search_params)
+            resp.raise_for_status()
+        except requests.exceptions.HTTPError as http_err:
+            data = (f'HTTP error occurred: {http_err}')
+        except Exception as err:
+            data = (f'Genneric error occured: {err}')
+
+        try:
+            resp_output = resp.json()
+            data = json.dumps(resp_output, indent=4, sort_keys=True)
+        except ValueError:
+            data = resp.text
+        self.wfile.write(bytes("<!DOCTYPE html>", "utf-8"))
+        self.wfile.write(bytes("<html>", "utf-8"))
+
+        self.wfile.write(bytes("<head>", "utf-8"))
+        self.wfile.write(bytes("<title>Splunk Monitor</title>", "utf-8"))
         self.do_body(data)
 
         self.wfile.write(bytes("</html>", "utf-8"))
