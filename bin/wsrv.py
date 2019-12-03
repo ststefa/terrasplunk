@@ -180,7 +180,8 @@ class TerraformServer(BaseHTTPRequestHandler):
         self.wfile.write(bytes("</html>", "utf-8"))
 
     @method_trace
-    def do_monitor(self, data):
+    def do_monitor(self):
+        coding = 'utf-8'
         user = 'functional_user_monitor'
         password = 'functional_user_monitor'
         splunk_app = 'itsi'
@@ -189,29 +190,57 @@ class TerraformServer(BaseHTTPRequestHandler):
         splunk_search_params = {'output_mode': 'json', 'search': f'savedsearch {splunk_search}'}
         splunkREST_savedSearches = f'/servicesNS/{user}/{splunk_app}/search/jobs/export'
         splunkURL = f'https://search.splunk.sbb.ch:8089{splunkREST_savedSearches}'
-        data = ''
 
         try:
             resp = requests.get(splunkURL, auth=splunk_auth, params=splunk_search_params)
             resp.raise_for_status()
         except requests.exceptions.HTTPError as http_err:
-            data = (f'HTTP error occurred: {http_err}')
+            log.error('HTTP error occurred: %s', http_err)
         except Exception as err:
-            data = (f'Genneric error occured: {err}')
+            log.error('Genneric error occured: %s', err)
+        log.info('HTTP %s for URL: %s', resp.status_code, resp.url)
 
         try:
-            resp_output = resp.json()
-            data = json.dumps(resp_output, indent=4, sort_keys=True)
+            data = resp.json()
+            log.debug('HTTP output (JSON): %s', data)
         except ValueError:
-            data = resp.text
-        self.wfile.write(bytes("<!DOCTYPE html>", "utf-8"))
-        self.wfile.write(bytes("<html>", "utf-8"))
+            log.error('Decoding Splunk response:', resp.text)
 
-        self.wfile.write(bytes("<head>", "utf-8"))
-        self.wfile.write(bytes("<title>Splunk Monitor</title>", "utf-8"))
-        self.do_body(data)
+        json_data = json.dumps(data)
+        result_health_score_str = data['result']['health_score']
 
-        self.wfile.write(bytes("</html>", "utf-8"))
+        #Calculate output for Zabbix, based on result_health_score_str value
+        try:
+            result_health_score = float(result_health_score_str)
+        except ValueError:
+            result_health_score = -1.0  #Splunk ITSI health_score is always between 0 - 100 or 'N/A', with -1 we report that service was in maintenance ('N/A')
+            zabbix_output = 'SBB maintenance'
+            pass
+        else:
+            if result_health_score < 100:
+                zabbix_output = 'SBB NoOK'
+            else:
+                zabbix_output = 'SBB OK'
+        log.info('HTTP output: result { health_score = %s, ...}; therefore: %s', result_health_score_str, zabbix_output)
+
+        #HTML Header
+        self.wfile.write(bytes('<!DOCTYPE html>', coding))
+        self.wfile.write(bytes('<html>', coding))
+        self.wfile.write(bytes('<head><title>Splunk Monitor</title></head>', coding))
+
+        #HTML Body
+        self.wfile.write(bytes(f'<body>', coding))
+        self.wfile.write(bytes('<h1>Input  to Splunk</h1>', coding))
+        self.wfile.write(bytes(f'<p>REST call: <a href="{resp.url}">{resp.url}</a></p>', coding))
+        self.wfile.write(bytes('<h1>Output from Splunk</h1>', coding))
+        self.wfile.write(bytes(f'<p><samp>{json_data}</samp></p>', coding))
+        self.wfile.write(bytes('<h1>Output to Zabbix</h1>', coding))
+        self.wfile.write(bytes(f'<p>health_score (after convertion to float) = {result_health_score} ; therefore ...</p>', coding))
+        self.wfile.write(bytes(f'<p><b>{zabbix_output}</p></b>', coding))
+        self.wfile.write(bytes('</body>', coding))
+
+        #HTML End
+        self.wfile.write(bytes('</html>', coding))
 
     @method_trace
     def do_body(self, data):
