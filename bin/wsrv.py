@@ -201,13 +201,12 @@ class TerraformServer(BaseHTTPRequestHandler):
         log.info('HTTP %s for URL: %s', resp.status_code, resp.url)
 
         try:
-            data = resp.json()
-            log.debug('HTTP output (JSON): %s', data)
+            data_json = resp.json()
+            log.debug('HTTP output (JSON): %s', data_json)
         except ValueError:
             log.error('Decoding Splunk response:', resp.text)
 
-        json_data = json.dumps(data)
-        result_health_score_str = data['result']['health_score']
+        result_health_score_str = data_json['result']['health_score']
 
         #Calculate output for Zabbix, based on result_health_score_str value
         try:
@@ -230,13 +229,13 @@ class TerraformServer(BaseHTTPRequestHandler):
 
         #HTML Body
         self.wfile.write(bytes(f'<body>', coding))
-        self.wfile.write(bytes('<h1>Input  to Splunk</h1>', coding))
+        self.wfile.write(bytes('<h1>Input to Splunk</h1>', coding))
         self.wfile.write(bytes(f'<p>REST call: <a href="{resp.url}">{resp.url}</a></p>', coding))
         self.wfile.write(bytes('<h1>Output from Splunk</h1>', coding))
-        self.wfile.write(bytes(f'<p><samp>{json_data}</samp></p>', coding))
+        self.wfile.write(bytes(f'<p><pre>{json.dumps(data_json, indent=4)}</pre></p>', coding))
         self.wfile.write(bytes('<h1>Output to Zabbix</h1>', coding))
-        self.wfile.write(bytes(f'<p>health_score (after convertion to float) = {result_health_score} ; therefore ...</p>', coding))
-        self.wfile.write(bytes(f'<p><b>{zabbix_output}</p></b>', coding))
+        self.wfile.write(bytes(f'<p>health_score (after converted to float) = {result_health_score} ; therefore ...</p>', coding))
+        self.wfile.write(bytes(f'<p><b>{zabbix_output}</b></p>', coding))
         self.wfile.write(bytes('</body>', coding))
 
         #HTML End
