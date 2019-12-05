@@ -11,9 +11,11 @@ import inspect
 import json
 import logging
 import os
+import requests
 import socket
 import sys
 import time
+import traceback
 
 import build_state
 
@@ -129,31 +131,39 @@ class TerraformServer(BaseHTTPRequestHandler):
 
     @method_trace
     def do_GET(self):
-        if not TerraformServer._state_cache.valid():
-            TerraformServer._state_cache.update(
-                build_state.get_state(build_state.base_path))
-        self.send_response(200)
-        log.debug('self.path:%s' % self.path)
-        if self.path == '/tfstate':
-            self.send_header("Content-type", "application/json")
-            self.end_headers()
-            self.do_raw(TerraformServer._state_cache.get())
-        elif self.path == '/topology':
-            self.send_header("Content-type", "text/html")
-            self.end_headers()
-            self.do_html(TerraformServer._state_cache.get())
-        else:
-            self.send_header("Content-type", "text/html")
-            self.end_headers()
-            self.wfile.write(bytes(
-                "<!DOCTYPE html><html><body>Cannot handle this. Humans please use <a href='/topology'>/topology</a>, machines use <a href='/tfstate'>/tfstate</a></body></html>", "utf-8"))
+        try:
+            if not TerraformServer._state_cache.valid():
+                TerraformServer._state_cache.update(
+                    build_state.get_state(build_state.base_path))
+            self.send_response(200)
+            log.debug('self.path:%s' % self.path)
+            if self.path == '/tfstate':
+                self.send_header("Content-type", "application/json")
+                self.end_headers()
+                self.do_tfstate(TerraformServer._state_cache.get())
+            elif self.path == '/topology':
+                self.send_header("Content-type", "text/html")
+                self.end_headers()
+                self.do_topology(TerraformServer._state_cache.get())
+            elif self.path == '/monitor/health_score':
+                self.send_header("Content-type", "text/html")
+                self.end_headers()
+                self.do_monitor()
+            else:
+                self.send_header("Content-type", "text/html")
+                self.end_headers()
+                self.wfile.write(bytes(
+                    "<!DOCTYPE html><html><body>Cannot handle this. Humans please use <a href='/topology'>/topology</a>, machines use <a href='/tfstate'>/tfstate</a> and monitors use <a href='/monitor/health_score'>/monitor/health_score</a></body></html>", "utf-8"))
+        except Exception as err:
+            self.send_error(500, f'Python {err.__class__.__name__} exception', f'Unexpected error: {traceback.format_exc()}')
+            raise
 
     @method_trace
-    def do_raw(self, data):
+    def do_tfstate(self, data):
         self.wfile.write(bytes(json.dumps(data), "utf-8"))
 
     @method_trace
-    def do_html(self, data):
+    def do_topology(self, data):
         self.wfile.write(bytes("<!DOCTYPE html>", "utf-8"))
         self.wfile.write(bytes("<html>", "utf-8"))
 
@@ -173,6 +183,67 @@ class TerraformServer(BaseHTTPRequestHandler):
         self.do_body(data)
 
         self.wfile.write(bytes("</html>", "utf-8"))
+
+    @method_trace
+    def do_monitor(self):
+        coding = 'utf-8'
+        user = 'functional_user_monitor'
+        password = 'functional_user_monitor'
+        splunk_app = 'itsi'
+        splunk_auth = requests.auth.HTTPBasicAuth(user, password)
+        splunk_search = 'monitorSplunkHealth'
+        splunk_search_params = {'output_mode': 'json', 'search': f'savedsearch {splunk_search}'}
+        splunkREST_savedSearches = f'/servicesNS/{user}/{splunk_app}/search/jobs/export'
+        splunkURL = f'https://search.splunk.sbb.ch:8089{splunkREST_savedSearches}'
+
+        try:
+            resp = requests.get(splunkURL, auth=splunk_auth, params=splunk_search_params)
+            resp.raise_for_status()
+        except requests.exceptions.HTTPError as http_err:
+            log.error('HTTP error occurred: %s', http_err)
+        except Exception as err:
+            log.error('Genneric error occured: %s', err)
+        log.info('HTTP %s for URL: %s', resp.status_code, resp.url)
+
+        try:
+            data_json = resp.json()
+            log.debug('HTTP output (JSON): %s', data_json)
+        except ValueError:
+            log.error('Decoding Splunk response:', resp.text)
+
+        result_health_score_str = data_json['result']['health_score']
+
+        #Interpret if Splunk is healthy, providing service, based on result_health_score_str value
+        try:
+            result_health_score = float(result_health_score_str)
+        except ValueError:
+            result_health_score = -1.0  #Splunk ITSI health_score is always between 0 - 100 or 'N/A', with -1 we report that service was in maintenance ('N/A')
+            interpreted_splunk_health = 'SBB maintenance'
+        else:
+            if result_health_score < 100:
+                interpreted_splunk_health = 'SBB NoOK'
+            else:
+                interpreted_splunk_health = 'SBB OK'
+        log.info('HTTP output: result { health_score = %s, ...}; therefore: %s', result_health_score_str, interpreted_splunk_health)
+
+        #HTML Header
+        self.wfile.write(bytes('<!DOCTYPE html>', coding))
+        self.wfile.write(bytes('<html>', coding))
+        self.wfile.write(bytes('<head><title>Splunk Monitor</title></head>', coding))
+
+        #HTML Body
+        self.wfile.write(bytes(f'<body>', coding))
+        self.wfile.write(bytes('<h1>Input to Splunk</h1>', coding))
+        self.wfile.write(bytes(f'<p>REST call: <a href="{resp.url}">{resp.url}</a></p>', coding))
+        self.wfile.write(bytes('<h1>Output from Splunk</h1>', coding))
+        self.wfile.write(bytes(f'<p><pre>{json.dumps(data_json, indent=4)}</pre></p>', coding))
+        self.wfile.write(bytes('<h1>Interpretation of this output</h1>', coding))
+        self.wfile.write(bytes(f'<p>health_score (after converted to float) = {result_health_score} ; therefore ...</p>', coding))
+        self.wfile.write(bytes(f'<p><b>{interpreted_splunk_health}</b></p>', coding))
+        self.wfile.write(bytes('</body>', coding))
+
+        #HTML End
+        self.wfile.write(bytes('</html>', coding))
 
     @method_trace
     def do_body(self, data):
