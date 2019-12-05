@@ -15,7 +15,6 @@ import requests
 import socket
 import sys
 import time
-import traceback
 
 import build_state
 
@@ -131,31 +130,28 @@ class TerraformServer(BaseHTTPRequestHandler):
 
     @method_trace
     def do_GET(self):
-        try:
-            if not TerraformServer._state_cache.valid():
-                TerraformServer._state_cache.update(
-                    build_state.get_state(build_state.base_path))
-            self.send_response(200)
-            log.debug('self.path:%s' % self.path)
-            if self.path == '/tfstate':
-                self.send_header("Content-type", "application/json")
-                self.end_headers()
-                self.do_tfstate(TerraformServer._state_cache.get())
-            elif self.path == '/topology':
-                self.send_header("Content-type", "text/html")
-                self.end_headers()
-                self.do_topology(TerraformServer._state_cache.get())
-            elif self.path == '/monitor/health_score':
-                self.send_header("Content-type", "text/html")
-                self.end_headers()
-                self.do_monitor()
-            else:
-                self.send_header("Content-type", "text/html")
-                self.end_headers()
-                self.wfile.write(bytes(
-                    "<!DOCTYPE html><html><body>Cannot handle this. Humans please use <a href='/topology'>/topology</a>, machines use <a href='/tfstate'>/tfstate</a> and monitors use <a href='/monitor/health_score'>/monitor/health_score</a></body></html>", "utf-8"))
-        except Exception:
-            self.wfile.write(bytes( f"{traceback.format_exc()}", "utf-8"))
+        if not TerraformServer._state_cache.valid():
+            TerraformServer._state_cache.update(
+                build_state.get_state(build_state.base_path))
+        self.send_response(200)
+        log.debug('self.path:%s' % self.path)
+        if self.path == '/tfstate':
+            self.send_header("Content-type", "application/json")
+            self.end_headers()
+            self.do_tfstate(TerraformServer._state_cache.get())
+        elif self.path == '/topology':
+            self.send_header("Content-type", "text/html")
+            self.end_headers()
+            self.do_topology(TerraformServer._state_cache.get())
+        elif self.path == '/monitor/health_score':
+            self.send_header("Content-type", "text/html")
+            self.end_headers()
+            self.do_monitor()
+        else:
+            self.send_header("Content-type", "text/html")
+            self.end_headers()
+            self.wfile.write(bytes(
+                "<!DOCTYPE html><html><body>Cannot handle this. Humans please use <a href='/topology'>/topology</a>, machines use <a href='/tfstate'>/tfstate</a> and monitors use <a href='/monitor/health_score'>/monitor/health_score</a></body></html>", "utf-8"))
 
     @method_trace
     def do_tfstate(self, data):
