@@ -138,11 +138,11 @@ class TerraformServer(BaseHTTPRequestHandler):
         if self.path == '/tfstate':
             self.send_header("Content-type", "application/json")
             self.end_headers()
-            self.do_raw(TerraformServer._state_cache.get())
+            self.do_tfstate(TerraformServer._state_cache.get())
         elif self.path == '/topology':
             self.send_header("Content-type", "text/html")
             self.end_headers()
-            self.do_html(TerraformServer._state_cache.get())
+            self.do_topology(TerraformServer._state_cache.get())
         elif self.path == '/monitor/health_score':
             self.send_header("Content-type", "text/html")
             self.end_headers()
@@ -154,11 +154,11 @@ class TerraformServer(BaseHTTPRequestHandler):
                 "<!DOCTYPE html><html><body>Cannot handle this. Humans please use <a href='/topology'>/topology</a>, machines use <a href='/tfstate'>/tfstate</a> and monitors use <a href='/monitor/health_score'>/monitor/health_score</a></body></html>", "utf-8"))
 
     @method_trace
-    def do_raw(self, data):
+    def do_tfstate(self, data):
         self.wfile.write(bytes(json.dumps(data), "utf-8"))
 
     @method_trace
-    def do_html(self, data):
+    def do_topology(self, data):
         self.wfile.write(bytes("<!DOCTYPE html>", "utf-8"))
         self.wfile.write(bytes("<html>", "utf-8"))
 
