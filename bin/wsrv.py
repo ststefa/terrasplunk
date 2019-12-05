@@ -206,7 +206,7 @@ class TerraformServer(BaseHTTPRequestHandler):
         except ValueError:
             log.error('Decoding Splunk response:', resp.text)
 
-        result_health_score_str = data_json['result']['_cd']
+        result_health_score_str = data_json['result']['health_score']
 
         #Interpret if Splunk is healthy, providing service, based on result_health_score_str value
         try:
