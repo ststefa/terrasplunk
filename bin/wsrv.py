@@ -143,7 +143,7 @@ class TerraformServer(BaseHTTPRequestHandler):
             self.send_header("Content-type", "text/html")
             self.end_headers()
             self.do_html(TerraformServer._state_cache.get())
-        elif self.path == '/monitor/zabbix.html':
+        elif self.path == '/monitor/health_score':
             self.send_header("Content-type", "text/html")
             self.end_headers()
             self.do_monitor()
@@ -151,7 +151,7 @@ class TerraformServer(BaseHTTPRequestHandler):
             self.send_header("Content-type", "text/html")
             self.end_headers()
             self.wfile.write(bytes(
-                "<!DOCTYPE html><html><body>Cannot handle this. Humans please use <a href='/topology'>/topology</a>, machines use <a href='/tfstate'>/tfstate</a> but Zabbix uses <a href='/monitor/zabbix.html'>/monitor/zabbix.html</a></body></html>", "utf-8"))
+                "<!DOCTYPE html><html><body>Cannot handle this. Humans please use <a href='/topology'>/topology</a>, machines use <a href='/tfstate'>/tfstate</a> and monitors use <a href='/monitor/health_score'>/monitor/health_score</a></body></html>", "utf-8"))
 
     @method_trace
     def do_raw(self, data):
@@ -208,19 +208,19 @@ class TerraformServer(BaseHTTPRequestHandler):
 
         result_health_score_str = data_json['result']['health_score']
 
-        #Calculate output for Zabbix, based on result_health_score_str value
+        #Interpret if Splunk is healthy, providing service, based on result_health_score_str value
         try:
             result_health_score = float(result_health_score_str)
         except ValueError:
             result_health_score = -1.0  #Splunk ITSI health_score is always between 0 - 100 or 'N/A', with -1 we report that service was in maintenance ('N/A')
-            zabbix_output = 'SBB maintenance'
+            interpreted_splunk_health = 'SBB maintenance'
             pass
         else:
             if result_health_score < 100:
-                zabbix_output = 'SBB NoOK'
+                interpreted_splunk_health = 'SBB NoOK'
             else:
-                zabbix_output = 'SBB OK'
-        log.info('HTTP output: result { health_score = %s, ...}; therefore: %s', result_health_score_str, zabbix_output)
+                interpreted_splunk_health = 'SBB OK'
+        log.info('HTTP output: result { health_score = %s, ...}; therefore: %s', result_health_score_str, interpreted_splunk_health)
 
         #HTML Header
         self.wfile.write(bytes('<!DOCTYPE html>', coding))
@@ -233,9 +233,9 @@ class TerraformServer(BaseHTTPRequestHandler):
         self.wfile.write(bytes(f'<p>REST call: <a href="{resp.url}">{resp.url}</a></p>', coding))
         self.wfile.write(bytes('<h1>Output from Splunk</h1>', coding))
         self.wfile.write(bytes(f'<p><pre>{json.dumps(data_json, indent=4)}</pre></p>', coding))
-        self.wfile.write(bytes('<h1>Output to Zabbix</h1>', coding))
+        self.wfile.write(bytes('<h1>Interpretation of this output</h1>', coding))
         self.wfile.write(bytes(f'<p>health_score (after converted to float) = {result_health_score} ; therefore ...</p>', coding))
-        self.wfile.write(bytes(f'<p><b>{zabbix_output}</b></p>', coding))
+        self.wfile.write(bytes(f'<p><b>{interpreted_splunk_health}</b></p>', coding))
         self.wfile.write(bytes('</body>', coding))
 
         #HTML End
