@@ -206,7 +206,7 @@ class TerraformServer(BaseHTTPRequestHandler):
         except ValueError:
             log.error('Decoding Splunk response:', resp.text)
 
-        result_health_score_str = data_json['result']['health_score']
+        result_health_score_str = data_json['result']['_cd']
 
         #Interpret if Splunk is healthy, providing service, based on result_health_score_str value
         try:
@@ -214,7 +214,6 @@ class TerraformServer(BaseHTTPRequestHandler):
         except ValueError:
             result_health_score = -1.0  #Splunk ITSI health_score is always between 0 - 100 or 'N/A', with -1 we report that service was in maintenance ('N/A')
             interpreted_splunk_health = 'SBB maintenance'
-            pass
         else:
             if result_health_score < 100:
                 interpreted_splunk_health = 'SBB NoOK'
