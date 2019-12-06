@@ -139,18 +139,18 @@ variable "flavor_es_map" {
   type        = map
   default = {
     default = {
-      d0 : "s2.4xlarge.1"
-      t0 : "s2.4xlarge.1"
-      u0 : "s2.4xlarge.1"
-      p0 : "s2.4xlarge.1"
-      w0 : "s2.4xlarge.1"
+      d0 : "s2.4xlarge.2"
+      t0 : "s2.4xlarge.2"
+      u0 : "s2.4xlarge.2"
+      p0 : "s2.4xlarge.2"
+      w0 : "s2.4xlarge.2"
     }
     production = {
-      d0 : "s2.4xlarge.1"
-      t0 : "s2.4xlarge.1"
-      u0 : "s2.4xlarge.1"
+      d0 : "s2.4xlarge.2"
+      t0 : "s2.4xlarge.2"
+      u0 : "s2.4xlarge.2"
       p0 : "s2.4xlarge.2"
-      w0 : "s2.4xlarge.1"
+      w0 : "s2.4xlarge.2"
     }
   }
 }
@@ -369,7 +369,7 @@ variable "pmdns_list_map" {
       splu0sh000 : "10.104.198.234",
       splu0sh002 : "10.104.198.235",
       splw0ix002 : "10.104.198.236",
-      splw0es000 : "10.104.198.237",
+      ########## : "10.104.198.237",
       #--------- : "10.104.198.238", OTC System interface
 
       # Test tenant > nonProd subnet - netC (AZ2 network) > 10.104.198.242 - 10.104.198.254
@@ -377,7 +377,7 @@ variable "pmdns_list_map" {
       splw0sh001 : "10.104.198.243",
       splu0sh001 : "10.104.198.244",
       splw0ix003 : "10.104.198.245",
-      ########## : "10.104.198.246",
+      splw0es001 : "10.104.198.246",
       ########## : "10.104.198.247",
       ########## : "10.104.198.248",
       ########## : "10.104.198.249",
