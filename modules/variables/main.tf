@@ -114,7 +114,6 @@ variable "flavor_sh_map" {
   type        = map
   default = {
     default = {
-      # size test (almost) like prodution, maybe better idea anyway. The full size does not (currently 2019-08) fit and leads to errors
       d0 : "s2.4xlarge.1"
       t0 : "s2.4xlarge.1"
       u0 : "s2.4xlarge.1"
