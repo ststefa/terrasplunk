@@ -369,7 +369,7 @@ variable "pmdns_list_map" {
       splu0sh000 : "10.104.198.234",
       splu0sh002 : "10.104.198.235",
       splw0ix002 : "10.104.198.236",
-      ########## : "10.104.198.237",
+      splw0es000 : "10.104.198.237",
       #--------- : "10.104.198.238", OTC System interface
 
       # Test tenant > nonProd subnet - netC (AZ2 network) > 10.104.198.242 - 10.104.198.254
