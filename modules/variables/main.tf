@@ -135,6 +135,31 @@ output "flavor_sh" {
   value       = contains(keys(var.flavor_sh_map[var.workspace]), var.stage) ? var.flavor_sh_map[var.workspace][var.stage] : ""
 }
 
+variable "flavor_es_map" {
+  description = "Enterprise Searchhead VM sizes (split by tenant and stage)"
+  type        = map
+  default = {
+    default = {
+      d0 : "s2.4xlarge.1"
+      t0 : "s2.4xlarge.1"
+      u0 : "s2.4xlarge.1"
+      p0 : "s2.4xlarge.1"
+      w0 : "s2.4xlarge.1"
+    }
+    production = {
+      d0 : "s2.4xlarge.1"
+      t0 : "s2.4xlarge.1"
+      u0 : "s2.4xlarge.1"
+      p0 : "s2.4xlarge.2"
+      w0 : "s2.4xlarge.1"
+    }
+  }
+}
+output "flavor_es" {
+  description = "Enterprise Searchhead VM size for current tenant/stage"
+  value       = contains(keys(var.flavor_es_map[var.workspace]), var.stage) ? var.flavor_es_map[var.workspace][var.stage] : ""
+}
+
 variable "flavor_default_map" {
   description = "Default VM sizes (split by tenant and stage)"
   type        = map
