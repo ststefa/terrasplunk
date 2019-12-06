@@ -49,7 +49,7 @@ resource "opentelekomcloud_vpc_subnet_v1" "subnetB-az1" {
   secondary_dns     = module.variables.secondary_dns
 }
 data "opentelekomcloud_networking_network_v2" "netB-az1" {
-  count                = local.tenant_name == "tsch_rz_p_001" ? 1 : 0
+  count      = local.tenant_name == "tsch_rz_p_001" ? 1 : 0
   network_id = opentelekomcloud_vpc_subnet_v1.subnetB-az1[0].id
 }
 
@@ -65,7 +65,7 @@ resource "opentelekomcloud_vpc_subnet_v1" "subnetB-az2" {
   secondary_dns     = module.variables.secondary_dns
 }
 data "opentelekomcloud_networking_network_v2" "netB-az2" {
-  count                = local.tenant_name == "tsch_rz_p_001" ? 1 : 0
+  count      = local.tenant_name == "tsch_rz_p_001" ? 1 : 0
   network_id = opentelekomcloud_vpc_subnet_v1.subnetB-az2[0].id
 }
 
