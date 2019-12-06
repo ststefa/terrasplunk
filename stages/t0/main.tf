@@ -80,6 +80,6 @@ module "server-hf000" {
 }
 
 module "server-sy000" {
-  source         = "../../modules/sy"
-  instance_name  = "${local.prefix}sy000"
+  source        = "../../modules/sy"
+  instance_name = "${local.prefix}sy000"
 }

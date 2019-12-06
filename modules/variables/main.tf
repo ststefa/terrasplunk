@@ -51,37 +51,38 @@ output "shared_statefile" {
 # - ... (if this instance type has no additional requirements)
 #   no module should be created but the flavor should be passed to genericecs
 #   from <stage>/main.tf
-variable "flavor_ix_map" {
-  #$ openstack --os-cloud otc-sbb-p flavor list #excerpt
-  #+--------------+--------+--------+
-  #| ID           |    RAM |  VCPUs |
-  #+--------------+--------+--------+
-  #| s2.2xlarge.1 |   8192 |      8 |
-  #| s2.2xlarge.2 |  16384 |      8 |
-  #| s2.2xlarge.4 |  32768 |      8 |
-  #| s2.2xlarge.8 |  65536 |      8 |
-  #| s2.4xlarge.1 |  16384 |     16 |
-  #| s2.4xlarge.2 |  32768 |     16 |
-  #| s2.4xlarge.4 |  65536 |     16 |
-  #| s2.4xlarge.8 | 131072 |     16 |
-  #| s2.8xlarge.1 |  32768 |     32 |
-  #| s2.8xlarge.2 |  65536 |     32 |
-  #| s2.8xlarge.4 | 131072 |     32 |
-  #| s2.8xlarge.8 | 262144 |     32 |
-  #| s2.large.1   |   2048 |      2 |
-  #| s2.large.2   |   4096 |      2 |
-  #| s2.large.4   |   8192 |      2 |
-  #| s2.large.8   |  16384 |      2 |
-  #| s2.medium.1  |   1024 |      1 |
-  #| s2.medium.2  |   2048 |      1 |
-  #| s2.medium.4  |   4096 |      1 |
-  #| s2.medium.8  |   8192 |      1 |
-  #| s2.xlarge.1  |   4096 |      4 |
-  #| s2.xlarge.2  |   8192 |      4 |
-  #| s2.xlarge.4  |  16384 |      4 |
-  #| s2.xlarge.8  |  32768 |      4 |
-  #+--------------+--------+--------+
+# --- List of supported OTC flavors
+#$ openstack --os-cloud otc-sbb-p flavor list #(some columns discarded for brevity)
+#+--------------+--------+--------+
+#| ID           |    RAM |  VCPUs |
+#+--------------+--------+--------+
+#| s2.2xlarge.1 |   8192 |      8 |
+#| s2.2xlarge.2 |  16384 |      8 |
+#| s2.2xlarge.4 |  32768 |      8 |
+#| s2.2xlarge.8 |  65536 |      8 |
+#| s2.4xlarge.1 |  16384 |     16 |
+#| s2.4xlarge.2 |  32768 |     16 |
+#| s2.4xlarge.4 |  65536 |     16 |
+#| s2.4xlarge.8 | 131072 |     16 |
+#| s2.8xlarge.1 |  32768 |     32 |
+#| s2.8xlarge.2 |  65536 |     32 |
+#| s2.8xlarge.4 | 131072 |     32 |
+#| s2.8xlarge.8 | 262144 |     32 |
+#| s2.large.1   |   2048 |      2 |
+#| s2.large.2   |   4096 |      2 |
+#| s2.large.4   |   8192 |      2 |
+#| s2.large.8   |  16384 |      2 |
+#| s2.medium.1  |   1024 |      1 |
+#| s2.medium.2  |   2048 |      1 |
+#| s2.medium.4  |   4096 |      1 |
+#| s2.medium.8  |   8192 |      1 |
+#| s2.xlarge.1  |   4096 |      4 |
+#| s2.xlarge.2  |   8192 |      4 |
+#| s2.xlarge.4  |  16384 |      4 |
+#| s2.xlarge.8  |  32768 |      4 |
+#+--------------+--------+--------+
 
+variable "flavor_ix_map" {
   description = "Indexer VM sizes (split by tenant and stage)"
   type        = map
   default = {
@@ -113,7 +114,6 @@ variable "flavor_sh_map" {
   type        = map
   default = {
     default = {
-      # size test (almost) like prodution, maybe better idea anyway. The full size does not (currently 2019-08) fit and leads to errors
       d0 : "s2.4xlarge.1"
       t0 : "s2.4xlarge.1"
       u0 : "s2.4xlarge.1"
@@ -132,6 +132,31 @@ variable "flavor_sh_map" {
 output "flavor_sh" {
   description = "Searchhead VM size for current tenant/stage"
   value       = contains(keys(var.flavor_sh_map[var.workspace]), var.stage) ? var.flavor_sh_map[var.workspace][var.stage] : ""
+}
+
+variable "flavor_es_map" {
+  description = "Enterprise Searchhead VM sizes (split by tenant and stage)"
+  type        = map
+  default = {
+    default = {
+      d0 : "s2.4xlarge.2"
+      t0 : "s2.4xlarge.2"
+      u0 : "s2.4xlarge.2"
+      p0 : "s2.4xlarge.2"
+      w0 : "s2.4xlarge.2"
+    }
+    production = {
+      d0 : "s2.4xlarge.2"
+      t0 : "s2.4xlarge.2"
+      u0 : "s2.4xlarge.2"
+      p0 : "s2.4xlarge.2"
+      w0 : "s2.4xlarge.2"
+    }
+  }
+}
+output "flavor_es" {
+  description = "Enterprise Searchhead VM size for current tenant/stage"
+  value       = contains(keys(var.flavor_es_map[var.workspace]), var.stage) ? var.flavor_es_map[var.workspace][var.stage] : ""
 }
 
 variable "flavor_default_map" {
@@ -352,7 +377,7 @@ variable "pmdns_list_map" {
       splw0sh001 : "10.104.198.243",
       splu0sh001 : "10.104.198.244",
       splw0ix003 : "10.104.198.245",
-      ########## : "10.104.198.246",
+      splw0es001 : "10.104.198.246",
       ########## : "10.104.198.247",
       ########## : "10.104.198.248",
       ########## : "10.104.198.249",

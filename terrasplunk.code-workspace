@@ -31,7 +31,6 @@
 			//	"**/.terraform/**/*"
 			//]
 		},
-		//"terraform.path": "/home/linux/bin/terraform",
 		"terraform.paths": [
 			"shared/",
 			"stages/*/",
