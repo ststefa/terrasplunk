@@ -339,7 +339,7 @@ variable "pmdns_list_map" {
       ########## : "10.104.198.202",
       ########## : "10.104.198.203",
       ########## : "10.104.198.204",
-      ########## : "10.104.198.205", OTC System interface
+      #--------- : "10.104.198.205", OTC System interface
       #--------- : "10.104.198.206", OTC DHCP service
 
       # Test tenant > Prod subnet > netA (AZ2 network) > 10.104.198.210 - 10.104.198.222
@@ -354,7 +354,7 @@ variable "pmdns_list_map" {
       ########## : "10.104.198.218",
       ########## : "10.104.198.219",
       ########## : "10.104.198.220",
-      ########## : "10.104.198.221", OTC System interface
+      #--------- : "10.104.198.221", OTC System interface
       #--------- : "10.104.198.222", OTC DHCP service
 
       # Test tenant > nonProd subnet - netC (AZ1 network) > 10.104.198.226 - 10.104.198.238
@@ -369,7 +369,7 @@ variable "pmdns_list_map" {
       splu0sh000 : "10.104.198.234",
       splu0sh002 : "10.104.198.235",
       splw0ix002 : "10.104.198.236",
-      ########## : "10.104.198.237", OTC System interface
+      #--------- : "10.104.198.237", OTC System interface
       #--------- : "10.104.198.238", OTC DHCP service
 
       # Test tenant > nonProd subnet - netC (AZ2 network) > 10.104.198.242 - 10.104.198.254
@@ -384,7 +384,7 @@ variable "pmdns_list_map" {
       ########## : "10.104.198.250",
       ########## : "10.104.198.251",
       ########## : "10.104.198.252",
-      ########## : "10.104.198.253", OTC System interface
+      #--------- : "10.104.198.253", OTC System interface
       #--------- : "10.104.198.254", OTC DHCP service
     }
     production = {
