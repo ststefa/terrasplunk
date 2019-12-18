@@ -89,6 +89,7 @@ variable "flavor_ix_map" {
     default = {
       # size test (almost) like prodution, maybe better idea anyway. The full size does not (currently 2019-08) fit and leads to errors
       d0 : "s2.4xlarge.1"
+      h0 : "s2.4xlarge.1"
       p0 : "s2.4xlarge.1"
       t0 : "s2.4xlarge.1"
       u0 : "s2.4xlarge.1"
@@ -96,6 +97,7 @@ variable "flavor_ix_map" {
     }
     production = {
       d0 : "s2.4xlarge.1"
+      h0 : "s2.4xlarge.2"
       p0 : "s2.4xlarge.2"
       t0 : "s2.4xlarge.1"
       u0 : "s2.4xlarge.1"
@@ -115,6 +117,7 @@ variable "flavor_sh_map" {
   default = {
     default = {
       d0 : "s2.4xlarge.1"
+      h0 : "s2.4xlarge.1"
       p0 : "s2.4xlarge.1"
       t0 : "s2.4xlarge.1"
       u0 : "s2.4xlarge.1"
@@ -122,6 +125,7 @@ variable "flavor_sh_map" {
     }
     production = {
       d0 : "s2.4xlarge.1"
+      h0 : "s2.4xlarge.2"
       p0 : "s2.4xlarge.2"
       t0 : "s2.4xlarge.1"
       u0 : "s2.4xlarge.1"
@@ -140,6 +144,7 @@ variable "flavor_es_map" {
   default = {
     default = {
       d0 : "s2.4xlarge.2"
+      h0 : "s2.4xlarge.2"
       p0 : "s2.4xlarge.2"
       t0 : "s2.4xlarge.2"
       u0 : "s2.4xlarge.2"
@@ -147,6 +152,7 @@ variable "flavor_es_map" {
     }
     production = {
       d0 : "s2.4xlarge.2"
+      h0 : "s2.4xlarge.2"
       p0 : "s2.4xlarge.2"
       t0 : "s2.4xlarge.2"
       u0 : "s2.4xlarge.2"
@@ -165,6 +171,7 @@ variable "flavor_default_map" {
   default = {
     default = {
       d0 : "s2.4xlarge.1"
+      h0 : "s2.4xlarge.1"
       p0 : "s2.4xlarge.1"
       t0 : "s2.4xlarge.1"
       u0 : "s2.4xlarge.1"
@@ -172,6 +179,7 @@ variable "flavor_default_map" {
     }
     production = {
       d0 : "s2.4xlarge.1"
+      h0 : "s2.4xlarge.1"
       p0 : "s2.4xlarge.1"
       t0 : "s2.4xlarge.1"
       u0 : "s2.4xlarge.1"
@@ -223,6 +231,7 @@ variable "pvsize_hot_map" {
   default = {
     default = {
       d0 : 5
+      h0 : 5
       p0 : 5
       t0 : 5
       u0 : 5
@@ -230,6 +239,7 @@ variable "pvsize_hot_map" {
     }
     production = {
       d0 : 5
+      h0 : 5
       p0 : 250
       t0 : 5
       u0 : 5
@@ -248,6 +258,7 @@ variable "pvsize_cold_map" {
   default = {
     default = {
       d0 : 50
+      h0 : 50
       p0 : 50
       t0 : 50
       u0 : 50
@@ -255,6 +266,7 @@ variable "pvsize_cold_map" {
     }
     production = {
       d0 : 50
+      h0 : 50
       p0 : 2500
       t0 : 50
       u0 : 50
