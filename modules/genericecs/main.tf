@@ -8,8 +8,8 @@ locals {
   # Even numbers are placed in AZ1 (openstack name eu-ch-01). Odd numbers are placed in AZ2 (openstack name eu-ch-02).
   availability_zone = local.hostnumber % 2 == 0 ? "eu-ch-01" : "eu-ch-02"
 
-  # p0 is in netA, everything else in netC. More logic required if we extend to netB
-  netname = local.stage == "p0" ? "netA" : "netC"
+  # p0 and h0 is in netA, everything else in netC. More logic required if we extend to netB
+  netname = local.stage == "p0" || local.stage == "h0" ? "netA" : "netC"
 
   # The remote shared state exports the nets by these names
   network_id = local.hostnumber % 2 == 0 ? data.terraform_remote_state.shared.outputs["${local.netname}-az1_id"] : data.terraform_remote_state.shared.outputs["${local.netname}-az2_id"]

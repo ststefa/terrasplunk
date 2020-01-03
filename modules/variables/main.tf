@@ -89,16 +89,18 @@ variable "flavor_ix_map" {
     default = {
       # size test (almost) like prodution, maybe better idea anyway. The full size does not (currently 2019-08) fit and leads to errors
       d0 : "s2.4xlarge.1"
+      h0 : "s2.4xlarge.1"
+      p0 : "s2.4xlarge.1"
       t0 : "s2.4xlarge.1"
       u0 : "s2.4xlarge.1"
-      p0 : "s2.4xlarge.1"
       w0 : "s2.4xlarge.1"
     }
     production = {
       d0 : "s2.4xlarge.1"
+      h0 : "s2.4xlarge.2"
+      p0 : "s2.4xlarge.2"
       t0 : "s2.4xlarge.1"
       u0 : "s2.4xlarge.1"
-      p0 : "s2.4xlarge.2"
       w0 : "s2.4xlarge.1"
     }
   }
@@ -115,16 +117,18 @@ variable "flavor_sh_map" {
   default = {
     default = {
       d0 : "s2.4xlarge.1"
+      h0 : "s2.4xlarge.1"
+      p0 : "s2.4xlarge.1"
       t0 : "s2.4xlarge.1"
       u0 : "s2.4xlarge.1"
-      p0 : "s2.4xlarge.1"
       w0 : "s2.4xlarge.1"
     }
     production = {
       d0 : "s2.4xlarge.1"
+      h0 : "s2.4xlarge.2"
+      p0 : "s2.4xlarge.2"
       t0 : "s2.4xlarge.1"
       u0 : "s2.4xlarge.1"
-      p0 : "s2.4xlarge.2"
       w0 : "s2.4xlarge.1"
     }
   }
@@ -140,16 +144,18 @@ variable "flavor_es_map" {
   default = {
     default = {
       d0 : "s2.4xlarge.2"
+      h0 : "s2.4xlarge.2"
+      p0 : "s2.4xlarge.2"
       t0 : "s2.4xlarge.2"
       u0 : "s2.4xlarge.2"
-      p0 : "s2.4xlarge.2"
       w0 : "s2.4xlarge.2"
     }
     production = {
       d0 : "s2.4xlarge.2"
+      h0 : "s2.4xlarge.2"
+      p0 : "s2.4xlarge.2"
       t0 : "s2.4xlarge.2"
       u0 : "s2.4xlarge.2"
-      p0 : "s2.4xlarge.2"
       w0 : "s2.4xlarge.2"
     }
   }
@@ -165,16 +171,18 @@ variable "flavor_default_map" {
   default = {
     default = {
       d0 : "s2.4xlarge.1"
+      h0 : "s2.4xlarge.1"
+      p0 : "s2.4xlarge.1"
       t0 : "s2.4xlarge.1"
       u0 : "s2.4xlarge.1"
-      p0 : "s2.4xlarge.1"
       w0 : "s2.4xlarge.1"
     }
     production = {
       d0 : "s2.4xlarge.1"
+      h0 : "s2.4xlarge.1"
+      p0 : "s2.4xlarge.1"
       t0 : "s2.4xlarge.1"
       u0 : "s2.4xlarge.1"
-      p0 : "s2.4xlarge.1"
       w0 : "s2.4xlarge.1"
     }
   }
@@ -223,16 +231,18 @@ variable "pvsize_hot_map" {
   default = {
     default = {
       d0 : 5
+      h0 : 5
+      p0 : 5
       t0 : 5
       u0 : 5
-      p0 : 5
       w0 : 5
     }
     production = {
       d0 : 5
+      h0 : 5
+      p0 : 250
       t0 : 5
       u0 : 5
-      p0 : 250
       w0 : 5
     }
   }
@@ -248,16 +258,18 @@ variable "pvsize_cold_map" {
   default = {
     default = {
       d0 : 50
+      h0 : 50
+      p0 : 50
       t0 : 50
       u0 : 50
-      p0 : 50
       w0 : 50
     }
     production = {
       d0 : 50
+      h0 : 50
+      p0 : 2500
       t0 : 50
       u0 : 50
-      p0 : 2500
       w0 : 50
     }
   }
@@ -336,7 +348,7 @@ variable "pmdns_list_map" {
       splp0sh000 : "10.104.198.199",
       splp0sh002 : "10.104.198.200",
       splp0sy000 : "10.104.198.201",
-      ########## : "10.104.198.202",
+      splh0sy000 : "10.104.198.202",
       ########## : "10.104.198.203",
       ########## : "10.104.198.204",
       #--------- : "10.104.198.205", OTC System interface
@@ -348,7 +360,7 @@ variable "pmdns_list_map" {
       splp0ix003 : "10.104.198.212",
       splp0sh001 : "10.104.198.213",
       splp0sy001 : "10.104.198.214",
-      ########## : "10.104.198.215",
+      splh0sy001 : "10.104.198.215",
       ########## : "10.104.198.216",
       ########## : "10.104.198.217",
       ########## : "10.104.198.218",
@@ -397,7 +409,7 @@ variable "pmdns_list_map" {
       splp0sh000 : "10.104.146.7",
       splp0sh002 : "10.104.146.8",
       splp0sy000 : "10.104.146.9",
-      ########## : "10.104.146.10",
+      splh0sy000 : "10.104.146.10",
       ########## : "10.104.146.11",
       ########## : "10.104.146.12",
       ########## : "10.104.146.13",
@@ -447,7 +459,7 @@ variable "pmdns_list_map" {
       ########## : "10.104.146.57",
       ########## : "10.104.146.58",
       ########## : "10.104.146.59",
-      #bastionp  : "10.104.146.60", managed manually
+      ##########  : "10.104.146.60"
       #--------- : "10.104.146.61", OTC System interface
       #--------- : "10.104.146.62", OTC DHCP service
 
@@ -457,7 +469,7 @@ variable "pmdns_list_map" {
       splp0ix003 : "10.104.146.68",
       splp0sh001 : "10.104.146.69",
       splp0sy001 : "10.104.146.70",
-      ########## : "10.104.146.71",
+      splh0sy001 : "10.104.146.71",
       ########## : "10.104.146.72",
       ########## : "10.104.146.73",
       ########## : "10.104.146.74",

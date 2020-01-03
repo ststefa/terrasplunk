@@ -33,20 +33,11 @@ data "terraform_remote_state" "shared" {
   }
 }
 
-module "server-mt000" {
-  source        = "../../modules/mt"
-  instance_name = "${local.prefix}mt000"
+module "server-sy000" {
+  source         = "../../modules/sy"
+  instance_name  = "${local.prefix}sy000"
 }
-
-module "server-sh000" {
-  source        = "../../modules/sh"
-  instance_name = "${local.prefix}sh000"
-}
-module "server-sh001" {
-  source        = "../../modules/sh"
-  instance_name = "${local.prefix}sh001"
-}
-module "server-sh002" {
-  source        = "../../modules/sh"
-  instance_name = "${local.prefix}sh002"
+module "server-sy001" {
+  source         = "../../modules/sy"
+  instance_name  = "${local.prefix}sy001"
 }
