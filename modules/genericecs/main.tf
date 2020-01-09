@@ -65,6 +65,11 @@ resource "opentelekomcloud_compute_instance_v2" "instance" {
   #  application = "splunk"
   #}
 
+  metadata = {
+    Accounting_Number = "70031944"
+    splunk_stage = local.stage
+  }
+
   network {
     uuid        = local.network_id
     fixed_ip_v4 = module.variables.pmdns_list[var.instance_name]
