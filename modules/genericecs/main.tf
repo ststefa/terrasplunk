@@ -54,15 +54,13 @@ resource "opentelekomcloud_compute_instance_v2" "instance" {
   security_groups = setunion([
   data.terraform_remote_state.shared.outputs["base-secgrp_id"]], var.secgrp_id_list)
   auto_recovery = var.autorecover
-  # Give OS daemons time to shutdown
+  # Give OS daemons time to shutdown. Does not seem to work
   stop_before_destroy = true
   # sometimes instance are not deleted causing problems with recreation (IP still claimed)
   # However: "Error: Unsupported argument" although documented on https://www.terraform.io/docs/providers/opentelekomcloud/r/compute_instance_v2.html
   #force_delete        = true
 
-  # Attempting to tag results in:
-  # Error: Error fetching OpenTelekomCloud instance tags: Resource not found: [GET https://ecs.eu-ch.o13bb.otc.t-systems.com/v1/530ba6eaa121424fa485c4b983d81924/servers/c57f7b80-a5de-4b0a-9786-7121c22f126e/tags], error message: {"message":"API not found","request_id":"0d04f437a9062ae60dbe2e1281fc7aa0"}
-  # ATTENTION! The attempt to add a tag resulted in unusable terraform statefile. All tag sections had to be manually null-ed
+  # Tagging does not work on OTC. See terraform project https://gitlab-tss.sbb.ch/ssteine2/tagtest for in depth details
   #tag = {
   #  application = "splunk"
   #}
@@ -73,7 +71,7 @@ resource "opentelekomcloud_compute_instance_v2" "instance" {
   }
   #depends_on = [var.interface]
 
-  # using a nested blockstorage is also possible but resulted in mixed up vda/vdb assignments in some cases (i.e. root=vdb, opt=vda). Using externally defined blockstorage instead with additional dependencies in opt_attach to make sure opt is not assigned before the root disk
+  # using a nested blockstorage inside compute_instance is also possible but resulted in mixed up vda/vdb assignments in some cases (i.e. root=vdb, opt=vda). Using externally defined blockstorage instead with explicit dependencies in opt_attach to make sure opt is not assigned before the root disk
   block_device {
     uuid                  = opentelekomcloud_blockstorage_volume_v2.root.id
     source_type           = "volume"
