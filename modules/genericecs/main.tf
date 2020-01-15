@@ -65,9 +65,19 @@ resource "opentelekomcloud_compute_instance_v2" "instance" {
   #  application = "splunk"
   #}
 
+  # SBB required metadata as per https://issues.sbb.ch/browse/UOS-112
   metadata = {
-    Accounting_Number = "70031944"
-    splunk_stage = local.stage
+    sbb_accounting_number    = "70031944"
+    sbb_infrastructure_stage = module.variables.sbb_infrastructure_stage
+    sbb_mega_id              = "F52C083E529E0250"
+    sbb_requester            = "ursula.buehlmann@sbb.ch"
+    sbb_os                   = "linux"
+    sbb_contact              = "ursula.buehlmann@sbb.ch"
+    sbb_sla                  = module.variables.tenant == "tsch_rz_t_001" ? "none" : "2b"
+    uos_managed              = module.variables.tenant == "tsch_rz_t_001" ? "false" : "true"
+    uos_group                = "DG_RBT_UOS_ADMIN"
+    uos_monitoring           = module.variables.tenant == "tsch_rz_t_001" ? "false" : "true"
+    splunk_stage             = local.stage
   }
 
   network {
