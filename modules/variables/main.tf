@@ -39,6 +39,24 @@ output "shared_statefile" {
   value       = var.shared_statefile_map[var.workspace]
 }
 
+variable "sbb_infrastructure_stage_map" {
+  description = "1:1 assignment from workspace name to tenant name"
+  type        = map
+  default = {
+    g0    = "prod"
+    h0    = "prod"
+    p0    = "prod"
+    t0    = "test"
+    u0    = "int"
+    w0    = "dev"
+  }
+}
+output "sbb_infrastructure_stage" {
+  description = "SBB stage definition as per https://confluence.sbb.ch/display/OTC/Tagging+Policy"
+  value       = var.sbb_infrastructure_stage_map[var.stage]
+}
+
+
 # Concept of sizing:
 # Each flavor_<type>_map contains sizing for an instance type divided by tenant
 # and stage. flavor_default_map is used as a default for all instance types
