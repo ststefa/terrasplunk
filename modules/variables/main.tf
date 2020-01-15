@@ -26,7 +26,7 @@ output "tenant" {
 }
 
 variable "shared_statefile_map" {
-  # T: needs different concept if we go to remote state
+  # TODO: needs different concept if we go to remote state
   description = "1:1 assignment from workspace name to terraform state filename"
   type        = map
   default = {
