@@ -26,7 +26,7 @@ output "tenant" {
 }
 
 variable "shared_statefile_map" {
-  # T: needs different concept if we go to remote state
+  # TODO: needs different concept if we go to remote state
   description = "1:1 assignment from workspace name to terraform state filename"
   type        = map
   default = {
@@ -38,6 +38,24 @@ output "shared_statefile" {
   description = "Terraform state filename for current workspace"
   value       = var.shared_statefile_map[var.workspace]
 }
+
+variable "sbb_infrastructure_stage_map" {
+  description = "1:1 assignment from workspace name to tenant name"
+  type        = map
+  default = {
+    g0    = "prod"
+    h0    = "prod"
+    p0    = "prod"
+    t0    = "test"
+    u0    = "int"
+    w0    = "dev"
+  }
+}
+output "sbb_infrastructure_stage" {
+  description = "SBB stage definition as per https://confluence.sbb.ch/display/OTC/Tagging+Policy"
+  value       = var.sbb_infrastructure_stage_map[var.stage]
+}
+
 
 # Concept of sizing:
 # Each flavor_<type>_map contains sizing for an instance type divided by tenant
