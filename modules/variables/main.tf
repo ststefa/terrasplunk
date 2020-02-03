@@ -108,7 +108,7 @@ variable "flavor_ix_map" {
       # size test (almost) like prodution, maybe better idea anyway. The full size does not (currently 2019-08) fit and leads to errors
       d0 : "s2.4xlarge.1"
       h0 : "s2.4xlarge.1"
-      p0 : "s2.4xlarge.1"
+      p0 : "s3.4xlarge.1"
       t0 : "s2.4xlarge.1"
       u0 : "s2.4xlarge.1"
       w0 : "s2.4xlarge.1"
@@ -117,7 +117,7 @@ variable "flavor_ix_map" {
       d0 : "s2.4xlarge.1"
       h0 : "s2.4xlarge.2"
       p0 : "s2.4xlarge.2"
-      t0 : "s2.4xlarge.1"
+      t0 : "s3.4xlarge.1"
       u0 : "s2.4xlarge.1"
       w0 : "s2.4xlarge.1"
     }
@@ -136,7 +136,7 @@ variable "flavor_sh_map" {
     default = {
       d0 : "s2.4xlarge.1"
       h0 : "s2.4xlarge.1"
-      p0 : "s2.4xlarge.1"
+      p0 : "s3.4xlarge.1"
       t0 : "s2.4xlarge.1"
       u0 : "s2.4xlarge.1"
       w0 : "s2.4xlarge.1"
@@ -145,7 +145,7 @@ variable "flavor_sh_map" {
       d0 : "s2.4xlarge.1"
       h0 : "s2.4xlarge.2"
       p0 : "s2.4xlarge.2"
-      t0 : "s2.4xlarge.1"
+      t0 : "s3.4xlarge.1"
       u0 : "s2.4xlarge.1"
       w0 : "s2.4xlarge.1"
     }
@@ -163,7 +163,7 @@ variable "flavor_es_map" {
     default = {
       d0 : "s2.4xlarge.2"
       h0 : "s2.4xlarge.2"
-      p0 : "s2.4xlarge.2"
+      p0 : "s3.4xlarge.2"
       t0 : "s2.4xlarge.2"
       u0 : "s2.4xlarge.2"
       w0 : "s2.4xlarge.2"
@@ -172,7 +172,7 @@ variable "flavor_es_map" {
       d0 : "s2.4xlarge.2"
       h0 : "s2.4xlarge.2"
       p0 : "s2.4xlarge.2"
-      t0 : "s2.4xlarge.2"
+      t0 : "s3.4xlarge.2"
       u0 : "s2.4xlarge.2"
       w0 : "s2.4xlarge.2"
     }
@@ -190,7 +190,7 @@ variable "flavor_default_map" {
     default = {
       d0 : "s2.4xlarge.1"
       h0 : "s2.4xlarge.1"
-      p0 : "s2.4xlarge.1"
+      p0 : "s3.4xlarge.1"
       t0 : "s2.4xlarge.1"
       u0 : "s2.4xlarge.1"
       w0 : "s2.4xlarge.1"
@@ -199,7 +199,7 @@ variable "flavor_default_map" {
       d0 : "s2.4xlarge.1"
       h0 : "s2.4xlarge.1"
       p0 : "s2.4xlarge.1"
-      t0 : "s2.4xlarge.1"
+      t0 : "s3.4xlarge.1"
       u0 : "s2.4xlarge.1"
       w0 : "s2.4xlarge.1"
     }
@@ -379,7 +379,7 @@ variable "pmdns_list_map" {
       splp0sh001 : "10.104.198.213",
       splp0sy001 : "10.104.198.214",
       splh0sy001 : "10.104.198.215",
-      ########## : "10.104.198.216",
+      splp0es001 : "10.104.198.216",
       ########## : "10.104.198.217",
       ########## : "10.104.198.218",
       ########## : "10.104.198.219",
