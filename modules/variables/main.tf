@@ -210,6 +210,12 @@ output "flavor_si" {
   value       = contains(keys(var.flavor_si_map[var.workspace]), var.stage) ? var.flavor_si_map[var.workspace][var.stage] : ""
 }
 
+output "flavor_sy" {
+  description = "Syslog VM size for current tenant/stage"
+  # Small enough so one size fits all. Can be made more granular if required (see e.g. sh or ix).
+  value       = "s2.large.4"
+}
+
 variable "flavor_default_map" {
   description = "Default VM sizes (split by tenant and stage)"
   type        = map
