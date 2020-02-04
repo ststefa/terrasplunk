@@ -61,6 +61,11 @@ module "server-es001" {
   instance_name = "${local.prefix}es001"
 }
 
+module "server-si000" {
+  source        = "../../modules/si"
+  instance_name = "${local.prefix}si000"
+}
+
 module "server-ix000" {
   source        = "../../modules/ix"
   instance_name = "${local.prefix}ix000"

@@ -183,6 +183,33 @@ output "flavor_es" {
   value       = contains(keys(var.flavor_es_map[var.workspace]), var.stage) ? var.flavor_es_map[var.workspace][var.stage] : ""
 }
 
+variable "flavor_si_map" {
+  description = "Single Instance Searchhead VM sizes (split by tenant and stage)"
+  type        = map
+  default = {
+    default = {
+      d0 : "s2.4xlarge.2"
+      h0 : "s2.4xlarge.2"
+      p0 : "s3.4xlarge.2"
+      t0 : "s2.4xlarge.2"
+      u0 : "s2.4xlarge.2"
+      w0 : "s2.4xlarge.2"
+    }
+    production = {
+      d0 : "s2.4xlarge.2"
+      h0 : "s2.4xlarge.2"
+      p0 : "s2.4xlarge.2"
+      t0 : "s3.4xlarge.2"
+      u0 : "s2.4xlarge.2"
+      w0 : "s2.4xlarge.2"
+    }
+  }
+}
+output "flavor_si" {
+  description = "Single Instance Searchhead VM size for current tenant/stage"
+  value       = contains(keys(var.flavor_si_map[var.workspace]), var.stage) ? var.flavor_si_map[var.workspace][var.stage] : ""
+}
+
 variable "flavor_default_map" {
   description = "Default VM sizes (split by tenant and stage)"
   type        = map
@@ -352,7 +379,7 @@ output "gateway_list" {
 
 # Poor Mans DNS
 variable "pmdns_list_map" {
-  description = "Where others use rocket science, we do it by hand"
+  description = "Assignment of system to IP"
   # For servers name nomenclature refer to http://wiki.t-systems.ch/x/ieMLAg
 
   default = {
@@ -367,7 +394,7 @@ variable "pmdns_list_map" {
       splp0sh002 : "10.104.198.200",
       splp0sy000 : "10.104.198.201",
       splh0sy000 : "10.104.198.202",
-      ########## : "10.104.198.203",
+      splp0si000 : "10.104.198.203",
       ########## : "10.104.198.204",
       #--------- : "10.104.198.205", OTC System interface
       #--------- : "10.104.198.206", OTC DHCP service
@@ -428,7 +455,7 @@ variable "pmdns_list_map" {
       splp0sh002 : "10.104.146.8",
       splp0sy000 : "10.104.146.9",
       splh0sy000 : "10.104.146.10",
-      ########## : "10.104.146.11",
+      splp0si000 : "10.104.146.11",
       ########## : "10.104.146.12",
       ########## : "10.104.146.13",
       ########## : "10.104.146.14",
