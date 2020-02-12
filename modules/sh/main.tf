@@ -22,3 +22,15 @@ module "sh-instance" {
   flavor         = module.variables.flavor_sh
   secgrp_id_list = [data.terraform_remote_state.shared.outputs["searchhead-secgrp_id"]]
 }
+
+resource "opentelekomcloud_blockstorage_volume_v2" "kvstore" {
+  availability_zone = module.sh-instance.az
+  name              = "${module.sh-instance.name}-kvstore"
+  size              = module.variables.pvsize_kvstore
+  volume_type       = "SSD"
+}
+
+resource "opentelekomcloud_compute_volume_attach_v2" "kvstore_attach" {
+  instance_id = module.sh-instance.id
+  volume_id   = opentelekomcloud_blockstorage_volume_v2.kvstore.id
+}
