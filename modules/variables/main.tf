@@ -263,7 +263,7 @@ output "pvsize_opt" {
   value       = 100
 }
 
-output "pvsize_kvstore_map" {
+variable "pvsize_kvstore_map" {
   description = "Size of /var/splunk/kvstore pv (split by stage)"
   type        = map
   default = {
