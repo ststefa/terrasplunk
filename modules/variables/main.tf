@@ -133,7 +133,7 @@ variable "flavor_sh_map" {
       p0 : "s3.4xlarge.1"
       t0 : "s2.4xlarge.1"
       u0 : "s2.4xlarge.1"
-      #w0 : "s2.4xlarge.1"
+      w0 : "s2.4xlarge.1"
     }
     production = {
       p0 : "s2.4xlarge.2"
