@@ -44,6 +44,7 @@
             "id": "stage",
             "description": "Choose stage",
             "options": [
+                "g0",
                 "h0",
                 "p0",
                 "t0",
