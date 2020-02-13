@@ -106,16 +106,12 @@ variable "flavor_ix_map" {
   default = {
     default = {
       # size test (almost) like prodution, maybe better idea anyway. The full size does not (currently 2019-08) fit and leads to errors
-      d0 : "s2.4xlarge.1"
-      h0 : "s2.4xlarge.1"
       p0 : "s3.4xlarge.1"
       t0 : "s2.4xlarge.1"
       u0 : "s2.4xlarge.1"
       w0 : "s2.4xlarge.1"
     }
     production = {
-      d0 : "s2.4xlarge.1"
-      h0 : "s2.4xlarge.2"
       p0 : "s2.4xlarge.2"
       t0 : "s3.4xlarge.1"
       u0 : "s2.4xlarge.1"
@@ -126,7 +122,7 @@ variable "flavor_ix_map" {
 output "flavor_ix" {
   # note that this behaviour is not perfect. It returns a reasonably wrong value in case a stage does not exist. Instead terraform should abort with failure
   description = "Indexer VM size for current tenant/stage"
-  value       = contains(keys(var.flavor_ix_map[var.workspace]), var.stage) ? var.flavor_ix_map[var.workspace][var.stage] : ""
+  value       = contains(keys(var.flavor_ix_map[var.workspace]), var.stage) ? var.flavor_ix_map[var.workspace][var.stage] : "missing"
 }
 
 variable "flavor_sh_map" {
@@ -134,16 +130,12 @@ variable "flavor_sh_map" {
   type        = map
   default = {
     default = {
-      d0 : "s2.4xlarge.1"
-      h0 : "s2.4xlarge.1"
       p0 : "s3.4xlarge.1"
       t0 : "s2.4xlarge.1"
       u0 : "s2.4xlarge.1"
-      w0 : "s2.4xlarge.1"
+      #w0 : "s2.4xlarge.1"
     }
     production = {
-      d0 : "s2.4xlarge.1"
-      h0 : "s2.4xlarge.2"
       p0 : "s2.4xlarge.2"
       t0 : "s3.4xlarge.1"
       u0 : "s2.4xlarge.1"
@@ -153,7 +145,7 @@ variable "flavor_sh_map" {
 }
 output "flavor_sh" {
   description = "Searchhead VM size for current tenant/stage"
-  value       = contains(keys(var.flavor_sh_map[var.workspace]), var.stage) ? var.flavor_sh_map[var.workspace][var.stage] : ""
+  value       = contains(keys(var.flavor_sh_map[var.workspace]), var.stage) ? var.flavor_sh_map[var.workspace][var.stage] : "missing"
 }
 
 variable "flavor_es_map" {
@@ -161,16 +153,12 @@ variable "flavor_es_map" {
   type        = map
   default = {
     default = {
-      d0 : "s2.4xlarge.2"
-      h0 : "s2.4xlarge.2"
       p0 : "s3.4xlarge.2"
       t0 : "s2.4xlarge.2"
       u0 : "s2.4xlarge.2"
       w0 : "s2.4xlarge.2"
     }
     production = {
-      d0 : "s2.4xlarge.2"
-      h0 : "s2.4xlarge.2"
       p0 : "s2.4xlarge.2"
       t0 : "s3.4xlarge.2"
       u0 : "s2.4xlarge.2"
@@ -180,7 +168,7 @@ variable "flavor_es_map" {
 }
 output "flavor_es" {
   description = "Enterprise Searchhead VM size for current tenant/stage"
-  value       = contains(keys(var.flavor_es_map[var.workspace]), var.stage) ? var.flavor_es_map[var.workspace][var.stage] : ""
+  value       = contains(keys(var.flavor_es_map[var.workspace]), var.stage) ? var.flavor_es_map[var.workspace][var.stage] : "missing"
 }
 
 variable "flavor_si_map" {
@@ -188,16 +176,12 @@ variable "flavor_si_map" {
   type        = map
   default = {
     default = {
-      d0 : "s2.4xlarge.2"
-      h0 : "s2.4xlarge.2"
       p0 : "s3.4xlarge.2"
       t0 : "s2.4xlarge.2"
       u0 : "s2.4xlarge.2"
       w0 : "s2.4xlarge.2"
     }
     production = {
-      d0 : "s2.4xlarge.2"
-      h0 : "s2.4xlarge.2"
       p0 : "s2.4xlarge.2"
       t0 : "s3.4xlarge.2"
       u0 : "s2.4xlarge.2"
@@ -207,7 +191,7 @@ variable "flavor_si_map" {
 }
 output "flavor_si" {
   description = "Single Instance Searchhead VM size for current tenant/stage"
-  value       = contains(keys(var.flavor_si_map[var.workspace]), var.stage) ? var.flavor_si_map[var.workspace][var.stage] : ""
+  value       = contains(keys(var.flavor_si_map[var.workspace]), var.stage) ? var.flavor_si_map[var.workspace][var.stage] : "missing"
 }
 
 output "flavor_sy" {
@@ -216,12 +200,25 @@ output "flavor_sy" {
   value = "s2.large.4"
 }
 
+output "flavor_ds" {
+  description = "Deployment server VM size for current tenant/stage"
+  # Sizing agreed with customer on workshop 2020-02-12
+  value = "s2.2xlarge.2"
+}
+
+output "flavor_lm" {
+  description = "License master VM size for current tenant/stage"
+  # Sizing agreed with customer on workshop 2020-02-12
+  value = "s2.xlarge.2"
+}
+
 variable "flavor_default_map" {
   description = "Default VM sizes (split by tenant and stage)"
   type        = map
   default = {
     default = {
       d0 : "s2.4xlarge.1"
+      g0 : "s2.4xlarge.1"
       h0 : "s2.4xlarge.1"
       p0 : "s3.4xlarge.1"
       t0 : "s2.4xlarge.1"
@@ -230,6 +227,7 @@ variable "flavor_default_map" {
     }
     production = {
       d0 : "s2.4xlarge.1"
+      g0 : "s2.4xlarge.1"
       h0 : "s2.4xlarge.1"
       p0 : "s2.4xlarge.1"
       t0 : "s3.4xlarge.1"
@@ -240,7 +238,7 @@ variable "flavor_default_map" {
 }
 output "flavor_default" {
   description = "Default VM size for current tenant/stage"
-  value       = contains(keys(var.flavor_default_map[var.workspace]), var.stage) ? var.flavor_default_map[var.workspace][var.stage] : ""
+  value       = contains(keys(var.flavor_default_map[var.workspace]), var.stage) ? var.flavor_default_map[var.workspace][var.stage] : "missing"
 }
 
 output "primary_dns" {
@@ -267,8 +265,6 @@ variable "pvsize_kvstore_map" {
   description = "Size of /var/splunk/kvstore pv (split by stage)"
   type        = map
   default = {
-    d0 : 10
-    h0 : 10
     p0 : 50
     t0 : 10
     u0 : 10
@@ -277,7 +273,7 @@ variable "pvsize_kvstore_map" {
 }
 output "pvsize_kvstore" {
   description = "Size of /var/splunk/kvstore pv"
-  value       = var.pvsize_kvstore_map[var.stage]
+  value       = contains(keys(var.pvsize_kvstore_map), var.stage) ? var.pvsize_kvstore_map[var.stage] : "missing"
 }
 
 variable "pvsize_var_map" {
@@ -299,7 +295,6 @@ variable "pvsize_hot_map" {
   default = {
     default = {
       d0 : 5
-      h0 : 5
       p0 : 5
       t0 : 5
       u0 : 5
@@ -307,7 +302,6 @@ variable "pvsize_hot_map" {
     }
     production = {
       d0 : 5
-      h0 : 5
       p0 : 250
       t0 : 25
       u0 : 5
@@ -317,7 +311,7 @@ variable "pvsize_hot_map" {
 }
 output "pvsize_hot" {
   description = "Size of a single splunk hot/warm bucket pv for current tenant/stage"
-  value       = contains(keys(var.pvsize_hot_map[var.workspace]), var.stage) ? var.pvsize_hot_map[var.workspace][var.stage] : ""
+  value       = contains(keys(var.pvsize_hot_map[var.workspace]), var.stage) ? var.pvsize_hot_map[var.workspace][var.stage] : "missing"
 }
 
 variable "pvsize_cold_map" {
@@ -326,7 +320,6 @@ variable "pvsize_cold_map" {
   default = {
     default = {
       d0 : 50
-      h0 : 50
       p0 : 50
       t0 : 50
       u0 : 50
@@ -334,7 +327,6 @@ variable "pvsize_cold_map" {
     }
     production = {
       d0 : 50
-      h0 : 50
       p0 : 2500
       t0 : 250
       u0 : 50
@@ -344,7 +336,7 @@ variable "pvsize_cold_map" {
 }
 output "pvsize_cold" {
   description = "Size of a single splunk cold bucket pv for current tenant/stage"
-  value       = contains(keys(var.pvsize_cold_map[var.workspace]), var.stage) ? var.pvsize_cold_map[var.workspace][var.stage] : ""
+  value       = contains(keys(var.pvsize_cold_map[var.workspace]), var.stage) ? var.pvsize_cold_map[var.workspace][var.stage] : "missing"
 }
 
 variable "subnet_cidr_list_map" {
@@ -416,9 +408,9 @@ variable "pmdns_list_map" {
       splp0sh000 : "10.104.198.199",
       splp0sh002 : "10.104.198.200",
       splp0sy000 : "10.104.198.201",
-      splh0sy000 : "10.104.198.202",
-      splp0si000 : "10.104.198.203",
-      ########## : "10.104.198.204",
+      splg0ds000 : "10.104.198.202",
+      splg0lm000 : "10.104.198.203",
+      splp0si000 : "10.104.198.204",
       #--------- : "10.104.198.205", OTC System interface
       #--------- : "10.104.198.206", OTC DHCP service
 
@@ -479,8 +471,8 @@ variable "pmdns_list_map" {
       splp0sy000 : "10.104.146.9",
       splh0sy000 : "10.104.146.10",
       splp0si000 : "10.104.146.11",
-      ########## : "10.104.146.12",
-      ########## : "10.104.146.13",
+      splg0ds000 : "10.104.146.12",
+      splg0lm000 : "10.104.146.13",
       ########## : "10.104.146.14",
       ########## : "10.104.146.15",
       ########## : "10.104.146.16",
