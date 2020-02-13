@@ -22,7 +22,7 @@ To understand the reasoning for the code layout it might be helpful to know the 
 
 - We use two symmetrical network setups on two different tenants. The network is shared over stages, i.e. there is no symmetry between networks and stages (e.g. there is a "dev" stage but no "dev" network).
 - Stages are symmetrical between tenants
-- Stages are not symmetrical to each other, e.g. the production stage contains different systems than the test stage. I.e. the stages do not just differ by number of VMs but also by structure. For example there are no indexer instances on the "qa" (quality assurance) stage.
+- Stages are not symmetrical to each other, e.g. the production stage contains different systems than the test stage. I.e. the stages do not just differ by number of VMs but also by structure. For example there are no indexer instances on the "u0" (user acceptance) stage.
 - We don't have DNS as an OTC feature on our OTC-private installation and thus IPs need to be assigned statically
 
 ## Design goals
@@ -57,7 +57,7 @@ We have split up the infrastructure between tenants (test and prod tenant) as we
 
 We thus have two "axis" by which we separate terraform state, the *tenant axis* and the *stage axis*. By doing so we have two equivalent code paths for any stage. I.e. we can test modifications to any stage on the test tenant before bringing them to the production tenant.
 
-This was done because there are major differences (i.e. not just in size but also in structure) between stages because they are used for different purposes. E.g. there will be no indexing nodes on the qa stage. This would lead to untestable code if we had no other axis to differentiate state.
+This was done because there are major differences (i.e. not just in size but also in structure) between stages because they are used for different purposes. E.g. there will be no indexing nodes on the u0 stage. This would lead to untestable code if we had no other axis to differentiate state.
 
 The workspaces are
 
@@ -104,25 +104,21 @@ Basic terraform setup
 
 - Create shared resources first:
     - `cd shared`
-    - Work through shared/README.md for required manual network setup
     - `terraform workspace new production`
-    - `terraform workspace select production`
+    - Work through shared/README.md for required manual network setup
     - `terraform init`
-    - `terraform refresh`
     - `terraform plan`
     - `terraform apply`
 - Create any stage
-    - `terraform workspace new production`
-    - `terraform workspace select production`
     - `cd stages/<any>`
+    - `terraform workspace new production`
     - `terraform init`
-    - `terraform refresh`
     - `terraform plan`
     - `terraform apply`
 
 Don't break stuff on the production tenant! Feel free to break everything on the test tenant. I.e. do not just yet create the terraform production workspace until you know what you're doing. As long as you stick with the default terraform workspace you can only break things on the test tenant. This is fine.
 
-As an additional security net you should use different credentials on the test and prod tenant. This will safe you from accidentally using the wrong workspace.
+As an additional security net you should use different credentials on the test and prod tenant. This will safe you from accidentally using the wrong workspace / wrong tenant.
 
 # Provisioning
 
