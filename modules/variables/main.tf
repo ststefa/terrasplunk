@@ -268,7 +268,7 @@ variable "pvsize_var_map" {
   type        = map
   default = {
     default    = 20
-    production = 200
+    production = 500
   }
 }
 output "pvsize_var" {
