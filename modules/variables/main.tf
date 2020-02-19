@@ -43,12 +43,12 @@ variable "sbb_infrastructure_stage_map" {
   description = "1:1 assignment from workspace name to tenant name"
   type        = map
   default = {
-    g0    = "prod"
-    h0    = "prod"
-    p0    = "prod"
-    t0    = "test"
-    u0    = "int"
-    w0    = "dev"
+    g0 = "prod"
+    h0 = "prod"
+    p0 = "prod"
+    t0 = "test"
+    u0 = "int"
+    w0 = "dev"
   }
 }
 output "sbb_infrastructure_stage" {
@@ -213,7 +213,7 @@ output "flavor_si" {
 output "flavor_sy" {
   description = "Syslog VM size for current tenant/stage"
   # Small enough so one size fits all. Can be made more granular if required (see e.g. sh or ix).
-  value       = "s2.large.4"
+  value = "s2.large.4"
 }
 
 variable "flavor_default_map" {
@@ -261,6 +261,23 @@ output "pvsize_root" {
 output "pvsize_opt" {
   description = "Size of /opt pv"
   value       = 100
+}
+
+variable "pvsize_kvstore_map" {
+  description = "Size of /var/splunk/kvstore pv (split by stage)"
+  type        = map
+  default = {
+    d0 : 10
+    h0 : 10
+    p0 : 50
+    t0 : 10
+    u0 : 10
+    w0 : 10
+  }
+}
+output "pvsize_kvstore" {
+  description = "Size of /var/splunk/kvstore pv"
+  value       = var.pvsize_kvstore_map[var.stage]
 }
 
 variable "pvsize_var_map" {
