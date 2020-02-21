@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-
 """
 This collects all available terraform state and writes it to stdout as a json
 structure. Further doc on the structure of the output can be found in the
@@ -34,6 +33,11 @@ workspace_tenant_map = {  # TODO: remove if terraform.workspace==tenantname
     }
 }
 
+
+class TfstateError(Exception):
+    pass
+
+
 # set our own main path (i.e. the parent path of the dir containing $0)
 # base_path=""
 try:
@@ -41,11 +45,7 @@ try:
         os.path.join(os.path.dirname(os.path.realpath(__file__)), '..'))
     log.debug('base_path: %s' % base_path)
 except:
-    raise
-
-
-class TfstateError(Exception):
-    pass
+    raise TfstateError('Cannot determine base path')
 
 
 def init_logging():
@@ -81,13 +81,22 @@ def init_logging():
 
 def init_parser(base_path):
     parser = argparse.ArgumentParser(
-        description='Create combined output of all the splunk infrastructure that terraform created. The result will be a json formatted dictionary consisting of all tenants and all stages.',
+        description=
+        'Create combined output of all the splunk infrastructure that terraform created. The result will be a json formatted dictionary consisting of all tenants and all stages.',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('--debug', action='store_true',
+    parser.add_argument('--debug',
+                        action='store_true',
                         help='Turn on console debug output')
-    parser.add_argument('--root_dir', default=base_path, nargs='?',
-                        help='The root path of the splunk terraform project containing the state files')
-    parser.add_argument('-p', '--pretty', action='store_true',
+    parser.add_argument(
+        '--root_dir',
+        default=base_path,
+        nargs='?',
+        help=
+        'The root path of the splunk terraform project containing the state files'
+    )
+    parser.add_argument('-p',
+                        '--pretty',
+                        action='store_true',
                         help='Prettyprint output')
     return parser
 
@@ -115,8 +124,9 @@ def get_state(base_path):
                 f.close()
             tenant["shared"] = tfstate
         else:
-            log.warning("No shared state for tenant %s (workspace %s)" % (
-                workspace_tenant_map[workspace]['tenant_name'], workspace))
+            log.warning(
+                "No shared state for tenant %s (workspace %s)" %
+                (workspace_tenant_map[workspace]['tenant_name'], workspace))
 
         # Add stages to tenant
         # dynamically get stages based on existing dirs
@@ -136,7 +146,8 @@ def get_state(base_path):
             log.debug('this_stage_path: %s' % this_stage_path)
 
             tfstate_filename = os.path.join(
-                this_stage_path, workspace_tenant_map[workspace]['tfstate_path'])
+                this_stage_path,
+                workspace_tenant_map[workspace]['tfstate_path'])
             log.debug('tfstate_filename: %s' % tfstate_filename)
             file = pathlib.Path(tfstate_filename)
             if file.exists():
@@ -145,8 +156,8 @@ def get_state(base_path):
                     f.close()
                 tenant[stage_name] = tfstate
             else:
-                log.debug("No state for stage %s, workspace %s" % (
-                    stage_name, workspace))
+                log.debug("No state for stage %s, workspace %s" %
+                          (stage_name, workspace))
                 tenant[stage_name] = {}
                 continue
     return result
