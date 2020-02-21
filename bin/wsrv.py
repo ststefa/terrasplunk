@@ -223,7 +223,7 @@ class TerraformServer(BaseHTTPRequestHandler):
                 interpreted_splunk_health = 'SBB NoOK'
             else:
                 interpreted_splunk_health = 'SBB OK'
-        log.info(f'HTTP output: result { health_score = {result_health_score_str}, ...}; therefore: {interpreted_splunk_health}')
+        log.info(f'HTTP output: result {{ health_score = {result_health_score_str}, ...}}; therefore: {interpreted_splunk_health}')
 
         #HTML Header
         self.wfile.write(bytes('<!DOCTYPE html>', coding))
@@ -256,7 +256,7 @@ class TerraformServer(BaseHTTPRequestHandler):
             self.do_tenant(data[tenant])
 
         self.wfile.write(
-            bytes(f'<footer>Created with &hearts; on {socket.gethostname()} showing live terraform data as of  {time.asctime(time.localtime(round(TerraformServer._state_cache.issue()))))}</footer>', "utf-8")
+            bytes(f'<footer>Created with &hearts; on {socket.gethostname()} showing live terraform data as of {time.asctime(time.localtime(round(TerraformServer._state_cache.issue())))}</footer>', "utf-8"))
 
         self.wfile.write(bytes("</body>", "utf-8"))
 
@@ -299,11 +299,11 @@ class TerraformServer(BaseHTTPRequestHandler):
                 for i_name in sorted(instance_dict.keys()):
                     self.wfile.write(bytes("<tr><td>", "utf-8"))
                     self.wfile.write(bytes(f'<b>{i_name}</b><br>', "utf-8"))
-                    self.wfile.write(bytes(f'{instance_dict[i_name]['ip']}<br>', "utf-8"))
-                    self.wfile.write(bytes(f'{instance_dict[i_name]['az']}<br>', "utf-8"))
-                    self.wfile.write(bytes(f'{instance_dict[i_name]['flavor']}<br>', "utf-8"))
+                    self.wfile.write(bytes(f'{instance_dict[i_name]["ip"]}<br>', "utf-8"))
+                    self.wfile.write(bytes(f'{instance_dict[i_name]["az"]}<br>', "utf-8"))
+                    self.wfile.write(bytes(f'{instance_dict[i_name]["flavor"]}<br>', "utf-8"))
                     self.wfile.write(bytes('</td></tr>', "utf-8"))
-        except e:
+        except Exception as e:
             log.warn(f'Creating stage failed with {e}')
 
         self.wfile.write(bytes("</table>", "utf-8"))

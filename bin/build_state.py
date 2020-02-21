@@ -124,7 +124,7 @@ def get_state(base_path):
                 f.close()
             tenant["shared"] = tfstate
         else:
-            log.warning(f'No shared state for tenant {workspace_tenant_map[workspace]['tenant_name']} (workspace {workspace})'
+            log.warning(f'No shared state for tenant {workspace_tenant_map[workspace]["tenant_name"]} (workspace {workspace})')
 
         # Add stages to tenant
         # dynamically get stages based on existing dirs
