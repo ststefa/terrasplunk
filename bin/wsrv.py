@@ -29,7 +29,7 @@ log.setLevel(logging.INFO)
 try:
     base_path = os.path.normpath(
         os.path.join(os.path.dirname(os.path.realpath(__file__)), '..'))
-    log.debug('base_path: %s' % base_path)
+    log.debug(f'base_path: {base_path}')
 except:
     raise
 
@@ -41,10 +41,9 @@ def method_trace(fn):
 
     @wraps(fn)
     def wrapper(*my_args, **my_kwargs):
-        log.debug(
-            '>>> %s(%s ; %s ; %s)' % (fn.__name__, inspect.getargspec(fn), my_args, my_kwargs))
+        log.debug(f'>>> {fn.__name__}({inspect.getargspec(fn)} ; {my_args} ; {my_kwargs})')
         out = fn(*my_args, **my_kwargs)
-        log.debug('<<< %s' % fn.__name__)
+        log.debug(f'<<< {fn.__name__}')
         return out
 
     return wrapper
@@ -97,7 +96,7 @@ def init_parser():
 @method_trace
 def start_server():
     webServer = HTTPServer((hostName, serverPort), TerraformServer)
-    print("Server started http://%s:%s" % (hostName, serverPort))
+    print(f'Server started http://{hostName}:{serverPort}')
     return webServer
 
 
@@ -136,7 +135,7 @@ class TerraformServer(BaseHTTPRequestHandler):
                 TerraformServer._state_cache.update(
                     build_state.get_state(build_state.base_path))
             self.send_response(200)
-            log.debug('self.path:%s' % self.path)
+            log.debug(f'self.path:{self.path}')
             if self.path == '/tfstate':
                 self.send_header("Content-type", "application/json")
                 self.end_headers()
@@ -200,16 +199,16 @@ class TerraformServer(BaseHTTPRequestHandler):
             resp = requests.get(splunkURL, auth=splunk_auth, params=splunk_search_params)
             resp.raise_for_status()
         except requests.exceptions.HTTPError as http_err:
-            log.error('HTTP error occurred: %s', http_err)
+            log.error(f'HTTP error occurred: {http_err}')
         except Exception as err:
-            log.error('Genneric error occured: %s', err)
-        log.info('HTTP %s for URL: %s', resp.status_code, resp.url)
+            log.error(f'Genneric error occured: {err}')
+        log.info(f'HTTP {resp.status_code} for URL: {resp.url}')
 
         try:
             data_json = resp.json()
-            log.debug('HTTP output (JSON): %s', data_json)
+            log.debug(f'HTTP output (JSON): {data_json}')
         except ValueError:
-            log.error('Decoding Splunk response:', resp.text)
+            log.error(f'ValueError decoding Splunk response "{resp.text}"')
 
         result_health_score_str = data_json['result']['health_score']
 
@@ -224,7 +223,7 @@ class TerraformServer(BaseHTTPRequestHandler):
                 interpreted_splunk_health = 'SBB NoOK'
             else:
                 interpreted_splunk_health = 'SBB OK'
-        log.info('HTTP output: result { health_score = %s, ...}; therefore: %s', result_health_score_str, interpreted_splunk_health)
+        log.info(f'HTTP output: result { health_score = {result_health_score_str}, ...}; therefore: {interpreted_splunk_health}')
 
         #HTML Header
         self.wfile.write(bytes('<!DOCTYPE html>', coding))
@@ -252,13 +251,12 @@ class TerraformServer(BaseHTTPRequestHandler):
         self.wfile.write(
             bytes("<h1>Splunk environment overview</h1>", "utf-8"))
         for tenant in sorted(data.keys()):
-            self.wfile.write(bytes("<h2>Tenant %s</h2>" % tenant, "utf-8"))
+            self.wfile.write(bytes(f'<h2>Tenant {tenant}</h2>', "utf-8"))
 
             self.do_tenant(data[tenant])
 
         self.wfile.write(
-            bytes("<footer>Created with &hearts; on %s showing live terraform data as of  %s</footer>" %
-                  (socket.gethostname(), time.asctime(time.localtime(round(TerraformServer._state_cache.issue())))), "utf-8"))
+            bytes(f'<footer>Created with &hearts; on {socket.gethostname()} showing live terraform data as of  {time.asctime(time.localtime(round(TerraformServer._state_cache.issue()))))}</footer>', "utf-8")
 
         self.wfile.write(bytes("</body>", "utf-8"))
 
@@ -270,7 +268,7 @@ class TerraformServer(BaseHTTPRequestHandler):
         self.wfile.write(bytes("<tr>", "utf-8"))
         for stage in sorted(data.keys()):
             self.wfile.write(
-                bytes("<th width=180>Stage %s</th>" % stage, "utf-8"))
+                bytes(f'<th width=180>Stage {stage}</th>', "utf-8"))
         self.wfile.write(bytes("</tr>", "utf-8"))
 
         self.wfile.write(bytes("<tr>", "utf-8"))
@@ -300,13 +298,13 @@ class TerraformServer(BaseHTTPRequestHandler):
                     instance_dict[i_name]['flavor'] = instance['instances'][0]['attributes']['flavor_id']
                 for i_name in sorted(instance_dict.keys()):
                     self.wfile.write(bytes("<tr><td>", "utf-8"))
-                    self.wfile.write(bytes("<b>%s</b><br>" %i_name, "utf-8"))
-                    self.wfile.write(bytes("%s<br>" %instance_dict[i_name]['ip'], "utf-8"))
-                    self.wfile.write(bytes("%s<br>" %instance_dict[i_name]['az'], "utf-8"))
-                    self.wfile.write(bytes("%s<br>" %instance_dict[i_name]['flavor'], "utf-8"))
-                    self.wfile.write(bytes("</td></tr>", "utf-8"))
+                    self.wfile.write(bytes(f'<b>{i_name}</b><br>', "utf-8"))
+                    self.wfile.write(bytes(f'{instance_dict[i_name]['ip']}<br>', "utf-8"))
+                    self.wfile.write(bytes(f'{instance_dict[i_name]['az']}<br>', "utf-8"))
+                    self.wfile.write(bytes(f'{instance_dict[i_name]['flavor']}<br>', "utf-8"))
+                    self.wfile.write(bytes('</td></tr>', "utf-8"))
         except e:
-            log.warn("Creating stage failed with %s" % e)
+            log.warn(f'Creating stage failed with {e}')
 
         self.wfile.write(bytes("</table>", "utf-8"))
 
@@ -323,11 +321,11 @@ if __name__ == "__main__":
     if args.listen:
         hostName = args.listen
 
-    log.debug('sys.argv: %s' % sys.argv)
-    log.debug('args: %s' % args)
+    log.debug(f'sys.argv: {sys.argv}')
+    log.debug(f'args: {args}')
 
     web_server = HTTPServer((hostName, serverPort), TerraformServer)
-    log.info("Server listening on %s:%s" % (hostName, serverPort))
+    log.info(f'Server listening on {hostName}:{serverPort}')
 
     try:
         web_server.serve_forever()

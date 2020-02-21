@@ -43,7 +43,7 @@ class TfstateError(Exception):
 try:
     base_path = os.path.normpath(
         os.path.join(os.path.dirname(os.path.realpath(__file__)), '..'))
-    log.debug('base_path: %s' % base_path)
+    log.debug(f'base_path: {base_path}')
 except:
     raise TfstateError('Cannot determine base path')
 
@@ -116,7 +116,7 @@ def get_state(base_path):
         # Add shared to tenant
         tfstate_filename = os.path.join(
             shared_path, workspace_tenant_map[workspace]['tfstate_path'])
-        log.debug('shared tfstate_filename: %s' % tfstate_filename)
+        log.debug(f'shared tfstate_filename: {tfstate_filename}')
         file = pathlib.Path(tfstate_filename)
         if file.exists():
             with file.open('r') as f:
@@ -124,31 +124,29 @@ def get_state(base_path):
                 f.close()
             tenant["shared"] = tfstate
         else:
-            log.warning(
-                "No shared state for tenant %s (workspace %s)" %
-                (workspace_tenant_map[workspace]['tenant_name'], workspace))
+            log.warning(f'No shared state for tenant {workspace_tenant_map[workspace]['tenant_name']} (workspace {workspace})'
 
         # Add stages to tenant
         # dynamically get stages based on existing dirs
         stages = os.listdir(stage_path)
         for stage in stages:
-            log.debug('stage: %s' % stage)
+            log.debug(f'stage: {stage}')
             stagedir = os.path.join(base_path, stage)
             if os.path.isdir(stagedir):
                 stages.remove(stage)
             if not reg_stagename.fullmatch(stage):
                 stages.remove(stage)
-        log.debug('stages: %s' % stages)
+        log.debug(f'stages: {stages}')
 
         # iterate over stage dirs, adding their tfstate
         for stage_name in stages:
             this_stage_path = os.path.join(stage_path, stage_name)
-            log.debug('this_stage_path: %s' % this_stage_path)
+            log.debug(f'this_stage_path: {this_stage_path}')
 
             tfstate_filename = os.path.join(
                 this_stage_path,
                 workspace_tenant_map[workspace]['tfstate_path'])
-            log.debug('tfstate_filename: %s' % tfstate_filename)
+            log.debug(f'tfstate_filename: {tfstate_filename}')
             file = pathlib.Path(tfstate_filename)
             if file.exists():
                 with file.open('r') as f:
@@ -156,8 +154,7 @@ def get_state(base_path):
                     f.close()
                 tenant[stage_name] = tfstate
             else:
-                log.debug("No state for stage %s, workspace %s" %
-                          (stage_name, workspace))
+                log.debug(f'No state for stage {stage_name}, workspace {workspace}')
                 tenant[stage_name] = {}
                 continue
     return result
@@ -171,12 +168,12 @@ def main(base_path):
     if args.debug:
         log.setLevel(logging.DEBUG)
 
-    log.debug('sys.argv: %s' % sys.argv)
-    log.debug('args: %s' % args)
+    log.debug(f'sys.argv: {sys.argv}')
+    log.debug(f'args: {args}')
 
     if args.root_dir:
         base_path = args.root_dir
-    log.debug('base_path: %s' % base_path)
+    log.debug(f'base_path: {base_path}')
 
     # The final result to ppoulate
     result = get_state(base_path)
