@@ -35,7 +35,8 @@ To understand the reasoning for the code layout it might be helpful to know the 
 ## Project layout
 The project is structured into several parts
 
-- `lib` contains supplementary code like scripts
+- `bin` contains supplementary code like scripts
+- `lib` contains artifacts required somewhere in the terraform process
 - `modules` contains terraform modules which are used to compose the infrastructure in the stages
 - `shared` contains code and state for infrastructure which is shared among stages
 - `stages` contains one directory for each stage. Each directory contains code and state for that stage. The code is mostly composed from modules.
