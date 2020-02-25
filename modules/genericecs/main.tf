@@ -30,7 +30,9 @@ data "terraform_remote_state" "shared" {
 }
 
 data "opentelekomcloud_images_image_v2" "osimage" {
-  name        = "Standard_CentOS_7_latest"
+  #name        = "Standard_CentOS_7_latest"
+  name        = "Standard_CentOS_7_prev"
+  #name        = "Standard_CentOS_7_r7.7.1980"
   most_recent = true
 }
 
