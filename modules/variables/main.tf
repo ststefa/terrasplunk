@@ -53,7 +53,7 @@ variable "sbb_infrastructure_stage_map" {
 }
 output "sbb_infrastructure_stage" {
   description = "SBB stage definition as per https://confluence.sbb.ch/display/OTC/Tagging+Policy"
-  value       = var.sbb_infrastructure_stage_map[var.stage]
+  value       = contains(keys(var.sbb_infrastructure_stage_map), var.stage) ? var.sbb_infrastructure_stage_map[var.stage] : "missing"
 }
 
 
