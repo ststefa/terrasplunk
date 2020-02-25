@@ -22,7 +22,7 @@ To understand the reasoning for the code layout it might be helpful to know the 
 
 - We use two symmetrical network setups on two different tenants. The network is shared over stages, i.e. there is no symmetry between networks and stages (e.g. there is a "dev" stage but no "dev" network).
 - Stages are symmetrical between tenants
-- Stages are not symmetrical to each other, e.g. the production stage contains different systems than the test stage. I.e. the stages do not just differ by number of VMs but also by structure. For example there are no indexer instances on the "u0" (user acceptance) stage.
+- Stages are not symmetrical to each other, e.g. the production stage contains different systems than the test stage. I.e. the stages do not just differ by number of VMs but also by structure. For example there are no syslog instances on the "t0" (test) stage.
 - We don't have DNS as an OTC feature on our OTC-private installation and thus IPs need to be assigned statically
 
 ## Design goals
