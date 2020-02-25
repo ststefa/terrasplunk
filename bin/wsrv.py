@@ -195,6 +195,7 @@ class TerraformServer(BaseHTTPRequestHandler):
         splunkREST_savedSearches = f'/servicesNS/{user}/{splunk_app}/search/jobs/export'
         splunkURL = f'https://search.splunk.sbb.ch:8089{splunkREST_savedSearches}'
 
+        #TODO: This should probably rather re-raise the exception like in do_GET(). Logging output is not visible to the HTTP client
         try:
             resp = requests.get(splunkURL, auth=splunk_auth, params=splunk_search_params)
             resp.raise_for_status()
