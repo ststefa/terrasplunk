@@ -112,10 +112,10 @@ variable "flavor_ix_map" {
       w0 : "s2.4xlarge.1"
     }
     production = {
-      p0 : "s2.4xlarge.2"
+      p0 : "s3.4xlarge.2"
       t0 : "s3.4xlarge.1"
-      u0 : "s2.4xlarge.1"
-      w0 : "s2.4xlarge.1"
+      u0 : "s3.4xlarge.1"
+      w0 : "s3.4xlarge.1"
     }
   }
 }
@@ -136,10 +136,10 @@ variable "flavor_sh_map" {
       w0 : "s2.4xlarge.1"
     }
     production = {
-      p0 : "s2.4xlarge.2"
+      p0 : "s3.4xlarge.2"
       t0 : "s3.4xlarge.1"
-      u0 : "s2.4xlarge.1"
-      w0 : "s2.4xlarge.1"
+      u0 : "s3.4xlarge.1"
+      w0 : "s3.4xlarge.1"
     }
   }
 }
@@ -159,10 +159,10 @@ variable "flavor_es_map" {
       w0 : "s2.4xlarge.2"
     }
     production = {
-      p0 : "s2.4xlarge.2"
+      p0 : "s3.4xlarge.2"
       t0 : "s3.4xlarge.2"
-      u0 : "s2.4xlarge.2"
-      w0 : "s2.4xlarge.2"
+      u0 : "s3.4xlarge.2"
+      w0 : "s3.4xlarge.2"
     }
   }
 }
@@ -182,10 +182,10 @@ variable "flavor_si_map" {
       w0 : "s2.4xlarge.2"
     }
     production = {
-      p0 : "s2.4xlarge.2"
+      p0 : "s3.4xlarge.2"
       t0 : "s3.4xlarge.2"
-      u0 : "s2.4xlarge.2"
-      w0 : "s2.4xlarge.2"
+      u0 : "s3.4xlarge.2"
+      w0 : "s3.4xlarge.2"
     }
   }
 }
@@ -194,22 +194,46 @@ output "flavor_si" {
   value       = contains(keys(var.flavor_si_map[var.workspace]), var.stage) ? var.flavor_si_map[var.workspace][var.stage] : "missing"
 }
 
+variable "flavor_sy_map" {
+  description = "Syslog VM size (split by tenant)"
+  # Small enough so one size fits all. Can be made more granular if required (see e.g. sh or ix).
+  type        = map
+  default = {
+    default    = "s2.large.4"
+    production = "s3.large.4"
+  }
+}
 output "flavor_sy" {
   description = "Syslog VM size for current tenant/stage"
-  # Small enough so one size fits all. Can be made more granular if required (see e.g. sh or ix).
-  value = "s2.large.4"
+  value       = contains(keys(var.flavor_sy_map), var.workspace) ? var.flavor_sy_map[var.workspace] : "missing"
 }
 
+variable "flavor_ds_map" {
+  description = "Deployment server VM size (split by tenant)"
+  # Sizing agreed with customer on workshop 2020-02-12
+  type        = map
+  default = {
+    default    = "s2.2xlarge.2"
+    production = "s3.2xlarge.2"
+  }
+}
 output "flavor_ds" {
   description = "Deployment server VM size for current tenant/stage"
-  # Sizing agreed with customer on workshop 2020-02-12
-  value = "s2.2xlarge.2"
+  value       = contains(keys(var.flavor_ds_map), var.workspace) ? var.flavor_ds_map[var.workspace] : "missing"
 }
 
+variable "flavor_lm_map" {
+  description = "License master VM size (split by tenant)"
+  # Sizing agreed with customer on workshop 2020-02-12
+  type        = map
+  default = {
+    default    = "s2.xlarge.2"
+    production = "s3.xlarge.2"
+  }
+}
 output "flavor_lm" {
   description = "License master VM size for current tenant/stage"
-  # Sizing agreed with customer on workshop 2020-02-12
-  value = "s2.xlarge.2"
+  value       = contains(keys(var.flavor_lm_map), var.workspace) ? var.flavor_lm_map[var.workspace] : "missing"
 }
 
 variable "flavor_default_map" {
@@ -226,13 +250,13 @@ variable "flavor_default_map" {
       w0 : "s2.4xlarge.1"
     }
     production = {
-      d0 : "s2.4xlarge.1"
-      g0 : "s2.4xlarge.1"
-      h0 : "s2.4xlarge.1"
-      p0 : "s2.4xlarge.1"
+      d0 : "s3.4xlarge.1"
+      g0 : "s3.4xlarge.1"
+      h0 : "s3.4xlarge.1"
+      p0 : "s3.4xlarge.1"
       t0 : "s3.4xlarge.1"
-      u0 : "s2.4xlarge.1"
-      w0 : "s2.4xlarge.1"
+      u0 : "s3.4xlarge.1"
+      w0 : "s3.4xlarge.1"
     }
   }
 }
