@@ -58,7 +58,7 @@ We have split up the infrastructure between tenants (test and prod tenant) as we
 
 We thus have two "axis" by which we separate terraform state, the *tenant axis* and the *stage axis*. By doing so we have two equivalent code paths for any stage. I.e. we can test modifications to any stage on the test tenant before bringing them to the production tenant.
 
-This was done because there are major differences (i.e. not just in size but also in structure) between stages because they are used for different purposes. E.g. there will be no indexing nodes on the u0 stage. This would lead to untestable code if we had no other axis to differentiate state.
+This was done because there are major differences (i.e. not just in size but also in structure) between stages because they are used for different purposes. E.g. there will be no syslog nodes on the t0 stage. This would lead to untestable code if we had no other axis to differentiate state.
 
 The workspaces are
 
