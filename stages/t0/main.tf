@@ -39,7 +39,7 @@ module "server-mt000" {
 }
 
 module "server-cm000" {
-  source        = "../../modules/genericecs"
+  source        = "../../modules/cm"
   instance_name = "${local.prefix}cm000"
 }
 
@@ -79,7 +79,7 @@ module "server-ix003" {
 }
 
 module "server-hf000" {
-  source        = "../../modules/genericecs"
+  source        = "../../modules/hf"
   instance_name = "${local.prefix}hf000"
 }
 
