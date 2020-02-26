@@ -1,5 +1,5 @@
 terraform {
-  required_version = ">= 0.12.15"
+  required_version = ">= 0.12.21"
 }
 
 locals {
@@ -12,7 +12,7 @@ provider "opentelekomcloud" {
   tenant_name = "eu-ch_splunk"
   user_name   = var.username
   password    = var.password
-  auth_url = "https://iam.eu-ch.o13bb.otc.t-systems.com/v3"
+  auth_url    = "https://iam.eu-ch.o13bb.otc.t-systems.com/v3"
 }
 
 module "variables" {
@@ -39,7 +39,7 @@ module "server-mt000" {
 }
 
 module "server-cm000" {
-  source        = "../../modules/genericecs"
+  source        = "../../modules/cm"
   instance_name = "${local.prefix}cm000"
 }
 
@@ -84,11 +84,11 @@ module "server-ix003" {
 }
 
 module "server-hf000" {
-  source        = "../../modules/genericecs"
+  source        = "../../modules/hf"
   instance_name = "${local.prefix}hf000"
 }
 module "server-hf001" {
-  source        = "../../modules/genericecs"
+  source        = "../../modules/hf"
   instance_name = "${local.prefix}hf001"
 }
 

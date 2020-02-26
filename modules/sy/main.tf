@@ -20,7 +20,7 @@ module "sy-instance" {
   source         = "../../modules/genericecs"
   instance_name  = var.instance_name
   flavor         = module.variables.flavor_sy
-  secgrp_id_list = [data.terraform_remote_state.shared.outputs["parser-secgrp_id"]]
+  secgrp_id_list = [data.terraform_remote_state.shared.outputs.parser-secgrp_id]
 }
 
 resource "opentelekomcloud_blockstorage_volume_v2" "var" {

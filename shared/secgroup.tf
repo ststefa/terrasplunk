@@ -119,7 +119,7 @@ resource "opentelekomcloud_compute_secgroup_v2" "searchhead-secgrp" {
     from_port   = 8000
     to_port     = 8000
     ip_protocol = "tcp"
-    cidr        = "0.0.0.0/0"
+    cidr        = "10.104.0.0/16"
   }
 
   # api
@@ -127,7 +127,7 @@ resource "opentelekomcloud_compute_secgroup_v2" "searchhead-secgrp" {
     from_port   = 8089
     to_port     = 8089
     ip_protocol = "tcp"
-    cidr        = "0.0.0.0/0"
+    cidr        = "10.104.0.0/16"
   }
 }
 
@@ -141,7 +141,7 @@ resource "opentelekomcloud_compute_secgroup_v2" "parser-secgrp" {
     from_port   = 514
     to_port     = 514
     ip_protocol = "udp"
-    cidr        = "0.0.0.0/0"
+    cidr        = "10.104.0.0/16"
   }
 
   # syslog tcp/tls
@@ -149,7 +149,7 @@ resource "opentelekomcloud_compute_secgroup_v2" "parser-secgrp" {
     from_port   = 6514
     to_port     = 6514
     ip_protocol = "tcp"
-    cidr        = "0.0.0.0/0"
+    cidr        = "10.104.0.0/16"
   }
 
   # allow inbound rsyslog exporter scraping inside rz network

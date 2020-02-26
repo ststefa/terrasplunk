@@ -4,7 +4,7 @@ locals {
 }
 
 terraform {
-  required_version = ">= 0.12.15"
+  required_version = ">= 0.12.21"
 }
 
 provider "opentelekomcloud" {

@@ -1,5 +1,5 @@
 terraform {
-  required_version = ">= 0.12.15"
+  required_version = ">= 0.12.21"
 }
 
 locals {
@@ -35,6 +35,6 @@ data "terraform_remote_state" "shared" {
 }
 
 module "server-lm000" {
-  source         = "../../modules/lm"
-  instance_name  = "${local.prefix}lm000"
+  source        = "../../modules/lm"
+  instance_name = "${local.prefix}lm000"
 }

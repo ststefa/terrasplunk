@@ -1,5 +1,5 @@
 terraform {
-  required_version = ">= 0.12.15"
+  required_version = ">= 0.12.21"
 }
 
 locals {
@@ -12,7 +12,7 @@ provider "opentelekomcloud" {
   tenant_name = "eu-ch_splunk"
   user_name   = var.username
   password    = var.password
-  auth_url = "https://iam.eu-ch.o13bb.otc.t-systems.com/v3"
+  auth_url    = "https://iam.eu-ch.o13bb.otc.t-systems.com/v3"
 }
 
 module "variables" {
@@ -34,10 +34,10 @@ data "terraform_remote_state" "shared" {
 }
 
 module "server-sy000" {
-  source         = "../../modules/sy"
-  instance_name  = "${local.prefix}sy000"
+  source        = "../../modules/sy"
+  instance_name = "${local.prefix}sy000"
 }
 module "server-sy001" {
-  source         = "../../modules/sy"
-  instance_name  = "${local.prefix}sy001"
+  source        = "../../modules/sy"
+  instance_name = "${local.prefix}sy001"
 }
