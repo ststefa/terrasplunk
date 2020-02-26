@@ -47,7 +47,6 @@ variable "sbb_infrastructure_stage_map" {
     h0 = "prod"
     p0 = "prod"
     t0 = "test"
-    u0 = "int"
     w0 = "dev"
   }
 }
@@ -108,13 +107,11 @@ variable "flavor_ix_map" {
       # size test (almost) like prodution, maybe better idea anyway. The full size does not (currently 2019-08) fit and leads to errors
       p0 : "s3.4xlarge.1"
       t0 : "s2.4xlarge.1"
-      u0 : "s2.4xlarge.1"
       w0 : "s2.4xlarge.1"
     }
     production = {
       p0 : "s3.4xlarge.2"
       t0 : "s3.4xlarge.1"
-      u0 : "s3.4xlarge.1"
       w0 : "s3.4xlarge.1"
     }
   }
@@ -132,13 +129,11 @@ variable "flavor_sh_map" {
     default = {
       p0 : "s3.4xlarge.1"
       t0 : "s2.4xlarge.1"
-      u0 : "s2.4xlarge.1"
       w0 : "s2.4xlarge.1"
     }
     production = {
       p0 : "s3.4xlarge.2"
       t0 : "s3.4xlarge.1"
-      u0 : "s3.4xlarge.1"
       w0 : "s3.4xlarge.1"
     }
   }
@@ -155,13 +150,11 @@ variable "flavor_es_map" {
     default = {
       p0 : "s3.4xlarge.2"
       t0 : "s2.4xlarge.2"
-      u0 : "s2.4xlarge.2"
       w0 : "s2.4xlarge.2"
     }
     production = {
       p0 : "s3.4xlarge.2"
       t0 : "s3.4xlarge.2"
-      u0 : "s3.4xlarge.2"
       w0 : "s3.4xlarge.2"
     }
   }
@@ -178,13 +171,11 @@ variable "flavor_si_map" {
     default = {
       p0 : "s3.4xlarge.2"
       t0 : "s2.4xlarge.2"
-      u0 : "s2.4xlarge.2"
       w0 : "s2.4xlarge.2"
     }
     production = {
       p0 : "s3.4xlarge.2"
       t0 : "s3.4xlarge.2"
-      u0 : "s3.4xlarge.2"
       w0 : "s3.4xlarge.2"
     }
   }
@@ -246,7 +237,6 @@ variable "flavor_default_map" {
       h0 : "s2.4xlarge.1"
       p0 : "s3.4xlarge.1"
       t0 : "s2.4xlarge.1"
-      u0 : "s2.4xlarge.1"
       w0 : "s2.4xlarge.1"
     }
     production = {
@@ -255,7 +245,6 @@ variable "flavor_default_map" {
       h0 : "s3.4xlarge.1"
       p0 : "s3.4xlarge.1"
       t0 : "s3.4xlarge.1"
-      u0 : "s3.4xlarge.1"
       w0 : "s3.4xlarge.1"
     }
   }
@@ -291,7 +280,6 @@ variable "pvsize_kvstore_map" {
   default = {
     p0 : 50
     t0 : 10
-    u0 : 10
     w0 : 10
   }
 }
@@ -321,14 +309,12 @@ variable "pvsize_hot_map" {
       d0 : 5
       p0 : 5
       t0 : 5
-      u0 : 5
       w0 : 5
     }
     production = {
       d0 : 5
       p0 : 250
       t0 : 25
-      u0 : 5
       w0 : 5
     }
   }
@@ -346,14 +332,12 @@ variable "pvsize_cold_map" {
       d0 : 50
       p0 : 50
       t0 : 50
-      u0 : 50
       w0 : 50
     }
     production = {
       d0 : 50
       p0 : 2500
       t0 : 250
-      u0 : 50
       w0 : 50
     }
   }
@@ -461,9 +445,9 @@ variable "pmdns_list_map" {
       splw0sh000 : "10.104.198.230",
       splw0sy000 : "10.104.198.231",
       splw0sh002 : "10.104.198.232",
-      splu0mt000 : "10.104.198.233",
-      splu0sh000 : "10.104.198.234",
-      splu0sh002 : "10.104.198.235",
+      ########## : "10.104.198.233",
+      ########## : "10.104.198.234",
+      ########## : "10.104.198.235",
       splw0ix002 : "10.104.198.236",
       #--------- : "10.104.198.237", OTC System interface
       #--------- : "10.104.198.238", OTC DHCP service
@@ -471,7 +455,7 @@ variable "pmdns_list_map" {
       # Test tenant > nonProd subnet - netC (AZ2 network) > 10.104.198.242 - 10.104.198.254
       splw0ix001 : "10.104.198.242",
       splw0sh001 : "10.104.198.243",
-      splu0sh001 : "10.104.198.244",
+      ########## : "10.104.198.244",
       splw0ix003 : "10.104.198.245",
       splw0es001 : "10.104.198.246",
       ########## : "10.104.198.247",
@@ -627,12 +611,12 @@ variable "pmdns_list_map" {
       splt0ix000 : "10.104.146.201",
       splt0sy000 : "10.104.146.202",
       splt0mt000 : "10.104.146.203",
-      splu0mt000 : "10.104.146.204",
+      ########## : "10.104.146.204",
       splt0cm000 : "10.104.146.205",
-      splu0sh000 : "10.104.146.206",
+      ########## : "10.104.146.206",
       splt0hf000 : "10.104.146.207",
       splt0sh002 : "10.104.146.208",
-      splu0sh002 : "10.104.146.209",
+      ########## : "10.104.146.209",
       splw0sh002 : "10.104.146.210",
       splw0ix002 : "10.104.146.211",
       splt0ix002 : "10.104.146.212",
@@ -655,7 +639,7 @@ variable "pmdns_list_map" {
       splt0sh001 : "10.104.146.229",
       splt0ix001 : "10.104.146.230",
       splt0ix003 : "10.104.146.231",
-      splu0sh001 : "10.104.146.232",
+      ########## : "10.104.146.232",
       splw0es001 : "10.104.146.233",
       splt0es001 : "10.104.146.234",
       ########## : "10.104.146.235",
