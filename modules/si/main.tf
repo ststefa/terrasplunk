@@ -20,5 +20,5 @@ module "si-instance" {
   source         = "../../modules/genericecs"
   instance_name  = var.instance_name
   flavor         = module.variables.flavor_si
-  secgrp_id_list = [data.terraform_remote_state.shared.outputs["searchhead-secgrp_id"]]
+  secgrp_id_list = [data.terraform_remote_state.shared.outputs.searchhead-secgrp_id]
 }
