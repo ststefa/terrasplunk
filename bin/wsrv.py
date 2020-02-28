@@ -155,7 +155,7 @@ class TerraformServer(BaseHTTPRequestHandler):
                 if tenant=="tsch_rz_p_001":
                     return f'<a href="https://{ecs_type}{ecs_number}-{stage_table[ecs_stage]}.{domain}">{hostname}</a>'
                 else:
-                    return f'<a href="https://ip:8000">{hostname}</a>'
+                    return f'<a href="https://ip:8000">{hostname}</a>' #TODO pass IP
             if ecs_type in type_table.keys():
                 if tenant=="tsch_rz_p_001":
                     return f'<a href="https://{type_table[ecs_type]}-{stage_table[ecs_stage]}.{domain}">{hostname}</a>'
