@@ -129,6 +129,46 @@ class TerraformServer(BaseHTTPRequestHandler):
     _state_cache = StateCache()
 
     @method_trace
+    def hostname_to_link(self, hostname, tenant):
+        domain="splunk.sbb.ch"
+        ecs_type=hostname[5:7]
+        ecs_stage=hostname[3:5]
+        ecs_number=hostname[7:]
+        type_table = {
+            "cm": "clmaster",
+            "dp": "deployer",
+            "ds": "dpserver",
+            "es": "siem",
+            "lm": "license",
+            "mt": "deployer",
+            "sh": "search",
+        }
+        stage_table = {
+            "g0": "global",
+            "p0": "prod",
+            "t0": "test",
+            "w0": "pg",
+        }
+
+        if ecs_stage in stage_table.keys():
+            if ecs_type == "hf":
+                if tenant=="tsch_rz_p_001":
+                    return f'<a href="https://{ecs_type}{ecs_number}-{stage_table[ecs_stage]}.{domain}">{hostname}</a>'
+                else:
+                    return f'<a href="https://ip:8000">{hostname}</a>'
+            if ecs_type in type_table.keys():
+                if tenant=="tsch_rz_p_001":
+                    return f'<a href="https://{type_table[ecs_type]}-{stage_table[ecs_stage]}.{domain}">{hostname}</a>'
+                else:
+                    return f'<a href="https://ip:8000">{hostname}</a>'
+            else:
+                return hostname
+        else:
+            return hostname
+
+
+
+    @method_trace
     def do_GET(self):
         try:
             if not TerraformServer._state_cache.valid():
@@ -254,7 +294,7 @@ class TerraformServer(BaseHTTPRequestHandler):
         for tenant in sorted(data.keys()):
             self.wfile.write(bytes(f'<h2>Tenant {tenant}</h2>', "utf-8"))
 
-            self.do_tenant(data[tenant])
+            self.do_tenant(data[tenant], tenant)
 
         self.wfile.write(
             bytes(f'<footer>Created with &hearts; on {socket.gethostname()} showing live terraform data as of {time.asctime(time.localtime(round(TerraformServer._state_cache.issue())))}</footer>', "utf-8"))
@@ -262,7 +302,7 @@ class TerraformServer(BaseHTTPRequestHandler):
         self.wfile.write(bytes("</body>", "utf-8"))
 
     @method_trace
-    def do_tenant(self, data):
+    def do_tenant(self, data, tenant):
         del data['shared']
         self.wfile.write(bytes("<table>", "utf-8"))
 
@@ -275,14 +315,14 @@ class TerraformServer(BaseHTTPRequestHandler):
         self.wfile.write(bytes("<tr>", "utf-8"))
         for stage in sorted(data.keys()):
             self.wfile.write(bytes("<td>", "utf-8"))
-            self.do_stage(data[stage])
+            self.do_stage(data[stage], tenant)
             self.wfile.write(bytes("</td>", "utf-8"))
         self.wfile.write(bytes("</tr>", "utf-8"))
 
         self.wfile.write(bytes("</table>", "utf-8"))
 
     @method_trace
-    def do_stage(self, data):
+    def do_stage(self, data, tenant):
         self.wfile.write(bytes("<table>", "utf-8"))
 
         try:
@@ -299,7 +339,7 @@ class TerraformServer(BaseHTTPRequestHandler):
                     instance_dict[i_name]['flavor'] = instance['instances'][0]['attributes']['flavor_id']
                 for i_name in sorted(instance_dict.keys()):
                     self.wfile.write(bytes("<tr><td>", "utf-8"))
-                    self.wfile.write(bytes(f'<b>{i_name}</b><br>', "utf-8"))
+                    self.wfile.write(bytes(f'<b>{self.hostname_to_link(i_name, tenant)}</b><br>', "utf-8"))
                     self.wfile.write(bytes(f'{instance_dict[i_name]["ip"]}<br>', "utf-8"))
                     self.wfile.write(bytes(f'{instance_dict[i_name]["az"]}<br>', "utf-8"))
                     self.wfile.write(bytes(f'{instance_dict[i_name]["flavor"]}<br>', "utf-8"))
