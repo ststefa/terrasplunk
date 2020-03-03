@@ -107,12 +107,12 @@ class StateCache():
         self._last_update = 0
 
     @method_trace
-    def valid(self):
+    def _is_valid(self):
         is_valid = (round(time.time()) - self._last_update) < 15
         return is_valid
 
     @method_trace
-    def update(self, new_state):
+    def _update(self, new_state):
         self._state = new_state
         self._last_update = round(time.time())
 
@@ -122,14 +122,16 @@ class StateCache():
 
     @method_trace
     def get(self):
-        return copy.deepcopy(self._state)
+        if not self._is_valid():
+            self._update(build_state.get_state(build_state.base_path))
+        return self._state
 
 
 class TerraformServer(BaseHTTPRequestHandler):
     _state_cache = StateCache()
 
     @method_trace
-    def hostname_to_link(self, hostname, tenant):
+    def hostname_to_link(self, hostname, tenant, stage):
         domain="splunk.sbb.ch"
         ecs_type=hostname[5:7]
         ecs_stage=hostname[3:5]
@@ -142,6 +144,7 @@ class TerraformServer(BaseHTTPRequestHandler):
             "lm": "license",
             "mt": "deployer",
             "sh": "search",
+            "si": "search-uat", #ugly hack because there is not u0 stage anymore
         }
         stage_table = {
             "g0": "global",
@@ -150,40 +153,50 @@ class TerraformServer(BaseHTTPRequestHandler):
             "w0": "pg",
         }
 
-        if ecs_stage in stage_table.keys():
+        if tenant=="tsch_rz_p_001":
             if ecs_type == "hf":
-                if tenant=="tsch_rz_p_001":
-                    return f'<a href="https://{ecs_type}{ecs_number}-{stage_table[ecs_stage]}.{domain}">{hostname}</a>'
-                else:
-                    return f'<a href="https://ip:8000">{hostname}</a>' #TODO pass IP
+                return f'<a href="https://{ecs_type}{ecs_number}-{stage_table[ecs_stage]}.{domain}">{hostname}</a>'
             if ecs_type in type_table.keys():
-                if tenant=="tsch_rz_p_001":
-                    return f'<a href="https://{type_table[ecs_type]}-{stage_table[ecs_stage]}.{domain}">{hostname}</a>'
+                if ecs_type == "si":
+                    return f'<a href="https://{type_table[ecs_type]}.{domain}">{hostname}</a>'
                 else:
-                    return f'<a href="https://ip:8000">{hostname}</a>'
+                    return f'<a href="https://{type_table[ecs_type]}-{stage_table[ecs_stage]}.{domain}">{hostname}</a>'
             else:
                 return hostname
         else:
-            return hostname
+            if ecs_type == "hf" or ecs_type in type_table.keys():
+                data = TerraformServer._state_cache.get()[tenant][stage]
+
+                # find host in json data
+                this_host = None
+                compute_instances = jsonpath.jsonpath(data, "$..resources[?(@.type=='opentelekomcloud_compute_instance_v2')]") # yapf: disable
+                for instance in compute_instances:
+                    log.debug(f'instance:{instance}')
+                    if instance['instances'][0]['attributes']['name'] == hostname:
+                        this_host = instance
+                        break
+                if this_host is not None:
+                    return f'<a href="https://{instance["instances"][0]["attributes"]["access_ip_v4"]}:8000">{hostname}</a>'
+                else:
+                    return hostname
+            else:
+                return hostname
 
 
 
     @method_trace
     def do_GET(self):
         try:
-            if not TerraformServer._state_cache.valid():
-                TerraformServer._state_cache.update(
-                    build_state.get_state(build_state.base_path))
             self.send_response(200)
             log.debug(f'self.path:{self.path}')
             if self.path == '/tfstate':
                 self.send_header("Content-type", "application/json")
                 self.end_headers()
-                self.do_tfstate(TerraformServer._state_cache.get())
+                self.do_tfstate()
             elif self.path == '/topology':
                 self.send_header("Content-type", "text/html")
                 self.end_headers()
-                self.do_topology(TerraformServer._state_cache.get())
+                self.do_topology()
             elif self.path == '/monitor/health_score':
                 self.send_header("Content-type", "text/html")
                 self.end_headers()
@@ -198,11 +211,12 @@ class TerraformServer(BaseHTTPRequestHandler):
             raise
 
     @method_trace
-    def do_tfstate(self, data):
+    def do_tfstate(self):
+        data=TerraformServer._state_cache.get()
         self.wfile.write(bytes(json.dumps(data), "utf-8"))
 
     @method_trace
-    def do_topology(self, data):
+    def do_topology(self):
         self.wfile.write(bytes("<!DOCTYPE html>", "utf-8"))
         self.wfile.write(bytes("<html>", "utf-8"))
 
@@ -219,7 +233,7 @@ class TerraformServer(BaseHTTPRequestHandler):
             </style>", "utf-8"))
         self.wfile.write(bytes("</head>", "utf-8"))
 
-        self.do_body(data)
+        self.do_topology_body()
 
         self.wfile.write(bytes("</html>", "utf-8"))
 
@@ -286,15 +300,15 @@ class TerraformServer(BaseHTTPRequestHandler):
         self.wfile.write(bytes('</html>', coding))
 
     @method_trace
-    def do_body(self, data):
+    def do_topology_body(self):
         self.wfile.write(bytes("<body>", "utf-8"))
 
         self.wfile.write(
             bytes("<h1>Splunk environment overview</h1>", "utf-8"))
-        for tenant in sorted(data.keys()):
+        for tenant in sorted(TerraformServer._state_cache.get().keys()):
             self.wfile.write(bytes(f'<h2>Tenant {tenant}</h2>', "utf-8"))
 
-            self.do_tenant(data[tenant], tenant)
+            self.do_topology_tenant(tenant)
 
         self.wfile.write(
             bytes(f'<footer>Created with &hearts; on {socket.gethostname()} showing live terraform data as of {time.asctime(time.localtime(round(TerraformServer._state_cache.issue())))}</footer>', "utf-8"))
@@ -302,27 +316,33 @@ class TerraformServer(BaseHTTPRequestHandler):
         self.wfile.write(bytes("</body>", "utf-8"))
 
     @method_trace
-    def do_tenant(self, data, tenant):
-        del data['shared']
+    def do_topology_tenant(self, tenant):
+        data = TerraformServer._state_cache.get()[tenant]
+
+        stages = sorted([key for key in data.keys()])
+        stages.remove('shared')
+
         self.wfile.write(bytes("<table>", "utf-8"))
 
         self.wfile.write(bytes("<tr>", "utf-8"))
-        for stage in sorted(data.keys()):
-            self.wfile.write(
-                bytes(f'<th width=180>Stage {stage}</th>', "utf-8"))
+        for stage in stages:
+                self.wfile.write(
+                    bytes(f'<th width=180>Stage {stage}</th>', "utf-8"))
         self.wfile.write(bytes("</tr>", "utf-8"))
 
         self.wfile.write(bytes("<tr>", "utf-8"))
-        for stage in sorted(data.keys()):
+        for stage in stages:
             self.wfile.write(bytes("<td>", "utf-8"))
-            self.do_stage(data[stage], tenant)
+            self.do_topology_stage(tenant, stage)
             self.wfile.write(bytes("</td>", "utf-8"))
         self.wfile.write(bytes("</tr>", "utf-8"))
 
         self.wfile.write(bytes("</table>", "utf-8"))
 
     @method_trace
-    def do_stage(self, data, tenant):
+    def do_topology_stage(self, tenant, stage):
+        data = TerraformServer._state_cache.get()[tenant][stage]
+
         self.wfile.write(bytes("<table>", "utf-8"))
 
         try:
@@ -339,7 +359,7 @@ class TerraformServer(BaseHTTPRequestHandler):
                     instance_dict[i_name]['flavor'] = instance['instances'][0]['attributes']['flavor_id']
                 for i_name in sorted(instance_dict.keys()):
                     self.wfile.write(bytes("<tr><td>", "utf-8"))
-                    self.wfile.write(bytes(f'<b>{self.hostname_to_link(i_name, tenant)}</b><br>', "utf-8"))
+                    self.wfile.write(bytes(f'<b>{self.hostname_to_link(i_name, tenant, stage)}</b><br>', "utf-8"))
                     self.wfile.write(bytes(f'{instance_dict[i_name]["ip"]}<br>', "utf-8"))
                     self.wfile.write(bytes(f'{instance_dict[i_name]["az"]}<br>', "utf-8"))
                     self.wfile.write(bytes(f'{instance_dict[i_name]["flavor"]}<br>', "utf-8"))
