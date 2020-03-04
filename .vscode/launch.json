@@ -14,8 +14,9 @@
             "cwd": "${workspaceFolder}/bin",
             "serverReadyAction": {
                 "pattern": "Server listening on",
-                "uriFormat": "http://localhost:8081/topology",
-                "action": "debugWithChrome"
+                "uriFormat": "http://localhost:8081/monitor/health_score",
+                "action": "openExternally",
+                //"action": "debugWithChrome",
               }
         }
     ]
