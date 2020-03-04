@@ -19,21 +19,12 @@ import traceback
 
 import build_state
 
-hostName = "0.0.0.0"
-serverPort = 8080
+listen_ip = "0.0.0.0"
+listen_port = 8080
 
 log = logging.getLogger(__name__)
 # set to DEBUG for early-stage debugging
 log.setLevel(logging.INFO)
-
-try:
-    base_path = os.path.normpath(
-        os.path.join(os.path.dirname(os.path.realpath(__file__)), '..'))
-    log.debug(f'base_path: {base_path}')
-except:
-    raise
-
-sys.path.append(os.path.realpath(__file__))
 
 
 def method_trace(fn):
@@ -41,7 +32,9 @@ def method_trace(fn):
 
     @wraps(fn)
     def wrapper(*my_args, **my_kwargs):
-        log.debug(f'>>> {fn.__name__}({inspect.getargspec(fn)} ; {my_args} ; {my_kwargs})')
+        log.debug(
+            f'>>> {fn.__name__}({inspect.getargspec(fn)} ; {my_args} ; {my_kwargs})'
+        )
         out = fn(*my_args, **my_kwargs)
         log.debug(f'<<< {fn.__name__}')
         return out
@@ -86,21 +79,19 @@ def init_parser():
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('--debug', action='store_true',
                         help='Turn on debug output')
-    parser.add_argument('--listen', nargs='?', default=hostName,
+    parser.add_argument('--listen', nargs='?', default=listen_ip,
                         help='Listen on specified IP')
-    parser.add_argument('--port', nargs='?', default=serverPort,
+    parser.add_argument('--port', nargs='?', default=listen_port,
                         type=int, help='Listen on specified TCP port')
     return parser
 
 
-@method_trace
-def start_server():
-    webServer = HTTPServer((hostName, serverPort), TerraformServer)
-    print(f'Server started http://{hostName}:{serverPort}')
-    return webServer
-
-
 class StateCache():
+    """
+    A container which caches the terraform data for a short period of time so
+    that it does not need to be rebuilt with every HTTP GET request.
+    Mainly a measure against DoS.
+    """
     @method_trace
     def __init__(self):
         self._state = {}
@@ -108,6 +99,7 @@ class StateCache():
 
     @method_trace
     def _is_valid(self):
+        # invalidate cache after several seconds
         is_valid = (round(time.time()) - self._last_update) < 15
         return is_valid
 
@@ -193,22 +185,28 @@ class TerraformServer(BaseHTTPRequestHandler):
                 self.send_header("Content-type", "application/json")
                 self.end_headers()
                 self.do_tfstate()
-            elif self.path == '/topology':
-                self.send_header("Content-type", "text/html")
-                self.end_headers()
-                self.do_topology()
             elif self.path == '/monitor/health_score':
                 self.send_header("Content-type", "text/html")
                 self.end_headers()
                 self.do_monitor()
+            elif self.path == '/topology':
+                self.send_header("Content-type", "text/html")
+                self.end_headers()
+                self.do_topology()
             else:
                 self.send_header("Content-type", "text/html")
                 self.end_headers()
                 self.wfile.write(bytes(
-                    "<!DOCTYPE html><html><body>Cannot handle this. Humans please use <a href='/topology'>/topology</a>, machines use <a href='/tfstate'>/tfstate</a> and monitors use <a href='/monitor/health_score'>/monitor/health_score</a></body></html>", "utf-8"))
+                    "<!DOCTYPE html><html><body>Cannot handle this. Humans please use <a href='/topology'>/topology</a>, machines use <a href='/tfstate'>/tfstate</a> and monitors use <a href='/monitor/health_score'>/monitor/health_score</a></body></html>", "utf-8")) #yapf: disable
+        except requests.exceptions.HTTPError as http_err:
+            self.send_error(http_err.response.status_code,
+                            f'{http_err.__class__.__name__} occured',
+                            f'{traceback.format_exc()}')
+            log.exception(http_err)
         except Exception as err:
-            self.send_error(500, f'Python {err.__class__.__name__} exception', f'Unexpected error: {traceback.format_exc()}')
-            raise
+            self.send_error(500, f'Python {err.__class__.__name__} exception',
+                            f'Unexpected error: {traceback.format_exc()}')
+            log.exception(err)
 
     @method_trace
     def do_tfstate(self):
@@ -216,31 +214,9 @@ class TerraformServer(BaseHTTPRequestHandler):
         self.wfile.write(bytes(json.dumps(data), "utf-8"))
 
     @method_trace
-    def do_topology(self):
-        self.wfile.write(bytes("<!DOCTYPE html>", "utf-8"))
-        self.wfile.write(bytes("<html>", "utf-8"))
-
-        self.wfile.write(bytes("<head>", "utf-8"))
-        self.wfile.write(bytes("<title>Splunk Overview</title>", "utf-8"))
-        self.wfile.write(bytes("\
-            <style>\
-                body       {font-family: verdana;}\
-                h1         {color: green;}\
-                table      {border-collapse: collapse; font-size: small;}\
-                tr, th, td {text-align: left; vertical-align: top; border: 1px solid; padding: 2px; padding-left: 30px;; padding-right: 30px;}\
-                tr         {text-align: left; vertical-align: top; border: 1px solid;}\
-                footer     {padding: 10px; color: lightgrey; font-size: small;}\
-            </style>", "utf-8"))
-        self.wfile.write(bytes("</head>", "utf-8"))
-
-        self.do_topology_body()
-
-        self.wfile.write(bytes("</html>", "utf-8"))
-
-    @method_trace
     def do_monitor(self):
         coding = 'utf-8'
-        user = 'functional_user_monitor'
+        user = 'fsspl06'
         password = 'functional_user_monitor'
         splunk_app = 'itsi'
         splunk_auth = requests.auth.HTTPBasicAuth(user, password)
@@ -249,22 +225,12 @@ class TerraformServer(BaseHTTPRequestHandler):
         splunkREST_savedSearches = f'/servicesNS/{user}/{splunk_app}/search/jobs/export'
         splunkURL = f'https://search.splunk.sbb.ch:8089{splunkREST_savedSearches}'
 
-        #TODO: This should probably rather re-raise the exception like in do_GET(). Logging output is not visible to the HTTP client
-        try:
-            resp = requests.get(splunkURL, auth=splunk_auth, params=splunk_search_params)
-            resp.raise_for_status()
-        except requests.exceptions.HTTPError as http_err:
-            log.error(f'HTTP error occurred: {http_err}')
-        except Exception as err:
-            log.error(f'Genneric error occured: {err}')
+        resp = requests.get(splunkURL, auth=(splunk_auth), params=splunk_search_params)
+        resp.raise_for_status()
         log.info(f'HTTP {resp.status_code} for URL: {resp.url}')
 
-        try:
-            data_json = resp.json()
-            log.debug(f'HTTP output (JSON): {data_json}')
-        except ValueError:
-            log.error(f'ValueError decoding Splunk response "{resp.text}"')
-
+        data_json = resp.json()
+        log.debug(f'HTTP output (JSON): {data_json}')
         result_health_score_str = data_json['result']['health_score']
 
         #Interpret if Splunk is healthy, providing service, based on result_health_score_str value
@@ -300,6 +266,29 @@ class TerraformServer(BaseHTTPRequestHandler):
         self.wfile.write(bytes('</html>', coding))
 
     @method_trace
+    def do_topology(self):
+        self.wfile.write(bytes("<!DOCTYPE html>", "utf-8"))
+        self.wfile.write(bytes("<html>", "utf-8"))
+
+        self.wfile.write(bytes("<head>", "utf-8"))
+        self.wfile.write(bytes("<title>Splunk Overview</title>", "utf-8"))
+        self.wfile.write(bytes("\
+            <style>\
+                body       {font-family: verdana;}\
+                h1         {color: green;}\
+                table      {border-collapse: collapse; font-size: small;}\
+                tr, th, td {text-align: left; vertical-align: top; border: 1px solid; padding: 2px; padding-left: 30px;; padding-right: 30px;}\
+                tr         {text-align: left; vertical-align: top; border: 1px solid;}\
+                footer     {padding: 10px; color: lightgrey; font-size: small;}\
+            </style>"                                                                                                                                                   , "utf-8"))
+        self.wfile.write(bytes("</head>", "utf-8"))
+
+        self.do_topology_body()
+
+        self.wfile.write(bytes("</html>", "utf-8"))
+
+
+    @method_trace
     def do_topology_body(self):
         self.wfile.write(bytes("<body>", "utf-8"))
 
@@ -326,8 +315,8 @@ class TerraformServer(BaseHTTPRequestHandler):
 
         self.wfile.write(bytes("<tr>", "utf-8"))
         for stage in stages:
-                self.wfile.write(
-                    bytes(f'<th width=180>Stage {stage}</th>', "utf-8"))
+            self.wfile.write(
+                bytes(f'<th width=180>Stage {stage}</th>', "utf-8"))
         self.wfile.write(bytes("</tr>", "utf-8"))
 
         self.wfile.write(bytes("<tr>", "utf-8"))
@@ -378,20 +367,22 @@ if __name__ == "__main__":
     if args.debug:
         log.setLevel(logging.DEBUG)
     if args.port:
-        serverPort = args.port
+        listen_port = args.port
     if args.listen:
-        hostName = args.listen
+        listen_ip = args.listen
 
     log.debug(f'sys.argv: {sys.argv}')
     log.debug(f'args: {args}')
 
-    web_server = HTTPServer((hostName, serverPort), TerraformServer)
-    log.info(f'Server listening on {hostName}:{serverPort}')
+    web_server = HTTPServer((listen_ip, listen_port), TerraformServer)
+    log.info(f'Server listening on {listen_ip}:{listen_port}')
 
     try:
+        ret_code = 1
         web_server.serve_forever()
     except KeyboardInterrupt:
-        pass
-
-    web_server.server_close()
-    log.info("Server stopped.")
+        ret_code = 0
+    finally:
+        web_server.server_close()
+        log.info("Server stopped.")
+        sys.exit(ret_code)
