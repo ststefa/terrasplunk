@@ -153,8 +153,6 @@ class TerraformServer(BaseHTTPRequestHandler):
                     return f'<a href="https://{type_table[ecs_type]}.{domain}">{hostname}</a>'
                 else:
                     return f'<a href="https://{type_table[ecs_type]}-{stage_table[ecs_stage]}.{domain}">{hostname}</a>'
-            else:
-                return hostname
         else:
             if ecs_type == "hf" or ecs_type in type_table.keys():
                 data = TerraformServer._state_cache.get()[tenant][stage]
@@ -169,10 +167,8 @@ class TerraformServer(BaseHTTPRequestHandler):
                         break
                 if this_host is not None:
                     return f'<a href="https://{instance["instances"][0]["attributes"]["access_ip_v4"]}:8000">{hostname}</a>'
-                else:
-                    return hostname
-            else:
-                return hostname
+        # if nothing of the above did apply then return just the simple hostname without any HTML
+        return hostname
 
 
 
