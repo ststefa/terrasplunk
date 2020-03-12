@@ -84,7 +84,7 @@ def init_parser():
                         help='Listen on specified IP')
     parser.add_argument('--port', nargs='?', default=listen_port,
                         type=int, help='Listen on specified TCP port')
-    parser.add_argument('--password', nargs='?', defautl=password,
+    parser.add_argument('--password', nargs='?', default=password,
                         help='Password for Splunk REST user')
     return parser
 
