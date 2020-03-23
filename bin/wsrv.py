@@ -21,6 +21,7 @@ import build_state
 
 listen_ip = "0.0.0.0"
 listen_port = 8080
+user = 'to_be_replaced_as_arg'
 password = 'to_be_replaced_as_arg'
 
 log = logging.getLogger(__name__)
@@ -84,7 +85,9 @@ def init_parser():
                         help='Listen on specified IP')
     parser.add_argument('--port', nargs='?', default=listen_port,
                         type=int, help='Listen on specified TCP port')
-    parser.add_argument('--password', nargs='?', default=password,
+    parser.add_argument('--user', nargs='?', default=user, required=True,
+                        help='Splunk REST user')
+    parser.add_argument('--password', nargs='?', default=password, required=True,
                         help='Password for Splunk REST user')
     return parser
 
@@ -215,8 +218,6 @@ class TerraformServer(BaseHTTPRequestHandler):
     @method_trace
     def do_monitor(self):
         coding = 'utf-8'
-        user = 'fsspl06'
-        password = 'functional_user_monitor'
         splunk_app = 'itsi'
         splunk_auth = requests.auth.HTTPBasicAuth(user, password)
         splunk_search = f"|inputlookup itsi_entities| search title!=splh0* AND title!=splw0* " \
@@ -372,6 +373,8 @@ if __name__ == "__main__":
         listen_port = args.port
     if args.listen:
         listen_ip = args.listen
+    if args.user:
+        user = args.user
     if args.password:
         password = args.password
 
