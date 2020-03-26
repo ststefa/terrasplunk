@@ -85,9 +85,9 @@ def init_parser():
                         help='Listen on specified IP')
     parser.add_argument('--port', nargs='?', default=listen_port,
                         type=int, help='Listen on specified TCP port')
-    parser.add_argument('--user', nargs='?', default=user,
+    parser.add_argument('--user', nargs=1, default=user, required=True,
                         help='Splunk REST user')
-    parser.add_argument('--password', nargs='?', default=password,
+    parser.add_argument('--password', nargs=1, default=password, required=True,
                         help='Password for Splunk REST user')
     return parser
 
@@ -374,9 +374,9 @@ if __name__ == "__main__":
     if args.listen:
         listen_ip = args.listen
     if args.user:
-        user = args.user
+        user = args.user[0]
     if args.password:
-        password = args.password
+        password = args.password[0]
 
     log.debug(f'sys.argv: {sys.argv}')
     log.debug(f'args: {args}')
