@@ -128,39 +128,86 @@ class StateCache():
 class TerraformServer(BaseHTTPRequestHandler):
     _state_cache = StateCache()
 
+    type_table = {
+        "cm": "clmaster",
+        "dp": "deployer",
+        "ds": "dpserver",
+        "es": "siem",
+        "lm": "license",
+        "mt": "deployer",
+        "sh": "search",
+        "si": "search-uat", #ugly hack because there is not u0 stage anymore
+    }
+    stage_table = {
+        "d0": "dev",
+        "g0": "global",
+        "h0": "historic",
+        "p0": "prod",
+        "t0": "test",
+        "w0": "pg",
+    }
+    role_table = {
+        "ao": ["all-in-one"],
+        "bd": ["builder"],
+        "cm": ["clustermaster", "monitoring-console"],
+        "dp": ["deployer"],
+        "ds": ["deployment-server"],
+        "es": ["entp-searchhead"],
+        "hf": ["heavyforwarder"],
+        "it": ["itsi-searchhead"],
+        "ix": ["indexer"],
+        "lm": ["licensemaster"],
+        "mc": ["monitoring-console"],
+        "mt": ["deployer", "deployment-server"],
+        "pr": ["syslog", "heavyforwarder"],
+        "sh": ["searchhead"],
+        "si": ["single-searchhead"],
+        "sy": ["syslog"],
+    }
+    hardware_table = {
+        "2xlarge.1": "8 GB |  8 vCPU",
+        "2xlarge.2": "16 GB |  8 vCPU",
+        "2xlarge.4": "32 GB |  8 vCPU",
+        "2xlarge.8": "64 GB |  8 vCPU",
+        "4xlarge.1": "16 GB | 16 vCPU",
+        "4xlarge.2": "32 GB | 16 vCPU",
+        "4xlarge.4": "64 GB | 16 vCPU",
+        "4xlarge.8": "128 GB | 16 vCPU",
+        "8xlarge.1": "32 GB | 32 vCPU",
+        "8xlarge.2": "64 GB | 32 vCPU",
+        "8xlarge.4": "128 GB | 32 vCPU",
+        "8xlarge.8": "256 GB | 32 vCPU",
+        "large.1": "2 GB |  2 vCPU",
+        "large.2": "4 GB |  2 vCPU",
+        "large.4": "8 GB |  2 vCPU",
+        "large.8": "16 GB |  2 vCPU",
+        "medium.1": "1 GB |  1 vCPU",
+        "medium.2": "2 GB |  1 vCPU",
+        "medium.4": "4 GB |  1 vCPU",
+        "medium.8": "8 GB |  1 vCPU",
+        "xlarge.1": "4 GB |  4 vCPU",
+        "xlarge.2": "8 GB |  4 vCPU",
+        "xlarge.4": "16 GB |  4 vCPU",
+        "xlarge.8": "32 GB |  4 vCPU",
+    }
+
     @method_trace
     def hostname_to_link(self, hostname, tenant, stage):
         domain="splunk.sbb.ch"
         ecs_type=hostname[5:7]
         ecs_stage=hostname[3:5]
         ecs_number=hostname[7:]
-        type_table = {
-            "cm": "clmaster",
-            "dp": "deployer",
-            "ds": "dpserver",
-            "es": "siem",
-            "lm": "license",
-            "mt": "deployer",
-            "sh": "search",
-            "si": "search-uat", #ugly hack because there is not u0 stage anymore
-        }
-        stage_table = {
-            "g0": "global",
-            "p0": "prod",
-            "t0": "test",
-            "w0": "pg",
-        }
 
         if tenant=="tsch_rz_p_001":
             if ecs_type == "hf":
-                return f'<a href="https://{ecs_type}{ecs_number}-{stage_table[ecs_stage]}.{domain}">{hostname}</a>'
-            if ecs_type in type_table.keys():
+                return f'<a href="https://{ecs_type}{ecs_number}-{TerraformServer.stage_table[ecs_stage]}.{domain}">{hostname}</a>'
+            if ecs_type in TerraformServer.type_table.keys():
                 if ecs_type == "si":
-                    return f'<a href="https://{type_table[ecs_type]}.{domain}">{hostname}</a>'
+                    return f'<a href="https://{TerraformServer.type_table[ecs_type]}.{domain}">{hostname}</a>'
                 else:
-                    return f'<a href="https://{type_table[ecs_type]}-{stage_table[ecs_stage]}.{domain}">{hostname}</a>'
+                    return f'<a href="https://{TerraformServer.type_table[ecs_type]}-{TerraformServer.stage_table[ecs_stage]}.{domain}">{hostname}</a>'
         else:
-            if ecs_type == "hf" or ecs_type in type_table.keys():
+            if ecs_type == "hf" or ecs_type in TerraformServer.type_table.keys():
                 data = TerraformServer._state_cache.get()[tenant][stage]
 
                 # find host in json data
@@ -280,7 +327,7 @@ class TerraformServer(BaseHTTPRequestHandler):
                 body       {font-family: verdana;}\
                 h1         {color: green;}\
                 table      {border-collapse: collapse; font-size: small;}\
-                tr, th, td {text-align: left; vertical-align: top; border: 1px solid; padding: 2px; padding-left: 30px;; padding-right: 30px;}\
+                tr, th, td {text-align: left; vertical-align: top; border: 1px solid; padding: 2px; padding-left: 10px;; padding-right: 10px;}\
                 tr         {text-align: left; vertical-align: top; border: 1px solid;}\
                 footer     {padding: 10px; color: lightgrey; font-size: small;}\
             </style>"                                                                                                                                                   , "utf-8"))
@@ -319,7 +366,7 @@ class TerraformServer(BaseHTTPRequestHandler):
         self.wfile.write(bytes("<tr>", "utf-8"))
         for stage in stages:
             self.wfile.write(
-                bytes(f'<th width=180>Stage {stage}</th>', "utf-8"))
+                bytes(f'<th width=200>{TerraformServer.stage_table[stage]}</th>', "utf-8"))
         self.wfile.write(bytes("</tr>", "utf-8"))
 
         self.wfile.write(bytes("<tr>", "utf-8"))
@@ -347,14 +394,22 @@ class TerraformServer(BaseHTTPRequestHandler):
                     i_name = instance['instances'][0]['attributes']['name']
                     instance_dict[i_name] = {}
                     instance_dict[i_name]['ip'] = instance['instances'][0]['attributes']['access_ip_v4']
+                    instance_dict[i_name]['id'] = instance['instances'][0]['attributes']['id']
                     instance_dict[i_name]['az'] = instance['instances'][0]['attributes']['availability_zone']
                     instance_dict[i_name]['flavor'] = instance['instances'][0]['attributes']['flavor_id']
                 for i_name in sorted(instance_dict.keys()):
+                    i_type=i_name[5:7]
+                    i_ip=instance_dict[i_name]["ip"]
+                    i_az=instance_dict[i_name]["az"]
+                    i_flavor=TerraformServer.hardware_table[instance_dict[i_name]["flavor"][3:]]
+                    i_id=instance_dict[i_name]["id"]
                     self.wfile.write(bytes("<tr><td>", "utf-8"))
                     self.wfile.write(bytes(f'<b>{self.hostname_to_link(i_name, tenant, stage)}</b><br>', "utf-8"))
-                    self.wfile.write(bytes(f'{instance_dict[i_name]["ip"]}<br>', "utf-8"))
-                    self.wfile.write(bytes(f'{instance_dict[i_name]["az"]}<br>', "utf-8"))
-                    self.wfile.write(bytes(f'{instance_dict[i_name]["flavor"]}<br>', "utf-8"))
+                    self.wfile.write(bytes(f'ip: {i_ip}<br>', "utf-8"))
+                    self.wfile.write(bytes(f'az: {i_az}<br>', "utf-8"))
+                    self.wfile.write(bytes(f'fl: {i_flavor}<br>', "utf-8"))
+                    self.wfile.write(bytes(f'rl: {", ".join(TerraformServer.role_table[i_type])}<br>', "utf-8"))
+                    self.wfile.write(bytes(f'id: {i_id}<br>', "utf-8"))
                     self.wfile.write(bytes('</td></tr>', "utf-8"))
         except Exception as e:
             log.warn(f'Creating stage failed with {e}')
