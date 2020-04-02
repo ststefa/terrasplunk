@@ -9,7 +9,7 @@
             "type": "python",
             "request": "launch",
             "program": "wsrv.py",
-            "args": ["--port", "8081"],
+            "args": ["--port", "8082", "--user", "myuser", "--password", "mypassword", "--health_score_watermark", "70"],
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}/bin",
             "serverReadyAction": {
