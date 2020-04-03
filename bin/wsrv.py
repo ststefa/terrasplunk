@@ -341,7 +341,7 @@ class TerraformServer(BaseHTTPRequestHandler):
             resp.raise_for_status()
             log.info(f'HTTP {resp.status_code} for URL: {resp.url}')
 
-            result1 = json.loads(resp.content)['result']['header'][2:]    # string from JSON
+            result1 = json.loads(resp.content)['result']['header'][2:]    # string from JSON, skip b'
             result2 = base64.b64decode(result1)                           # bytes
             result3 = result2.decode()                                    # string with inner JSON
             data_json = json.loads(result3)
