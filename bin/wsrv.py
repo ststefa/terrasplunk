@@ -16,6 +16,7 @@ import socket
 import sys
 import time
 import traceback
+import base64
 
 import build_state
 
@@ -245,6 +246,10 @@ class TerraformServer(BaseHTTPRequestHandler):
                 self.send_header("Content-type", "text/html")
                 self.end_headers()
                 self.do_topology()
+            elif self.path.startswith('/investigate'):
+                self.send_header("Content-type", "text/html")
+                self.end_headers()
+                self.do_investigate(self.path.split('/investigate/')[1])
             else:
                 self.send_header("Content-type", "text/html")
                 self.end_headers()
@@ -313,6 +318,59 @@ class TerraformServer(BaseHTTPRequestHandler):
         self.wfile.write(bytes('<h1>Interpretation of this output</h1>', coding))
         self.wfile.write(bytes(f'<p>health_score (after converted to float) = {result_health_score}, watermark = {health_score_watermark} ; therefore ...</p>', coding))
         self.wfile.write(bytes(f'<p><b>{interpreted_splunk_health}</b></p>', coding))
+        self.wfile.write(bytes('</body>', coding))
+
+        #HTML End
+        self.wfile.write(bytes('</html>', coding))
+
+    @method_trace
+    def do_investigate(self, server):
+        coding = 'utf-8'
+        splunk_auth = requests.auth.HTTPBasicAuth(user, password)
+        splunkREST_endpoint = f'/servicesNS/{user}/itsi/search/jobs/export'
+        splunk_sh = 'search.splunk.sbb.ch'
+        splunk_search = f'|makeresults | eval server="{server}" | tschcheckserverhealthdetail'
+        splunk_search_params = {'output_mode': 'json', 'search': f'{splunk_search}'}
+        splunkURL = f'https://{splunk_sh}:8089{splunkREST_endpoint}'
+
+        url='error'
+        data_json='error'
+        error_string = ''
+        try:
+            resp = requests.get(splunkURL, auth=(splunk_auth), params=splunk_search_params, timeout=5)
+            resp.raise_for_status()
+            log.info(f'HTTP {resp.status_code} for URL: {resp.url}')
+
+            result1 = json.loads(resp.content)['result']['header'][2:]    # string from JSON
+            result2 = base64.b64decode(result1)                           # bytes
+            result3 = result2.decode()                                    # string with inner JSON
+            data_json = json.loads(result3)
+            log.debug(f'HTTP output (JSON): {data_json}')
+            url=resp.url
+        except requests.exceptions.HTTPError as http_err:
+            log.error(f'Error trying to communicate to {server}: {http_err}')
+            error_string=str(http_err)
+        except Exception as err:
+            log.error(f'Error trying to communicate to {server}: {err}')
+            error_string=str(err)
+        except ValueError as err:
+            log.error(f'Error trying to communicate to {server}')
+            error_string=str(err)
+
+        #HTML Header
+        self.wfile.write(bytes('<!DOCTYPE html>', coding))
+        self.wfile.write(bytes('<html>', coding))
+        self.wfile.write(bytes('<head><title>Splunk Investigator</title></head>', coding))
+
+        #HTML Body
+        self.wfile.write(bytes(f'<body>', coding))
+        self.wfile.write(bytes('<h1>Input to Splunk</h1>', coding))
+        self.wfile.write(bytes(f'<p>REST call: <a href="{url}">{url}</a></p>', coding))
+        self.wfile.write(bytes('<h1>Output from Splunk</h1>', coding))
+        if data_json == 'error':
+            self.wfile.write(bytes(f'<p><pre>{error_string}</pre></p>', coding))
+        else:
+            self.wfile.write(bytes(f'<p><pre>{json.dumps(data_json, indent=4)}</pre></p>', coding))
         self.wfile.write(bytes('</body>', coding))
 
         #HTML End
