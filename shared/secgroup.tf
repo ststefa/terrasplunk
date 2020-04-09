@@ -80,7 +80,6 @@ resource "opentelekomcloud_compute_secgroup_v2" "base-secgrp" {
 }
 
 resource "opentelekomcloud_compute_secgroup_v2" "indexer-secgrp" {
-  # TODO: Extend/fix ports, see splunk doc above
   name        = "${local.project}-indexer-secgrp"
   description = "Specific rules for ${local.project} indexer instances"
 
@@ -99,6 +98,11 @@ resource "opentelekomcloud_compute_secgroup_v2" "indexer-secgrp" {
     ip_protocol = "tcp"
     cidr        = "0.0.0.0/0"
   }
+}
+
+resource "opentelekomcloud_compute_secgroup_v2" "hec-secgrp" {
+  name        = "${local.project}-hec-secgrp"
+  description = "Specific rules for ${local.project} HEC (HTTPS) input"
 
   # HEC Indexer, Receiving data from HTTP (ssl)
   rule {
@@ -110,7 +114,6 @@ resource "opentelekomcloud_compute_secgroup_v2" "indexer-secgrp" {
 }
 
 resource "opentelekomcloud_compute_secgroup_v2" "searchhead-secgrp" {
-  # TODO: Extend/fix ports, see splunk doc above
   name        = "${local.project}-searchhead-secgrp"
   description = "Specific rules for ${local.project} searchhead instances"
 
