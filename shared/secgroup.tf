@@ -99,6 +99,12 @@ resource "opentelekomcloud_compute_secgroup_v2" "indexer-secgrp" {
     ip_protocol = "tcp"
     cidr        = "0.0.0.0/0"
   }
+}
+
+resource "opentelekomcloud_compute_secgroup_v2" "hec-secgrp" {
+  # TODO: Extend/fix ports, see splunk doc above
+  name        = "${local.project}-hec-secgrp"
+  description = "Specific rules for ${local.project} HEC (HTTPS) input"
 
   # HEC Indexer, Receiving data from HTTP (ssl)
   rule {
