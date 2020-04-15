@@ -1,5 +1,6 @@
 {
     "recommendations": [
+        "alanwalk.markdown-toc",
         "davidanson.vscode-markdownlint",
         "mauve.terraform",
         "ms-python.python",
