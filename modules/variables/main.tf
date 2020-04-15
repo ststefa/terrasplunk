@@ -1,13 +1,4 @@
-# This idea has been dropped in favor of a fixed 1:1 relation. Keeping for reference
-#variable stage_map {
-#  description = "Assign workspace names (lval) to stage names (rval). There might be more workspaces than stages!"
-#  type = map
-#  default = {
-#    spielwiese     = "spielwiese"
-#  }
-#}
-
-# TODO: Using mod.variables in both stages and shared causes quirks. Maybe refactor into two separate variable modules.
+# TODO: Using mod.variables in both stages and shared causes quirks because shared does not have a stage. Maybe refactor into two separate variable modules.
 # - One which takes tenant/stage as input and is (exclusively) used in stages
 # - Another one which takes tenant as input and is (exclusively) used in shared. Shared currently only really uses it for provider auth to get tenant name
 
@@ -25,18 +16,38 @@ output "tenant" {
   value       = var.tenant_map[var.workspace]
 }
 
-variable "shared_statefile_map" {
-  # TODO: needs different concept if we go to remote state
-  description = "1:1 assignment from workspace name to terraform state filename"
+# Used for local state files. Obsolete when using S3 remote state
+#variable "shared_statefile_map" {
+#  description = "1:1 assignment from workspace name to terraform state filename"
+#  type        = map
+#  default = {
+#    default    = "../../shared/terraform.tfstate"
+#    production = "../../shared/terraform.tfstate.d/production/terraform.tfstate"
+#  }
+#}
+#output "shared_statefile" {
+#  description = "Terraform state filename for current workspace"
+#  value       = var.shared_statefile_map[var.workspace]
+#}
+
+# autoselect the proper S3 remote state. Terraform does not interpolate this by workspace automatically
+variable "s3_shared_config_map" {
+  description = "1:1 assignment from workspace name to S3 state filename"
   type        = map
   default = {
-    default    = "../../shared/terraform.tfstate"
-    production = "../../shared/terraform.tfstate.d/production/terraform.tfstate"
+    default    = "shared.tfstate"
+    production = "env:/production/shared.tfstate"
   }
 }
-output "shared_statefile" {
-  description = "Terraform state filename for current workspace"
-  value       = var.shared_statefile_map[var.workspace]
+output "s3_shared_config" {
+  description = "Connection properties for accessing S3 shared state file"
+  value = {
+    profile        = "sbb-splunk"
+    bucket         = "sbb-splunkterraform-prod"
+    region         = "eu-central-1"
+    key            = var.s3_shared_config_map[var.workspace]
+    dynamodb_table = "splunkterraform"
+  }
 }
 
 variable "sbb_infrastructure_stage_map" {
