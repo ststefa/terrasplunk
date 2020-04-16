@@ -5,5 +5,7 @@
         "mauve.terraform",
         "ms-python.python",
         "msjsdiag.debugger-for-chrome",
+        "rogalmic.bash-debug",
+        "timonwong.shellcheck",
     ]
 }
