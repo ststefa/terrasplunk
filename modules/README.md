@@ -3,10 +3,10 @@
 <!-- TOC -->
 
 - [terraform modules](#terraform-modules)
-    - [`core`](#core)
-    - [`genericecs`](#genericecs)
-    - [`ix`, `sh`, etc](#ix-sh-etc)
-    - [`variables`](#variables)
+  - [`core`](#core)
+  - [`genericecs`](#genericecs)
+  - [`ix`, `sh`, etc](#ix-sh-etc)
+  - [`variables`](#variables)
 
 <!-- /TOC -->
 

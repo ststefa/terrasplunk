@@ -25,5 +25,6 @@
     "terraform.paths": [
         "shared/",
         "stages/*/",
-    ]
+    ],
+    "restructuredtext.confPath": "",
 }

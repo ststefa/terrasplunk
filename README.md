@@ -1,30 +1,31 @@
-
 # Splunk> hardware layer
+
 <!-- TOC -->
 
 - [Splunk> hardware layer](#splunk-hardware-layer)
-    - [Overview](#overview)
-    - [Prerequisites](#prerequisites)
-    - [Code architecture](#code-architecture)
-        - [Preconditions](#preconditions)
-        - [Design goals](#design-goals)
-        - [Project layout](#project-layout)
-    - [Usage](#usage)
-        - [General](#general)
-        - [Terraform usage](#terraform-usage)
-        - [To get started with this project](#to-get-started-with-this-project)
-            - [on the test tenant](#on-the-test-tenant)
-            - [on the production tenant](#on-the-production-tenant)
-    - [Provisioning](#provisioning)
-        - [Thoughts on provisioning](#thoughts-on-provisioning)
-        - [Implementation](#implementation)
-    - [Contributing](#contributing)
-    - [Open Points (notes to self)](#open-points-notes-to-self)
-        - [Asymetry between tenants](#asymetry-between-tenants)
-        - [Duplicate hostnames](#duplicate-hostnames)
-        - [New resource-level for_each meta-argument](#new-resource-level-for_each-meta-argument)
+  - [Overview](#overview)
+  - [Prerequisites](#prerequisites)
+  - [Code architecture](#code-architecture)
+    - [Preconditions](#preconditions)
+    - [Design goals](#design-goals)
+    - [Project layout](#project-layout)
+  - [Usage](#usage)
+    - [General](#general)
+    - [Terraform usage](#terraform-usage)
+    - [To get started with this project](#to-get-started-with-this-project)
+      - [on the test tenant](#on-the-test-tenant)
+      - [on the production tenant](#on-the-production-tenant)
+  - [Provisioning](#provisioning)
+    - [Thoughts on provisioning](#thoughts-on-provisioning)
+    - [Implementation](#implementation)
+  - [Contributing](#contributing)
+  - [Open Points (notes to self)](#open-points-notes-to-self)
+    - [Asymetry between tenants](#asymetry-between-tenants)
+    - [Duplicate hostnames](#duplicate-hostnames)
+    - [New resource-level for_each meta-argument](#new-resource-level-for_each-meta-argument)
 
 <!-- /TOC -->
+
 ## Overview
 
 This project is about creating and maintaining the splunk platform.
@@ -49,9 +50,9 @@ The network is not (yet) managed on this version of the code but only referenced
 
 To understand the reasoning for the code layout it might be helpful to know the preconditions:
 
-- We use two symmetrical network setups on two different tenants. The network is shared over stages, i.e. there is no symmetry between networks and stages (e.g. there is a "dev" stage but no "dev" network).
+- We use two symmetrical network setups on two different tenants. The network is shared over stages, i.e.there is no symmetry between networks and stages (e.g.there is a "dev" stage but no "dev" network).
 - Stages are symmetrical between tenants
-- Stages are not symmetrical to each other, e.g. the production stage contains different systems than the test stage. I.e. the stages do not just differ by number of VMs but also by structure. For example there are no syslog instances on the "t0" (test) stage.
+- Stages are not symmetrical to each other, e.g.the production stage contains different systems than the test stage. I.e.the stages do not just differ by number of VMs but also by structure. For example there are no syslog instances on the "t0" (test) stage.
 - We don't have DNS as an OTC feature on our OTC-private installation and thus IPs need to be assigned statically
 
 ### Design goals
@@ -60,7 +61,7 @@ To understand the reasoning for the code layout it might be helpful to know the 
 - Be flexible towards expected changes as far as possible
 - Be DRY / avoid redundancy
 - Minimize risk of human error, ensure consistency through code
-- Be self-contained and do not rely on any organizational dependencies (e.g. existence of DNS entries)
+- Be self-contained and do not rely on any organizational dependencies (e.g.existence of DNS entries)
 
 ### Project layout
 
@@ -80,17 +81,17 @@ Each terraform directory/module is structured in a default layout as proposed by
 - `main.tf` contains the infrastructure objects
 - `output.tf` contains the output parameters which can be referenced by other objects
 
-Changes between tenants and stages are factored out into the `variables` module as much as possible. It encapsulates e.g. changes in IP addresses or tenant names. By doing so it becomes somewhat safer to compose code in the stages. For further details see `modules/README.md`
+Changes between tenants and stages are factored out into the `variables` module as much as possible. It encapsulates e.g.changes in IP addresses or tenant names. By doing so it becomes somewhat safer to compose code in the stages. For further details see `modules/README.md`
 
 ## Usage
 
 ### General
 
-We have split up the infrastructure between tenants (test and prod tenant) as well as between stages (dev/test/...). Each stage has a separate directory in the `stages/` tree where its code is kept. In each stage directory you can have two **terraform workspaces** which are `default` and `production`.
+We have split up the infrastructure between tenants (test and prod tenant) as well as between stages (dev/test/... ). Each stage has a separate directory in the `stages/` tree where its code is kept. In each stage directory you can have two **terraform workspaces** which are `default` and `production` .
 
-We thus have two "axis" by which we separate terraform state, the *tenant axis* and the *stage axis*. By doing so we have two equivalent code paths for any stage. I.e. we can test modifications to any stage on the test tenant before bringing them to the production tenant.
+We thus have two "axis" by which we separate terraform state, the *tenant axis* and the *stage axis*. By doing so we have two equivalent code paths for any stage. I.e.we can test modifications to any stage on the test tenant before bringing them to the production tenant.
 
-This was done because there are major differences (i.e. not just in size but also in structure) between stages because they are used for different purposes. E.g. there will be no syslog nodes on the t0 stage. This would lead to untestable code if we had no other axis to differentiate state.
+This was done because there are major differences (i.e.not just in size but also in structure) between stages because they are used for different purposes. E.g.there will be no syslog nodes on the t0 stage. This would lead to untestable code if we had no other axis to differentiate state.
 
 The workspaces are
 
@@ -107,14 +108,14 @@ Hashicorp provides a comprehensive documentation site for terraform which detail
 
 Some places to visit:
 
-- Download and setup: https://www.terraform.io/downloads.html
-- Introduction: https://www.terraform.io/intro/index.html
-- The language: https://www.terraform.io/docs/configuration/index.html
-- The OpenStack provider: https://www.terraform.io/docs/providers/openstack/index.html
-- The OpenTelekomCloud provider: https://www.terraform.io/docs/providers/opentelekomcloud/index.html
-- About expressions: https://www.terraform.io/docs/configuration/expressions.html
-- About state: https://www.terraform.io/docs/state/index.html
-- About workspaces: https://www.terraform.io/docs/state/workspaces.html
+- Download and setup: <https://www.terraform.io/downloads.html>
+- Introduction: <https://www.terraform.io/intro/index.html>
+- The language: <https://www.terraform.io/docs/configuration/index.html>
+- The OpenStack provider: <https://www.terraform.io/docs/providers/openstack/index.html>
+- The OpenTelekomCloud provider: <https://www.terraform.io/docs/providers/opentelekomcloud/index.html>
+- About expressions: <https://www.terraform.io/docs/configuration/expressions.html>
+- About state: <https://www.terraform.io/docs/state/index.html>
+- About workspaces: <https://www.terraform.io/docs/state/workspaces.html>
 
 Basic terraform setup
 
@@ -129,7 +130,7 @@ Next, setup your cloud credentails. The terraform state is kept on AWS S3. The i
 
 For AWS, the code assumes a profile named "sbb-splunk" in your `~/.aws/credentials` like this:
 
-```shell
+``` shell
 $ cat ~/.aws/credentials
 [sbb-splunk]
 aws_access_key_id = <your-key>
@@ -138,46 +139,48 @@ aws_secret_access_key = <your-secret>
 
 To access the OTC the code assumes your credentials being exported as variables like this
 
-```shell
+``` shell
 export TF_VAR_username=<otc-username>
 export TF_VAR_password='<otc-password>'
 ```
 
-If they do not exist you have to also setup the objects on AWS S3 and DynamoDB. The code assumes a bucket named **sbb-splunkterraform-prod** and a DynamoDB table called **splunkterraform**. For details on setting these up visit https://www.terraform.io/docs/backends/types/s3.html
+If they do not exist you have to also setup the objects on AWS S3 and DynamoDB. The code assumes a bucket named **sbb-splunkterraform-prod** and a DynamoDB table called **splunkterraform**. For details on setting these up visit <https://www.terraform.io/docs/backends/types/s3.html>
 
 If you've prepared your cloud setup, resume...
 
 #### on the test tenant
 
 - Create shared resources first:
-    - `cd shared`
-    - Work through shared/README.md for required manual network setup
-    - `terraform init`
-    - `terraform plan`
-    - `terraform apply`
+  - `cd shared`
+  - Work through shared/README.md for required manual network setup
+  - `terraform init`
+  - `terraform plan`
+  - `terraform apply`
+
 - Create any stage
-    - `cd stages/<any>`
-    - `terraform init`
-    - `terraform plan`
-    - `terraform apply`
+  - `cd stages/<any>`
+  - `terraform init`
+  - `terraform plan`
+  - `terraform apply`
 
 #### on the production tenant
 
 - Create shared resources first:
-    - `cd shared`
-    - `terraform workspace new production`
-    - Work through shared/README.md for required manual network setup
-    - `terraform init`
-    - `terraform plan`
-    - `terraform apply`
-- Create any stage
-    - `cd stages/<any>`
-    - `terraform workspace new production`
-    - `terraform init`
-    - `terraform plan`
-    - `terraform apply`
+  - `cd shared`
+  - `terraform workspace new production`
+  - Work through shared/README.md for required manual network setup
+  - `terraform init`
+  - `terraform plan`
+  - `terraform apply`
 
-Don't break stuff on the production tenant! Feel free to break everything on the test tenant. I.e. do not just yet create the terraform production workspace until you know what you're doing. As long as you stick with the default terraform workspace you can only break things on the test tenant. This is fine.
+- Create any stage
+  - `cd stages/<any>`
+  - `terraform workspace new production`
+  - `terraform init`
+  - `terraform plan`
+  - `terraform apply`
+
+Don't break stuff on the production tenant! Feel free to break everything on the test tenant. I.e.do not just yet create the terraform production workspace until you know what you're doing. As long as you stick with the default terraform workspace you can only break things on the test tenant. This is fine.
 
 As an additional security net you should use different credentials on the test and prod tenant. This will safe you from accidentally using the wrong workspace / wrong tenant.
 
@@ -189,7 +192,7 @@ Once the base infrastructure has been created with terraform the next most impor
 
 Multiple approaches how this can be done are available and there is (afaik) currently no proven and generally applicable "best of breed" solution. Some use state definition tools like salt or puppet which correspond to the declarative nature of terraform. Some prefer a more procedural way using ansible or plain bash. There are also tools like `packer` (<https://www.packer.io/>) which aim to use preconfigured images. Each of these have their pros and cons which are outside of the scope of this readme.
 
-A key requirement is that arbitrary data from terraform can be passed to the provisioning step, e.g. disk device names and instance names. This is very important because it is likely that the provisioning will need arbitrary and not yet known pieces of information about the terraformed infrastructure. A good solution will thus have to use a generic mechanism which is capable of transferring arbitrary data to the provisioning process.
+A key requirement is that arbitrary data from terraform can be passed to the provisioning step, e.g.disk device names and instance names. This is very important because it is likely that the provisioning will need arbitrary and not yet known pieces of information about the terraformed infrastructure. A good solution will thus have to use a generic mechanism which is capable of transferring arbitrary data to the provisioning process.
 
 There are multiple approaches how to pass arbitrary data to the provisioning, among them:
 
@@ -199,11 +202,11 @@ There are multiple approaches how to pass arbitrary data to the provisioning, am
 
 ### Implementation
 
-For now we've chosen to build a mechanism which fully exposes the complete terraform state including all tenants as a single json structure. It is then up to the provisioning process to extract the relevant information. While this sure is not the most efficient approach it is the simplest one and still allows maximum flexibility on the provisioner side. Optimizations could be implemented (e.g. just passing parts of the full state) if this becomes necessary. Tests have shown that this will probably not be necessary for what we have planned.
+For now we've chosen to build a mechanism which fully exposes the complete terraform state including all tenants as a single json structure. It is then up to the provisioning process to extract the relevant information. While this sure is not the most efficient approach it is the simplest one and still allows maximum flexibility on the provisioner side. Optimizations could be implemented (e.g.just passing parts of the full state) if this becomes necessary. Tests have shown that this will probably not be necessary for what we have planned.
 
 To obtain the terraform data a provisioner uses the `bin/build_state.py` executable which will write the full terraform state as a json structure to stdout. The structure looks like this
 
-```json
+``` json
 {
     tenant1: {
         shared: {
@@ -233,13 +236,13 @@ To obtain the terraform data a provisioner uses the `bin/build_state.py` executa
 }
 ```
 
-While the structure is deterministic, the sort order is not. I.e. there is no guarantee in which order the tenants, shared or stages will appear in the output.
+While the structure is deterministic, the sort order is not. I.e.there is no guarantee in which order the tenants, shared or stages will appear in the output.
 
 A provisioning process can consume the json data from stdin and apply its parsing logic to extract required information.
 
 ## Contributing
 
-For any suggestion, improvment, correction, etc. open a branch with a descriptive name (which explains the goal of the update) and assign it to a repo maintainer.
+For any suggestion, improvment, correction, etc.open a branch with a descriptive name (which explains the goal of the update) and assign it to a repo maintainer.
 
 Otherwise, if you don't feel brave enough to edit code (this shouldn't be the case :simple_smile:), open an issue and assign it to a repo maintainer.
 
