@@ -125,7 +125,7 @@ class StateCache():
     @method_trace
     def get(self):
         if not self._is_valid():
-            self._update(build_state.get_state(build_state.base_path))
+            self._update(build_state.get_state())
         return self._state
 
 
