@@ -101,7 +101,13 @@ def init_parser(base_path):
     return parser
 
 
-def get_state(base_path):
+def get_state():
+    return get_state_from_local()
+
+def get_state_from_s3():
+    import boto3
+
+def get_state_from_local(base_path):
     stage_path = os.path.join(base_path, 'stages')
     shared_path = os.path.join(base_path, 'shared')
     result = {}
@@ -175,10 +181,7 @@ def main(base_path):
         base_path = args.root_dir
     log.debug(f'base_path: {base_path}')
 
-    # The final result to ppoulate
-    result = get_state(base_path)
-
-    log.info(json.dumps(result, indent=2 if args.pretty else None))
+    log.info(json.dumps(get_state(), indent=2 if args.pretty else None))
 
 
 if __name__ == '__main__':

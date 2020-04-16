@@ -350,11 +350,11 @@ class TerraformServer(BaseHTTPRequestHandler):
         except requests.exceptions.HTTPError as http_err:
             log.error(f'Error trying to communicate to {server}: {http_err}')
             error_string=str(http_err)
-        except Exception as err:
-            log.error(f'Error trying to communicate to {server}: {err}')
-            error_string=str(err)
         except ValueError as err:
             log.error(f'Error trying to communicate to {server}')
+            error_string=str(err)
+        except Exception as err:
+            log.error(f'Error trying to communicate to {server}: {err}')
             error_string=str(err)
 
         #HTML Header
