@@ -114,13 +114,16 @@ def get_state_from_s3():
     bucket = s3r.Bucket('sbb-splunkterraform-prod')
     for obj in bucket.objects.all():
         key = obj.key
+        if not key.endswith('.tfstate'):
+            # not a terraform state file
+            continue
         if key.startswith('env:'):
             tenant='tsch_rz_p_001'
-            # key e.g. env:/production/p0.tfstate
+            # key e.g. "env:/production/p0.tfstate", reduce to "p0"
             stage=key[key.rfind('/')+1:key.rfind('.')]
         else:
             tenant='tsch_rz_t_001'
-            # key e.g. p0.tfstate
+            # key e.g. "p0.tfstate", reduce to "p0"
             stage=key[:key.rfind('.')]
         result[tenant][stage] = json.loads(obj.get()['Body'].read())
 
