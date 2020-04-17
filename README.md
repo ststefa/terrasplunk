@@ -124,18 +124,20 @@ Basic terraform setup
 
 ### To get started with this project
 
-If you have not already done so you might want to install the `openstack` and `aws` commandline clients. This is not a requirement. It's just handy for debugging if you don't like clicking in Web GUIs. Start at <https://docs.openstack.org/python-openstackclient/> and <https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html> if you don't know how to do that.
+If you have not already done so you might want to install the `openstack` and `aws` commandline clients. This is not a requirement. It's just handy for debugging if you don't like clicking in Web GUIs. Start at <https://docs.openstack.org/python-openstackclient/> and <https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html> if you don't know how to do that. Also make sure you have python `boto3` installed because the dynamic inventory uses it. It is availyble through `pip` (`pip3 install boto3`).
 
 Next, setup your cloud credentails. The terraform state is kept on AWS S3. The infrastructure is built on OTC. Hence you need access to both cloud providers.
 
-For AWS, the code assumes a profile named "sbb-splunk" in your `~/.aws/credentials` like this:
+For AWS, the code assumes a profile named **sbb-splunk** in your `~/.aws/credentials` like this:
 
 ``` shell
 $ cat ~/.aws/credentials
 [sbb-splunk]
-aws_access_key_id = <your-key>
-aws_secret_access_key = <your-secret>
+aws_access_key_id = <sbb-splunk-access-key>
+aws_secret_access_key = <sbb-splunk-secret-key>
 ```
+
+The AWS credentials are not personal. They are exclusively used for this project and shared among project members. The actual values for these keys are stored in PasswordSafe. Look for splunk_otc_2020.
 
 To access the OTC the code assumes your credentials being exported as variables like this
 
