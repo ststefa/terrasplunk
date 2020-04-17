@@ -26,5 +26,15 @@
         "shared/",
         "stages/*/",
     ],
-    "restructuredtext.confPath": "",
+
+    "[terraform]": {
+        "editor.insertSpaces": true,
+        "editor.tabSize": 2
+    },
+    "[markdown]": {
+        "editor.detectIndentation": false,
+        "editor.insertSpaces": true,
+        "editor.tabSize": 2,
+        "files.eol": "\n", //required for ext:alanwalk.markdown-toc to work properly
+    },
 }
