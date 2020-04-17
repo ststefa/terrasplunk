@@ -17,13 +17,13 @@ done
 if (( ${#EVEN_INSTANCES[@]} > 0 )) ; then
     echo "even"
     for HOSTNAME in "${EVEN_INSTANCES[@]}" ; do
-    echo "${HOSTNAME}"
+        echo "${HOSTNAME}"
     done
 fi
 
 if (( ${#ODD_INSTANCES[@]} > 0 )) ; then
     echo "odd"
     for HOSTNAME in "${ODD_INSTANCES[@]}" ; do
-    echo "${HOSTNAME}"
+        echo "${HOSTNAME}"
     done
 fi
