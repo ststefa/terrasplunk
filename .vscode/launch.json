@@ -5,11 +5,27 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Python: Current File",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal"
+        },
+        {
             "name": "Python: wsrv.py",
             "type": "python",
             "request": "launch",
             "program": "wsrv.py",
-            "args": ["--port", "8082", "--user", "myuser", "--password", "mypassword", "--health_score_watermark", "70"],
+            "args": [
+                "--port",
+                "8082",
+                "--user",
+                "myuser",
+                "--password",
+                "mypassword",
+                "--health_score_watermark",
+                "70"
+            ],
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}/bin",
             "serverReadyAction": {
@@ -17,7 +33,7 @@
                 "uriFormat": "http://localhost:8081/monitor/health_score",
                 "action": "openExternally",
                 //"action": "debugWithChrome",
-              }
+            }
         }
     ]
 }

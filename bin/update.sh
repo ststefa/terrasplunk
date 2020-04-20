@@ -12,5 +12,5 @@ for DIR in ${TF_DIRS} ; do
     echo "Upgrading ${DIR}"
     cd ${DIR} && \
     terraform init --upgrade ; \
-    cd - > /dev/null
+    cd - > /dev/null || exit
 done

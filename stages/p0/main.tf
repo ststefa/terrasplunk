@@ -1,5 +1,16 @@
 terraform {
   required_version = ">= 0.12.21"
+  backend "s3" {
+    # Unfortunately interpolations are not allowed in backend config
+    profile = "sbb-splunk"
+    bucket  = "sbb-splunkterraform-prod"
+    region  = "eu-central-1"
+    # Manually name it like the parent dir.
+    # ATTENTION! Do not mess this up! You might destroy another stages state!
+    key            = "p0.tfstate"
+    acl            = "private"
+    dynamodb_table = "splunkterraform"
+  }
 }
 
 locals {
@@ -27,10 +38,12 @@ module "core" {
 }
 
 data "terraform_remote_state" "shared" {
-  backend = "local"
-  config = {
-    path = module.variables.shared_statefile
-  }
+  #backend = "local"
+  #config = {
+  #  path = module.variables.shared_statefile
+  #}
+  backend = "s3"
+  config  = module.variables.s3_shared_config
 }
 
 module "server-mt000" {

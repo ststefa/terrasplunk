@@ -1,0 +1,11 @@
+{
+    "recommendations": [
+        "alanwalk.markdown-toc",
+        "davidanson.vscode-markdownlint",
+        "mauve.terraform",
+        "ms-python.python",
+        "msjsdiag.debugger-for-chrome",
+        "rogalmic.bash-debug",
+        "timonwong.shellcheck",
+    ]
+}

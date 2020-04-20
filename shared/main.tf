@@ -5,6 +5,17 @@ locals {
 
 terraform {
   required_version = ">= 0.12.21"
+  backend "s3" {
+    # Unfortunately interpolations are not allowed in backend config
+    profile        = "sbb-splunk"
+    bucket         = "sbb-splunkterraform-prod"
+    region         = "eu-central-1"
+    # Manually name it like the parent dir.
+    # ATTENTION! Do not mess this up! You might destroy another stages state!
+    key            = "shared.tfstate"
+    acl            = "private"
+    dynamodb_table = "splunkterraform"
+  }
 }
 
 provider "opentelekomcloud" {
@@ -12,11 +23,10 @@ provider "opentelekomcloud" {
   tenant_name = "eu-ch_splunk"
   user_name   = var.username
   password    = var.password
-  #delegated_project = "eu-ch_splunk"
-  auth_url = "https://iam.eu-ch.o13bb.otc.t-systems.com/v3"
+  auth_url    = "https://iam.eu-ch.o13bb.otc.t-systems.com/v3"
 }
 
-# TODO: refactor variables in two mods, see TODO there
+# TODO: Maybe refactor variables in two mods? see TODO there
 module "variables" {
   source    = "../modules/variables"
   workspace = terraform.workspace

@@ -10,10 +10,12 @@ module "variables" {
 }
 
 data "terraform_remote_state" "shared" {
-  backend = "local"
-  config = {
-    path = module.variables.shared_statefile
-  }
+  #backend = "local"
+  #config = {
+  #  path = module.variables.shared_statefile
+  #}
+  backend = "s3"
+  config = module.variables.s3_shared_config
 }
 
 module "sh-instance" {

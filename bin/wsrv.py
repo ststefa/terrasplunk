@@ -125,7 +125,7 @@ class StateCache():
     @method_trace
     def get(self):
         if not self._is_valid():
-            self._update(build_state.get_state(build_state.base_path))
+            self._update(build_state.get_state())
         return self._state
 
 
@@ -350,11 +350,11 @@ class TerraformServer(BaseHTTPRequestHandler):
         except requests.exceptions.HTTPError as http_err:
             log.error(f'Error trying to communicate to {server}: {http_err}')
             error_string=str(http_err)
-        except Exception as err:
-            log.error(f'Error trying to communicate to {server}: {err}')
-            error_string=str(err)
         except ValueError as err:
             log.error(f'Error trying to communicate to {server}')
+            error_string=str(err)
+        except Exception as err:
+            log.error(f'Error trying to communicate to {server}: {err}')
             error_string=str(err)
 
         #HTML Header
