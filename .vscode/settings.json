@@ -57,6 +57,7 @@
         "genericecs",
         "hostnames",
         "icmp",
+        "itertools",
         "itsi",
         "kvstore",
         "openstack",
