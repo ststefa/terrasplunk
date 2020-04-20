@@ -7,7 +7,7 @@ declare -a ODD_INSTANCES
 for MOD in $(terraform state list | grep opentelekomcloud_compute_instance_v2 | grep -o 'server-[^.]*') ; do
     INSTANCE_NUM=${MOD: -3}
     HOSTNAME="spl$(basename "$(pwd)")${MOD##*-}"
-    if [ $(( ${INSTANCE_NUM} % 2 )) == 0 ] ; then
+    if [ $(( INSTANCE_NUM % 2 )) == 0 ] ; then
         EVEN_INSTANCES+=("${HOSTNAME}")
     else
         ODD_INSTANCES+=("${HOSTNAME}")
