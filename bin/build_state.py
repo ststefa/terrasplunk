@@ -111,7 +111,7 @@ def get_state_from_s3():
 
     session = boto3.Session(profile_name='sbb-splunk')
     s3r = session.resource('s3')
-    bucket = s3r.Bucket('sbb-splunkterraform-prod')
+    bucket = s3r.Bucket('sbb-splunkterraform-prod') # pylint: disable=no-member
     for obj in bucket.objects.all():
         key = obj.key
         if not key.endswith('.tfstate'):
