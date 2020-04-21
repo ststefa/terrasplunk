@@ -34,6 +34,22 @@
                 "action": "openExternally",
                 //"action": "debugWithChrome",
             }
-        }
+        },
+        {
+            "name": "Python: serverlist.py",
+            "type": "python",
+            "request": "launch",
+            "program": "serverlist.py",
+            "args": [
+                "tsch_rz_t_001",
+                "w0",
+                "--az",
+                "1",
+                "--id",
+                "sh",
+            ],
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}/bin",
+        },
     ]
 }
