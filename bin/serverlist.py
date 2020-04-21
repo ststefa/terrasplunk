@@ -10,6 +10,7 @@ import logging
 import sys
 import traceback
 import re
+import pathlib
 
 log = logging.getLogger(__name__)
 # set to DEBUG for early-stage debugging
@@ -65,32 +66,49 @@ def init_logging():
 def init_parser():
     parser = argparse.ArgumentParser(
         description=
-        'Print a list of splunk servers amtching certain criteria. If multiple criteria are specified they are logically ANDed.',
+        'Print a list of splunk servers matching certain criteria. Multiple criteria are logically ANDed. If the current directory is a terraform directory then tenant and stage will be determined automatically. Otherwise they must be specified explicitly. If specified then they override the determined values.',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+
     parser.add_argument('--debug',
                         action='store_true',
-                        help='Turn on debug output')
+                        help='turn on debug output')
     parser.add_argument(
         '-v',
         '--verbose',
         action='store_true',
         help=
-        'Show details as json output. Default is to only report hostnames (one per line)'
+        'show details as json output. Default is to only report hostnames (one per line)'
     )
     parser.add_argument(
         '-p',
         '--pretty',
         action='store_true',
         help='prettyprint json output, only applies to --verbose')
+
     parser.add_argument('--az',
-                        help='Only show instances in availability zone 1 or 2')
+                        help='only show instances in availability zone 1 or 2')
     parser.add_argument(
-        '--flv', help='Only show instances whose flavor matches this regex')
+        '--flv', help='only show instances whose flavor matches this regex')
     parser.add_argument(
-        '--id',
-        help='Only show instances whose id (aka name) matches this regex')
-    parser.add_argument('tenant', help='Show instances of this tenant')
-    parser.add_argument('stage', help='Show instances of this stage')
+        '--name',
+        help='only show instances whose name matches this regex')
+
+    parser.add_argument(
+        '--profile', default='sbb-splunk',
+        help='use a non-default AWS profile for credentials')
+
+    parser.add_argument(
+        'tenant',
+        nargs='?',
+        help=
+        'show instances of this tenant (default derived from current directory)'
+    )
+    parser.add_argument(
+        'stage',
+        nargs='?',
+        help=
+        'show instances of this stage (default derived from current directory)'
+    )
     return parser
 
 
@@ -99,16 +117,40 @@ class ServerlistError(Exception):
 
 
 @method_trace
-def get_state_from_s3(tenant, stage):
+def get_state_from_s3(args):
 
-    key = ""
+    tenant = None
+    stage = None
+
+    cwd = pathlib.Path('.')
+
+    if args.stage is None or args.tenant is None:
+        terraform_workspace_file = pathlib.Path(cwd / '.terraform' / 'environment') # yapf: disable
+        if terraform_workspace_file.exists():
+            workspace = terraform_workspace_file.read_text()
+            if workspace == "default":
+                tenant = "tsch_rz_t_001"
+            elif workspace == "production":
+                tenant = "tsch_rz_p_001"
+            stage=cwd.resolve().name
+            log.warn(f'Using tenant {tenant} and stage {stage} derived from current terraform workspace')
+        else:
+            raise ServerlistError(
+                'Not inside a terraform directory. Cannot determine tenant and stage automatically. Please specifdy tenant and stage arguments.'
+            )
+    else:
+        tenant = args.tenant
+        stage = args.stage
+
+    s3_key = ""
     if tenant.lower() == "tsch_rz_p_001":
-        key += "env:/production/"
-    key = f'{key}{stage}.tfstate'
+        s3_key += "env:/production/"
+    s3_key = f'{s3_key}{stage}.tfstate'
 
-    session = boto3.Session(profile_name='sbb-splunk')
+    log.debug(f'Fetching {s3_key}from S3')
+    session = boto3.Session(profile_name=args.profile)
     s3 = session.client('s3')
-    s3_object = s3.get_object(Bucket='sbb-splunkterraform-prod', Key=key)
+    s3_object = s3.get_object(Bucket='sbb-splunkterraform-prod', Key=s3_key)
     data = json.loads(s3_object['Body'].read())
     return data
 
@@ -128,13 +170,13 @@ def print_servers(data, args):
                 'attributes']['availability_zone']
             instance_dict[i_name]['flavor'] = instance['instances'][0][
                 'attributes']['flavor_id']
-        if args.id is not None:
-            regex = re.compile(args.id, re.IGNORECASE)
+        if args.name is not None:
+            regex = re.compile(args.name, re.IGNORECASE)
             removals = [
                 name for name in instance_dict.keys() if not regex.search(name)
             ]
             for name in removals:
-                log.debug(f'remove {instance_dict.pop(name, None)}')
+                log.debug(f'remove {name}: {instance_dict.pop(name)}')
         if args.az is not None:
             if args.az == "1":
                 az = "eu-ch-01"
@@ -142,14 +184,14 @@ def print_servers(data, args):
                 az = "eu-ch-02"
             else:
                 raise ServerlistError(
-                    'Invalid value, choose "1" for AZ1/eu-ch-01 or "2" for AZ2/eu-ch-02'
+                    f'Invalid AZ "{args.az}". Use "1" for AZ1/eu-ch-01 or "2" for AZ2/eu-ch-02'
                 )
             removals = [
                 name for name in instance_dict.keys()
                 if not instance_dict[name]['az'] == az
             ]
             for name in removals:
-                log.debug(f'remove {instance_dict.pop(name, None)}')
+                log.debug(f'remove {name}: {instance_dict.pop(name)}')
         if args.flv is not None:
             regex = re.compile(args.flv, re.IGNORECASE)
             removals = [
@@ -157,10 +199,10 @@ def print_servers(data, args):
                 if not regex.search(instance_dict[name]['flavor'])
             ]
             for name in removals:
-                log.debug(f'remove {instance_dict.pop(name, None)}')
+                log.debug(f'remove {name}: {instance_dict.pop(name)}')
 
         if args.verbose:
-            log.info(json.dumps(instance_dict))
+            log.info(json.dumps(instance_dict, indent=2 if args.pretty else None))
         else:
             for i_name in sorted(instance_dict.keys()):
                 log.info(i_name)
@@ -177,6 +219,10 @@ if __name__ == "__main__":
     log.debug(f'sys.argv: {sys.argv}')
     log.debug(f'args: {args}')
 
-    state = get_state_from_s3(args.tenant, args.stage)
-    print_servers(state, args)
+    try:
+        state = get_state_from_s3(args)
+        print_servers(state, args)
+    except ServerlistError as e:
+        log.error(e)
+
     sys.exit()
