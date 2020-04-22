@@ -90,12 +90,17 @@ def init_parser():
     parser.add_argument(
         '--flv', help='only show instances whose flavor matches this regex')
     parser.add_argument(
-        '--name',
-        help='only show instances whose name matches this regex')
+        '--name', help='only show instances whose name matches this regex')
 
     parser.add_argument(
-        '--profile', default='sbb-splunk',
-        help='use a non-default AWS profile for credentials')
+        '--format',
+        help=
+        'use format string for output instead of just the name. The string can use the tokens %name, %ip, %az, %flv, %tenant and %stage. Collides with --verbose'
+    )
+
+    parser.add_argument('--profile',
+                        default='sbb-splunk',
+                        help='use a non-default AWS profile for credentials')
 
     parser.add_argument(
         'tenant',
@@ -118,34 +123,28 @@ class ServerlistError(Exception):
 
 @method_trace
 def get_state_from_s3(args):
-
-    tenant = None
-    stage = None
-
-    cwd = pathlib.Path('.')
-
     if args.stage is None or args.tenant is None:
+        cwd = pathlib.Path('.')
         terraform_workspace_file = pathlib.Path(cwd / '.terraform' / 'environment') # yapf: disable
         if terraform_workspace_file.exists():
             workspace = terraform_workspace_file.read_text()
             if workspace == "default":
-                tenant = "tsch_rz_t_001"
+                args.tenant = "tsch_rz_t_001"
             elif workspace == "production":
-                tenant = "tsch_rz_p_001"
-            stage=cwd.resolve().name
-            log.warn(f'Using tenant {tenant} and stage {stage} derived from current terraform workspace')
+                args.tenant = "tsch_rz_p_001"
+            args.stage = cwd.resolve().name
+            log.warn(
+                f'Using tenant {args.tenant} and stage {args.stage} derived from current terraform workspace'
+            )
         else:
             raise ServerlistError(
                 'Not inside a terraform directory. Cannot determine tenant and stage automatically. Please specifdy tenant and stage arguments.'
             )
-    else:
-        tenant = args.tenant
-        stage = args.stage
 
     s3_key = ""
-    if tenant.lower() == "tsch_rz_p_001":
+    if args.tenant.lower() == "tsch_rz_p_001":
         s3_key += "env:/production/"
-    s3_key = f'{s3_key}{stage}.tfstate'
+    s3_key = f'{s3_key}{args.stage}.tfstate'
 
     log.debug(f'Fetching {s3_key}from S3')
     session = boto3.Session(profile_name=args.profile)
@@ -202,10 +201,22 @@ def print_servers(data, args):
                 log.debug(f'remove {name}: {instance_dict.pop(name)}')
 
         if args.verbose:
-            log.info(json.dumps(instance_dict, indent=2 if args.pretty else None))
+            log.info(
+                json.dumps(instance_dict, indent=2 if args.pretty else None))
         else:
-            for i_name in sorted(instance_dict.keys()):
-                log.info(i_name)
+            format_string = "%name" if args.format is None else args.format
+            for instance_name in sorted(instance_dict.keys()):
+                out_line = format_string.replace('%name', instance_name)
+                out_line = out_line.replace('%ip',
+                                            instance_dict[instance_name]['ip'])
+                out_line = out_line.replace('%az',
+                                            instance_dict[instance_name]['az'])
+                out_line = out_line.replace('%tenant', args.tenant)
+                out_line = out_line.replace('%stage', args.stage)
+                out_line = out_line.replace('%az',
+                                            instance_dict[instance_name]['az'])
+
+                log.info(out_line)
 
 
 if __name__ == "__main__":
@@ -220,6 +231,9 @@ if __name__ == "__main__":
     log.debug(f'args: {args}')
 
     try:
+        if args.verbose and args.format is not None:
+            raise ServerlistError(
+                'Cannot use --verbose togehter with --format')
         state = get_state_from_s3(args)
         print_servers(state, args)
     except ServerlistError as e:
