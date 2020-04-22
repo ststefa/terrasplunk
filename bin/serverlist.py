@@ -211,6 +211,8 @@ def print_servers(data, args):
                                             instance_dict[instance_name]['ip'])
                 out_line = out_line.replace('%az',
                                             instance_dict[instance_name]['az'])
+                out_line = out_line.replace('%flv',
+                                            instance_dict[instance_name]['flavor'])
                 out_line = out_line.replace('%tenant', args.tenant)
                 out_line = out_line.replace('%stage', args.stage)
                 out_line = out_line.replace('%az',
