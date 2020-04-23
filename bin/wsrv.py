@@ -18,6 +18,7 @@ import time
 import traceback
 import base64
 import re
+import urllib.parse
 
 import build_state
 
@@ -288,7 +289,7 @@ class TerraformServer(BaseHTTPRequestHandler):
         self.wfile.write(bytes(json.dumps(data), "utf-8"))
 
     @method_trace
-    def do_monitor(self, severity='low', stage=''):
+    def do_monitor(self, severity='low', stage=None):
         coding = 'utf-8'
         splunk_app = 'itsi'
         splunk_auth = requests.auth.HTTPBasicAuth(user, password)
@@ -330,7 +331,8 @@ class TerraformServer(BaseHTTPRequestHandler):
         #HTML Body
         self.wfile.write(bytes(f'<body>', coding))
         self.wfile.write(bytes('<h1>Input to Splunk</h1>', coding))
-        self.wfile.write(bytes(f'<p>REST call: <a href="{resp.url}">{resp.url}</a></p>', coding))
+        search_url = f'https://search.splunk.sbb.ch/app/search/search?q={urllib.parse.quote_plus(splunk_search)}'
+        self.wfile.write(bytes(f'<p>Splunk search: <a href="{search_url}">{search_url}</a></p>', coding))
         self.wfile.write(bytes('<h1>Output from Splunk</h1>', coding))
         self.wfile.write(bytes(f'<p><pre>{json.dumps(data_json, indent=4)}</pre></p>', coding))
         self.wfile.write(bytes('<h1>Interpretation of this output</h1>', coding))
