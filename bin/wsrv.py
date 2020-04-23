@@ -296,7 +296,7 @@ class TerraformServer(BaseHTTPRequestHandler):
         stage_filter = 'title!=splh0* AND title!=splw0*' if stage==None else f'title=spl{stage}*'
         splunk_search = f"|inputlookup itsi_entities| search {stage_filter} " \
                         f"AND title!=spl*0sy* | fields title |tschcheckserverhealth " \
-                        f"| eval health_weight=case(health=\"black\", 5, health=\"green\", 0, health=\"yellow\", 3, " \
+                        f"| eval health_weight=case(health=\"black\", 7, health=\"green\", 0, health=\"yellow\", 3, " \
                         f"health=\"red\", 5)|eval _time=now() | stats sum(health_weight) as total | eval health_score=100-total"
         splunk_search_params = {'output_mode': 'json', 'search': f'{splunk_search}'}
         splunkREST_search = f'/servicesNS/{user}/{splunk_app}/search/jobs/export'
