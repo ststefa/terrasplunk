@@ -17,6 +17,7 @@ import sys
 import time
 import traceback
 import base64
+import re
 
 import build_state
 
@@ -238,10 +239,22 @@ class TerraformServer(BaseHTTPRequestHandler):
                 self.send_header("Content-type", "application/json")
                 self.end_headers()
                 self.do_tfstate()
-            elif self.path == '/monitor/health_score':
+            elif self.path.startswith('/monitor/health_score'):
                 self.send_header("Content-type", "text/html")
                 self.end_headers()
-                self.do_monitor()
+                if "?" in self.path:
+                    severity = re.search('severity=(.*?)(?=&|$)', self.path)
+                    if severity != None:
+                        severity = severity.group(1)
+                    stage = re.search('stage=(.*?)(?=&|$)', self.path)
+                    if stage != None:
+                        stage = stage.group(1)
+                    if severity != None and stage != None:
+                        self.do_monitor(severity, stage)
+                    else:
+                        self.do_monitor()
+                else:
+                    self.do_monitor()
             elif self.path == '/topology':
                 self.send_header("Content-type", "text/html")
                 self.end_headers()
@@ -271,14 +284,15 @@ class TerraformServer(BaseHTTPRequestHandler):
         self.wfile.write(bytes(json.dumps(data), "utf-8"))
 
     @method_trace
-    def do_monitor(self):
+    def do_monitor(self, severity='low', stage=''):
         coding = 'utf-8'
         splunk_app = 'itsi'
         splunk_auth = requests.auth.HTTPBasicAuth(user, password)
-        splunk_search = f"|inputlookup itsi_entities| search title!=splh0* AND title!=splw0* " \
-                         "AND title!=spl*0sy* AND title=spl*| fields title |tschcheckserverhealth " \
-                         "| eval health_weight=case(health=\"black\", 5, health=\"green\", 0, health=\"yellow\", 3, " \
-                         "health=\"red\", 5)|eval _time=now() | stats sum(health_weight) as total | eval health_score=100-total"
+        stage_filter = 'title!=splh0* AND title!=splw0*' if stage==None else f'title=spl{stage}*'
+        splunk_search = f"|inputlookup itsi_entities| search {stage_filter} " \
+                        f"AND title!=spl*0sy* | fields title |tschcheckserverhealth " \
+                        f"| eval health_weight=case(health=\"black\", 5, health=\"green\", 0, health=\"yellow\", 3, " \
+                        f"health=\"red\", 5)|eval _time=now() | stats sum(health_weight) as total | eval health_score=100-total"
         splunk_search_params = {'output_mode': 'json', 'search': f'{splunk_search}'}
         splunkREST_search = f'/servicesNS/{user}/{splunk_app}/search/jobs/export'
         splunkURL = f'https://search.splunk.sbb.ch:8089{splunkREST_search}'
