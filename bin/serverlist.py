@@ -4,6 +4,7 @@ import jsonpath
 
 import argparse
 import boto3
+import botocore.exceptions
 import inspect
 import json
 import logging
@@ -13,7 +14,7 @@ import re
 import pathlib
 
 log = logging.getLogger(__name__)
-# set to DEBUG for early-stage debugging
+# set to DEBUG for early-stage debugging, default INFO
 log.setLevel(logging.INFO)
 
 
@@ -63,10 +64,10 @@ def init_logging():
 
 
 @method_trace
-def init_parser():
+def init_parser(arg_defaults):
     parser = argparse.ArgumentParser(
         description=
-        'Print a list of splunk servers matching certain criteria. Multiple criteria are logically ANDed. If the current directory is a terraform directory then tenant and stage will be determined automatically. Otherwise they must be specified explicitly. If specified then they override the determined values.',
+        'Print a list of splunk servers in tenant/stage matching specified criteria. Multiple criteria are logically and-ed. If the current directory is a terraform directory then tenant and stage will be determined automatically. Otherwise they must be specified explicitly. If specified then they override the determined values.',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
     parser.add_argument('--debug',
@@ -95,7 +96,7 @@ def init_parser():
     parser.add_argument(
         '--format',
         help=
-        'use format string for output instead of just the name. The string can use the tokens %name, %ip, %az, %flv, %tenant and %stage. Collides with --verbose'
+        'use custom format string for output instead of just the hostname. The string will have the following tokens replaced: %%name, %%ip, %%az, %%flv, %%tenant, %%stage. Collides with --verbose'
     )
 
     parser.add_argument('--profile',
@@ -105,14 +106,16 @@ def init_parser():
     parser.add_argument(
         'tenant',
         nargs='?',
+        default=arg_defaults['tenant'],
         help=
-        'show instances of this tenant (default derived from current directory)'
+        'show instances of this tenant (default derived from current directory if possible)'
     )
     parser.add_argument(
         'stage',
         nargs='?',
+        default=arg_defaults['stage'],
         help=
-        'show instances of this stage (default derived from current directory)'
+        'show instances of this stage (default derived from current directory if possible)'
     )
     return parser
 
@@ -122,36 +125,42 @@ class ServerlistError(Exception):
 
 
 @method_trace
+def prep_arg_defaults():
+    # initialize all dynamic defaults with None
+    result = {'tenant': None, 'stage': None}
+
+    cwd = pathlib.Path('.')
+    terraform_workspace_file = pathlib.Path(cwd / '.terraform' / 'environment')
+    if terraform_workspace_file.exists():
+        workspace = terraform_workspace_file.read_text()
+        if workspace == "default":
+            result['tenant'] = "tsch_rz_t_001"
+        elif workspace == "production":
+            result['tenant'] = "tsch_rz_p_001"
+        result['stage'] = cwd.resolve().name
+        log.warn(
+            f'Using tenant {result["tenant"]} and stage {result["stage"]} derived from current terraform workspace'
+        )
+
+    return result
+
+
+@method_trace
 def get_state_from_s3(args):
-    if args.stage is None or args.tenant is None:
-        cwd = pathlib.Path('.')
-        terraform_workspace_file = pathlib.Path(cwd / '.terraform' / 'environment') # yapf: disable
-        if terraform_workspace_file.exists():
-            workspace = terraform_workspace_file.read_text()
-            if workspace == "default":
-                args.tenant = "tsch_rz_t_001"
-            elif workspace == "production":
-                args.tenant = "tsch_rz_p_001"
-            args.stage = cwd.resolve().name
-            log.warn(
-                f'Using tenant {args.tenant} and stage {args.stage} derived from current terraform workspace'
-            )
-        else:
-            raise ServerlistError(
-                'Not inside a terraform directory. Cannot determine tenant and stage automatically. Please specifdy tenant and stage arguments.'
-            )
-
     s3_key = ""
-    if args.tenant.lower() == "tsch_rz_p_001":
-        s3_key += "env:/production/"
-    s3_key = f'{s3_key}{args.stage}.tfstate'
+    try:
+        if args.tenant.lower() == "tsch_rz_p_001":
+            s3_key += "env:/production/"
+        s3_key = f'{s3_key}{args.stage}.tfstate'
 
-    log.debug(f'Fetching {s3_key}from S3')
-    session = boto3.Session(profile_name=args.profile)
-    s3 = session.client('s3')
-    s3_object = s3.get_object(Bucket='sbb-splunkterraform-prod', Key=s3_key)
-    data = json.loads(s3_object['Body'].read())
-    return data
+        log.debug(f'Fetching {s3_key}from S3')
+        session = boto3.Session(profile_name=args.profile)
+        s3 = session.client('s3')
+        s3_object = s3.get_object(Bucket='sbb-splunkterraform-prod', Key=s3_key)
+        data = json.loads(s3_object['Body'].read())
+        return data
+    except botocore.exceptions.ClientError:
+        raise ServerlistError(f'Cannot find any S3 data for key "{s3_key}"') from None
 
 
 @method_trace
@@ -161,13 +170,13 @@ def print_servers(data, args):
     if all_compute_instances:
         instance_dict = {}
         for instance in all_compute_instances:
-            i_name = instance['instances'][0]['attributes']['name']
-            instance_dict[i_name] = {}
-            instance_dict[i_name]['ip'] = instance['instances'][0][
+            instance_name = instance['instances'][0]['attributes']['name']
+            instance_dict[instance_name] = {}
+            instance_dict[instance_name]['ip'] = instance['instances'][0][
                 'attributes']['access_ip_v4']
-            instance_dict[i_name]['az'] = instance['instances'][0][
+            instance_dict[instance_name]['az'] = instance['instances'][0][
                 'attributes']['availability_zone']
-            instance_dict[i_name]['flavor'] = instance['instances'][0][
+            instance_dict[instance_name]['flavor'] = instance['instances'][0][
                 'attributes']['flavor_id']
         if args.name is not None:
             regex = re.compile(args.name, re.IGNORECASE)
@@ -211,8 +220,8 @@ def print_servers(data, args):
                                             instance_dict[instance_name]['ip'])
                 out_line = out_line.replace('%az',
                                             instance_dict[instance_name]['az'])
-                out_line = out_line.replace('%flv',
-                                            instance_dict[instance_name]['flavor'])
+                out_line = out_line.replace(
+                    '%flv', instance_dict[instance_name]['flavor'])
                 out_line = out_line.replace('%tenant', args.tenant)
                 out_line = out_line.replace('%stage', args.stage)
                 out_line = out_line.replace('%az',
@@ -224,8 +233,10 @@ def print_servers(data, args):
 if __name__ == "__main__":
     init_logging()
 
-    parser = init_parser()
+    arg_defaults = prep_arg_defaults()
+    parser = init_parser(arg_defaults)
     args = parser.parse_args()
+
     if args.debug:
         log.setLevel(logging.DEBUG)
 
@@ -236,6 +247,14 @@ if __name__ == "__main__":
         if args.verbose and args.format is not None:
             raise ServerlistError(
                 'Cannot use --verbose togehter with --format')
+        if args.pretty and not args.verbose:
+            raise ServerlistError(
+                'Can only use --pretty togehter with --verbose')
+        if args.tenant is None or args.stage is None:
+            raise ServerlistError(
+                'Not inside a terraform directory. Cannot determine tenant and stage automatically. Please supply tenant and stage explicitly.'
+            )
+
         state = get_state_from_s3(args)
         print_servers(state, args)
     except ServerlistError as e:
