@@ -25,7 +25,7 @@ listen_ip = "0.0.0.0"
 listen_port = 8080
 user = 'to_be_replaced_as_arg'
 password = 'to_be_replaced_as_arg'
-health_score_watermark = 100
+health_score_watermark = { 'low' : 100, 'high' : 76, 'critical' : 50 }
 
 log = logging.getLogger(__name__)
 # set to DEBUG for early-stage debugging
@@ -92,8 +92,12 @@ def init_parser():
                         help='Splunk REST user')
     parser.add_argument('--password', nargs=1, default=password, required=True,
                         help='Password for Splunk REST user')
-    parser.add_argument('--health_score_watermark', nargs='?', type=int, default=health_score_watermark,
-                        help='Watermark from 0-100 below which the check result is considered not ok')
+    parser.add_argument('--low_watermark', nargs='?', type=int, default=health_score_watermark['low'],
+                        help='Low watermark from 0-100 below which the check result is considered not ok')
+    parser.add_argument('--high_watermark', nargs='?', type=int, default=health_score_watermark['high'],
+                        help='High watermark from 0-100 below which the check result is considered not ok')
+    parser.add_argument('--critical_watermark', nargs='?', type=int, default=health_score_watermark['critical'],
+                        help='Critical watermark from 0-100 below which the check result is considered not ok')
     return parser
 
 
@@ -312,11 +316,11 @@ class TerraformServer(BaseHTTPRequestHandler):
             result_health_score = -1.0  #Splunk ITSI health_score is always between 0 - 100 or 'N/A', with -1 we report that service was in maintenance ('N/A')
             interpreted_splunk_health = 'SBB maintenance'
         else:
-            if result_health_score < health_score_watermark:
+            if result_health_score < health_score_watermark[severity]:
                 interpreted_splunk_health = 'SBB NoOK'
             else:
                 interpreted_splunk_health = 'SBB OK'
-        log.info(f'HTTP output: result {{ health_score = {result_health_score_str}, ...}}, watermark = {health_score_watermark}; therefore: {interpreted_splunk_health}')
+        log.info(f'HTTP output: result {{ health_score = {result_health_score_str}, ...}}, watermark = {health_score_watermark[severity]}; therefore: {interpreted_splunk_health}')
 
         #HTML Header
         self.wfile.write(bytes('<!DOCTYPE html>', coding))
@@ -330,7 +334,7 @@ class TerraformServer(BaseHTTPRequestHandler):
         self.wfile.write(bytes('<h1>Output from Splunk</h1>', coding))
         self.wfile.write(bytes(f'<p><pre>{json.dumps(data_json, indent=4)}</pre></p>', coding))
         self.wfile.write(bytes('<h1>Interpretation of this output</h1>', coding))
-        self.wfile.write(bytes(f'<p>health_score (after converted to float) = {result_health_score}, watermark = {health_score_watermark} ; therefore ...</p>', coding))
+        self.wfile.write(bytes(f'<p>health_score (after converted to float) = {result_health_score}, watermark = {health_score_watermark[severity]} ; therefore ...</p>', coding))
         self.wfile.write(bytes(f'<p><b>{interpreted_splunk_health}</b></p>', coding))
         self.wfile.write(bytes('<h1>Splunk System Health</h1>', coding))
         self.wfile.write(bytes('<p>Go to <a href="https://search.splunk.sbb.ch/en-GB/app/itsi/serverhealth">system health dashboard</a></p>', coding))
@@ -509,8 +513,12 @@ if __name__ == "__main__":
         user = args.user[0]
     if args.password:
         password = args.password[0]
-    if args.health_score_watermark:
-        health_score_watermark = args.health_score_watermark
+    if args.low_watermark:
+        health_score_watermark['low'] = args.low_watermark
+    if args.high_watermark:
+        health_score_watermark['high'] = args.high_watermark
+    if args.critical_watermark:
+        health_score_watermark['critical'] = args.critical_watermark
 
     log.debug(f'sys.argv: {sys.argv}')
     log.debug(f'args: {args}')
