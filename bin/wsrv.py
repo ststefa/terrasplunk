@@ -318,6 +318,8 @@ class TerraformServer(BaseHTTPRequestHandler):
         self.wfile.write(bytes('<h1>Interpretation of this output</h1>', coding))
         self.wfile.write(bytes(f'<p>health_score (after converted to float) = {result_health_score}, watermark = {health_score_watermark} ; therefore ...</p>', coding))
         self.wfile.write(bytes(f'<p><b>{interpreted_splunk_health}</b></p>', coding))
+        self.wfile.write(bytes('<h1>Splunk System Health</h1>', coding))
+        self.wfile.write(bytes('<p>Go to <a href="https://search.splunk.sbb.ch/en-GB/app/itsi/serverhealth">system health dashboard</a></p>', coding))
         self.wfile.write(bytes('</body>', coding))
 
         #HTML End
