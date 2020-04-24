@@ -247,19 +247,15 @@ class TerraformServer(BaseHTTPRequestHandler):
             elif self.path.startswith('/monitor/health_score'):
                 self.send_header("Content-type", "text/html")
                 self.end_headers()
+                severity = 'low'
+                stage = None
                 if "?" in self.path:
-                    severity = re.search('severity=(.*?)(?=&|$)', self.path)
-                    if severity != None:
-                        severity = severity.group(1)
-                    stage = re.search('stage=(.*?)(?=&|$)', self.path)
-                    if stage != None:
-                        stage = stage.group(1)
-                    if severity != None and stage != None:
-                        self.do_monitor(severity, stage)
-                    else:
-                        self.do_monitor()
-                else:
-                    self.do_monitor()
+                    parsed = urllib.parse.parse_qs(self.path.split('?')[1])
+                    if 'severity' in parsed:
+                        severity = parsed['severity'][0]
+                    if 'stage' in parsed:
+                        stage = parsed['stage'][0]
+                self.do_monitor(severity, stage)
             elif self.path == '/topology':
                 self.send_header("Content-type", "text/html")
                 self.end_headers()
