@@ -27,6 +27,7 @@ listen_port = 8080
 user = 'to_be_replaced_as_arg'
 password = 'to_be_replaced_as_arg'
 health_score_watermark = { 'low' : 100, 'high' : 76, 'critical' : 50 }
+coding = 'utf-8'
 
 log = logging.getLogger(__name__)
 # set to DEBUG for early-stage debugging
@@ -268,7 +269,7 @@ class TerraformServer(BaseHTTPRequestHandler):
                 self.send_header("Content-type", "text/html")
                 self.end_headers()
                 self.wfile.write(bytes(
-                    "<!DOCTYPE html><html><body>Cannot handle this. Humans please use <a href='/topology'>/topology</a>, machines use <a href='/tfstate'>/tfstate</a> and monitors use <a href='/monitor/health_score'>/monitor/health_score</a></body></html>", "utf-8")) #yapf: disable
+                    "<!DOCTYPE html><html><body>Cannot handle this. Humans please use <a href='/topology'>/topology</a>, machines use <a href='/tfstate'>/tfstate</a> and monitors use <a href='/monitor/health_score'>/monitor/health_score</a></body></html>", coding)) #yapf: disable
         except requests.exceptions.HTTPError as http_err:
             self.send_error(http_err.response.status_code,
                             f'{http_err.__class__.__name__} occured',
@@ -282,11 +283,10 @@ class TerraformServer(BaseHTTPRequestHandler):
     @method_trace
     def do_tfstate(self):
         data=TerraformServer._state_cache.get()
-        self.wfile.write(bytes(json.dumps(data), "utf-8"))
+        self.wfile.write(bytes(json.dumps(data), coding))
 
     @method_trace
     def do_monitor(self, severity='low', stage=None):
-        coding = 'utf-8'
         splunk_app = 'itsi'
         splunk_auth = requests.auth.HTTPBasicAuth(user, password)
         stage_filter = 'title!=splh0* AND title!=splw0*' if stage==None else f'title=spl{stage}*'
@@ -343,7 +343,6 @@ class TerraformServer(BaseHTTPRequestHandler):
 
     @method_trace
     def do_investigate(self, server):
-        coding = 'utf-8'
         splunk_auth = requests.auth.HTTPBasicAuth(user, password)
         splunkREST_endpoint = f'/servicesNS/{user}/itsi/search/jobs/export'
         splunk_sh = 'search.splunk.sbb.ch'
@@ -396,11 +395,11 @@ class TerraformServer(BaseHTTPRequestHandler):
 
     @method_trace
     def do_topology(self):
-        self.wfile.write(bytes("<!DOCTYPE html>", "utf-8"))
-        self.wfile.write(bytes("<html>", "utf-8"))
+        self.wfile.write(bytes("<!DOCTYPE html>", coding))
+        self.wfile.write(bytes("<html>", coding))
 
-        self.wfile.write(bytes("<head>", "utf-8"))
-        self.wfile.write(bytes("<title>Splunk Overview</title>", "utf-8"))
+        self.wfile.write(bytes("<head>", coding))
+        self.wfile.write(bytes("<title>Splunk Overview</title>", coding))
         self.wfile.write(bytes("\
             <style>\
                 body       {font-family: verdana;}\
@@ -409,29 +408,29 @@ class TerraformServer(BaseHTTPRequestHandler):
                 tr, th, td {text-align: left; vertical-align: top; border: 1px solid; padding: 2px; padding-left: 10px;; padding-right: 10px;}\
                 tr         {text-align: left; vertical-align: top; border: 1px solid;}\
                 footer     {padding: 10px; color: lightgrey; font-size: small;}\
-            </style>"                                                                                                                                                   , "utf-8"))
-        self.wfile.write(bytes("</head>", "utf-8"))
+            </style>"                                                                                                                                                   , coding))
+        self.wfile.write(bytes("</head>", coding))
 
         self.do_topology_body()
 
-        self.wfile.write(bytes("</html>", "utf-8"))
+        self.wfile.write(bytes("</html>", coding))
 
 
     @method_trace
     def do_topology_body(self):
-        self.wfile.write(bytes("<body>", "utf-8"))
+        self.wfile.write(bytes("<body>", coding))
 
         self.wfile.write(
-            bytes("<h1>Splunk environment overview</h1>", "utf-8"))
+            bytes("<h1>Splunk environment overview</h1>", coding))
         for tenant in sorted(TerraformServer._state_cache.get().keys()):
-            self.wfile.write(bytes(f'<h2>Tenant {tenant}</h2>', "utf-8"))
+            self.wfile.write(bytes(f'<h2>Tenant {tenant}</h2>', coding))
 
             self.do_topology_tenant(tenant)
 
         self.wfile.write(
-            bytes(f'<footer>Created with &hearts; on {socket.gethostname()} showing live terraform data as of {time.asctime(time.localtime(round(TerraformServer._state_cache.issue())))}</footer>', "utf-8"))
+            bytes(f'<footer>Created with &hearts; on {socket.gethostname()} showing live terraform data as of {time.asctime(time.localtime(round(TerraformServer._state_cache.issue())))}</footer>', coding))
 
-        self.wfile.write(bytes("</body>", "utf-8"))
+        self.wfile.write(bytes("</body>", coding))
 
     @method_trace
     def do_topology_tenant(self, tenant):
@@ -440,28 +439,28 @@ class TerraformServer(BaseHTTPRequestHandler):
         stages = sorted([key for key in data.keys()])
         stages.remove('shared')
 
-        self.wfile.write(bytes("<table>", "utf-8"))
+        self.wfile.write(bytes("<table>", coding))
 
-        self.wfile.write(bytes("<tr>", "utf-8"))
+        self.wfile.write(bytes("<tr>", coding))
         for stage in stages:
             self.wfile.write(
-                bytes(f'<th width=200>{TerraformServer.stage_table[stage]}</th>', "utf-8"))
-        self.wfile.write(bytes("</tr>", "utf-8"))
+                bytes(f'<th width=200>{TerraformServer.stage_table[stage]}</th>', coding))
+        self.wfile.write(bytes("</tr>", coding))
 
-        self.wfile.write(bytes("<tr>", "utf-8"))
+        self.wfile.write(bytes("<tr>", coding))
         for stage in stages:
-            self.wfile.write(bytes("<td>", "utf-8"))
+            self.wfile.write(bytes("<td>", coding))
             self.do_topology_stage(tenant, stage)
-            self.wfile.write(bytes("</td>", "utf-8"))
-        self.wfile.write(bytes("</tr>", "utf-8"))
+            self.wfile.write(bytes("</td>", coding))
+        self.wfile.write(bytes("</tr>", coding))
 
-        self.wfile.write(bytes("</table>", "utf-8"))
+        self.wfile.write(bytes("</table>", coding))
 
     @method_trace
     def do_topology_stage(self, tenant, stage):
         data = TerraformServer._state_cache.get()[tenant][stage]
 
-        self.wfile.write(bytes("<table>", "utf-8"))
+        self.wfile.write(bytes("<table>", coding))
 
         try:
             instance_query = "$..resources[?(@.type=='opentelekomcloud_compute_instance_v2')]"
@@ -482,18 +481,18 @@ class TerraformServer(BaseHTTPRequestHandler):
                     i_az=instance_dict[i_name]["az"]
                     i_flavor=TerraformServer.hardware_table[instance_dict[i_name]["flavor"][3:]]
                     i_id=instance_dict[i_name]["id"]
-                    self.wfile.write(bytes("<tr><td>", "utf-8"))
-                    self.wfile.write(bytes(f'<b>{self.hostname_to_link(i_name, tenant, stage)}</b><br>', "utf-8"))
-                    self.wfile.write(bytes(f'ip: {i_ip}<br>', "utf-8"))
-                    self.wfile.write(bytes(f'az: {i_az}<br>', "utf-8"))
-                    self.wfile.write(bytes(f'fl: {i_flavor}<br>', "utf-8"))
-                    self.wfile.write(bytes(f'rl: {", ".join(TerraformServer.role_table[i_type])}<br>', "utf-8"))
-                    self.wfile.write(bytes(f'id: {i_id}<br>', "utf-8"))
-                    self.wfile.write(bytes('</td></tr>', "utf-8"))
+                    self.wfile.write(bytes("<tr><td>", coding))
+                    self.wfile.write(bytes(f'<b>{self.hostname_to_link(i_name, tenant, stage)}</b><br>', coding))
+                    self.wfile.write(bytes(f'ip: {i_ip}<br>', coding))
+                    self.wfile.write(bytes(f'az: {i_az}<br>', coding))
+                    self.wfile.write(bytes(f'fl: {i_flavor}<br>', coding))
+                    self.wfile.write(bytes(f'rl: {", ".join(TerraformServer.role_table[i_type])}<br>', coding))
+                    self.wfile.write(bytes(f'id: {i_id}<br>', coding))
+                    self.wfile.write(bytes('</td></tr>', coding))
         except Exception as e:
             log.warn(f'Creating stage failed with {e}')
 
-        self.wfile.write(bytes("</table>", "utf-8"))
+        self.wfile.write(bytes("</table>", coding))
 
 
 if __name__ == "__main__":
