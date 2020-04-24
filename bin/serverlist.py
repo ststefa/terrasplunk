@@ -64,6 +64,26 @@ def init_logging():
 
 
 @method_trace
+def prep_arg_defaults():
+    # initialize all dynamic defaults with None
+    result = {'tenant': None, 'stage': None}
+
+    cwd = pathlib.Path('.')
+    terraform_workspace_file = pathlib.Path(cwd / '.terraform' / 'environment')
+    if terraform_workspace_file.exists():
+        workspace = terraform_workspace_file.read_text()
+        if workspace == "default":
+            result['tenant'] = "tsch_rz_t_001"
+        elif workspace == "production":
+            result['tenant'] = "tsch_rz_p_001"
+        result['stage'] = cwd.resolve().name
+        # This might be confusing becuase its potentially overriden
+        #log.warn( f'Using tenant {result["tenant"]} and stage {result["stage"]} derived from current terraform workspace')
+
+    return result
+
+
+@method_trace
 def init_parser(arg_defaults):
     parser = argparse.ArgumentParser(
         description=
@@ -125,27 +145,6 @@ class ServerlistError(Exception):
 
 
 @method_trace
-def prep_arg_defaults():
-    # initialize all dynamic defaults with None
-    result = {'tenant': None, 'stage': None}
-
-    cwd = pathlib.Path('.')
-    terraform_workspace_file = pathlib.Path(cwd / '.terraform' / 'environment')
-    if terraform_workspace_file.exists():
-        workspace = terraform_workspace_file.read_text()
-        if workspace == "default":
-            result['tenant'] = "tsch_rz_t_001"
-        elif workspace == "production":
-            result['tenant'] = "tsch_rz_p_001"
-        result['stage'] = cwd.resolve().name
-        log.warn(
-            f'Using tenant {result["tenant"]} and stage {result["stage"]} derived from current terraform workspace'
-        )
-
-    return result
-
-
-@method_trace
 def get_state_from_s3(args):
     s3_key = ""
     try:
@@ -156,11 +155,13 @@ def get_state_from_s3(args):
         log.debug(f'Fetching {s3_key}from S3')
         session = boto3.Session(profile_name=args.profile)
         s3 = session.client('s3')
-        s3_object = s3.get_object(Bucket='sbb-splunkterraform-prod', Key=s3_key)
+        s3_object = s3.get_object(Bucket='sbb-splunkterraform-prod',
+                                  Key=s3_key)
         data = json.loads(s3_object['Body'].read())
         return data
     except botocore.exceptions.ClientError:
-        raise ServerlistError(f'Cannot find any S3 data for key "{s3_key}"') from None
+        raise ServerlistError(
+            f'Cannot find any S3 data for key "{s3_key}"') from None
 
 
 @method_trace
