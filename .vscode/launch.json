@@ -39,17 +39,17 @@
             "name": "Python: serverlist.py",
             "type": "python",
             "request": "launch",
-            "program": "serverlist.py",
+            "program": "${workspaceFolder}/bin/serverlist.py",
+            "cwd": "${workspaceFolder}/stages/t0",
             "args": [
                 "tsch_rz_t_001",
                 "w0",
                 "--az",
                 "1",
-                "--id",
+                "--name",
                 "sh",
             ],
             "console": "integratedTerminal",
-            "cwd": "${workspaceFolder}/bin",
         },
     ]
 }
