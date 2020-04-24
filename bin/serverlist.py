@@ -116,7 +116,7 @@ def init_parser(arg_defaults):
     parser.add_argument(
         '--format',
         help=
-        'use custom format string for output instead of just the hostname. The string will have the following tokens replaced: %%name, %%ip, %%az, %%flv, %%tenant, %%stage. Collides with --verbose'
+        'use custom format string for output instead of just the hostname. The string will have the following tokens replaced: %%name, %%ip, %%az, %%flv, %%type, %%num, %%tenant, %%stage. Collides with --verbose'
     )
 
     parser.add_argument('--profile',
@@ -217,6 +217,8 @@ def print_servers(data, args):
             format_string = "%name" if args.format is None else args.format
             for instance_name in sorted(instance_dict.keys()):
                 out_line = format_string.replace('%name', instance_name)
+                out_line = out_line.replace('%type', instance_name[5:7])
+                out_line = out_line.replace('%num', instance_name[7:])
                 out_line = out_line.replace('%ip',
                                             instance_dict[instance_name]['ip'])
                 out_line = out_line.replace('%az',
