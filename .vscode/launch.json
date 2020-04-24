@@ -48,6 +48,8 @@
                 "1",
                 "--name",
                 "sh",
+                "--format",
+                "%ip-%name-%num-%type",
             ],
             "console": "integratedTerminal",
         },
