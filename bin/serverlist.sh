@@ -1,6 +1,9 @@
 #!/bin/bash
 # produce a list of hostnames based on terraform state
 
+echo "This code is retired. Use serverlist.py" >&2
+exit 1
+
 declare -a EVEN_INSTANCES
 declare -a ODD_INSTANCES
 
