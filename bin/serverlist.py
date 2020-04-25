@@ -145,15 +145,15 @@ class ServerlistError(Exception):
 
 
 @method_trace
-def get_state_from_s3(args):
+def get_state_from_s3(profile, tenant, stage):
     s3_key = ""
     try:
-        if args.tenant.lower() == "tsch_rz_p_001":
+        if tenant.lower() == "tsch_rz_p_001":
             s3_key += "env:/production/"
-        s3_key = f'{s3_key}{args.stage}.tfstate'
+        s3_key = f'{s3_key}{stage}.tfstate'
 
         log.debug(f'Fetching {s3_key}from S3')
-        session = boto3.Session(profile_name=args.profile)
+        session = boto3.Session(profile_name=profile)
         s3 = session.client('s3')
         s3_object = s3.get_object(Bucket='sbb-splunkterraform-prod',
                                   Key=s3_key)
@@ -258,7 +258,7 @@ if __name__ == "__main__":
                 'Not inside a terraform directory. Cannot determine tenant and stage automatically. Please supply tenant and stage explicitly.'
             )
 
-        state = get_state_from_s3(args)
+        state = get_state_from_s3(args.profile, args.tenant, args.stage)
         print_servers(state, args)
     except ServerlistError as e:
         log.error(e)
