@@ -118,7 +118,7 @@ variable "flavor_ix_map" {
       # size test (almost) like prodution, maybe better idea anyway. The full size does not (currently 2019-08) fit and leads to errors
       p0 : "s3.4xlarge.1"
       t0 : "s2.4xlarge.1"
-      w0 : "s2.4xlarge.1"
+      w0 : "s2.xlarge.2"
     }
     production = {
       p0 : "s3.4xlarge.2"
@@ -140,7 +140,7 @@ variable "flavor_sh_map" {
     default = {
       p0 : "s3.4xlarge.1"
       t0 : "s2.4xlarge.1"
-      w0 : "s2.4xlarge.1"
+      w0 : "s2.xlarge.2"
     }
     production = {
       p0 : "s3.4xlarge.2"
@@ -161,7 +161,7 @@ variable "flavor_es_map" {
     default = {
       p0 : "s3.4xlarge.2"
       t0 : "s2.4xlarge.2"
-      w0 : "s2.4xlarge.2"
+      w0 : "s2.xlarge.2"
     }
     production = {
       p0 : "s3.4xlarge.2"
@@ -182,7 +182,7 @@ variable "flavor_si_map" {
     default = {
       p0 : "s3.4xlarge.2"
       t0 : "s2.4xlarge.2"
-      w0 : "s2.4xlarge.2"
+      w0 : "s2.xlarge.2"
     }
     production = {
       p0 : "s3.4xlarge.2"
@@ -215,7 +215,7 @@ variable "flavor_ds_map" {
   # Sizing agreed with customer on workshop 2020-02-12
   type        = map
   default = {
-    default    = "s2.2xlarge.2"
+    default    = "s2.xlarge.2"
     production = "s3.2xlarge.2"
   }
 }
@@ -248,7 +248,7 @@ variable "flavor_default_map" {
       h0 : "s2.4xlarge.1"
       p0 : "s3.4xlarge.1"
       t0 : "s2.4xlarge.1"
-      w0 : "s2.4xlarge.1"
+      w0 : "s2.xlarge.2"
     }
     production = {
       d0 : "s3.4xlarge.1"
