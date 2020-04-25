@@ -111,7 +111,10 @@ def init_parser(arg_defaults):
     parser.add_argument(
         '--flv', help='only show instances whose flavor matches this regex')
     parser.add_argument(
-        '--name', help='only show instances whose name matches this regex')
+        '--type',
+        help=
+        'only show instances whose type matches this regex (e.g. "ix" -> all ix instances; "(sh|ix)" -> sh or ix instances; "^(?!ix)" -> all except ix instances; "^(?!(ix|sh))" -> all except ix or sh instances'
+    )
 
     parser.add_argument(
         '--format',
@@ -168,69 +171,77 @@ def get_state_from_s3(profile, tenant, stage):
 def print_servers(data, args):
     instance_query = "$..resources[?(@.type=='opentelekomcloud_compute_instance_v2')]"
     all_compute_instances = jsonpath.jsonpath(data, instance_query)
-    if all_compute_instances:
-        instance_dict = {}
-        for instance in all_compute_instances:
-            instance_name = instance['instances'][0]['attributes']['name']
-            instance_dict[instance_name] = {}
-            instance_dict[instance_name]['ip'] = instance['instances'][0][
-                'attributes']['access_ip_v4']
-            instance_dict[instance_name]['az'] = instance['instances'][0][
-                'attributes']['availability_zone']
-            instance_dict[instance_name]['flavor'] = instance['instances'][0][
-                'attributes']['flavor_id']
-        if args.name is not None:
-            regex = re.compile(args.name, re.IGNORECASE)
-            removals = [
-                name for name in instance_dict.keys() if not regex.search(name)
-            ]
-            for name in removals:
-                log.debug(f'remove {name}: {instance_dict.pop(name)}')
-        if args.az is not None:
-            if args.az == "1":
-                az = "eu-ch-01"
-            elif args.az == "2":
-                az = "eu-ch-02"
-            else:
-                raise ServerlistError(
-                    f'Invalid AZ "{args.az}". Use "1" for AZ1/eu-ch-01 or "2" for AZ2/eu-ch-02'
-                )
-            removals = [
-                name for name in instance_dict.keys()
-                if not instance_dict[name]['az'] == az
-            ]
-            for name in removals:
-                log.debug(f'remove {name}: {instance_dict.pop(name)}')
-        if args.flv is not None:
-            regex = re.compile(args.flv, re.IGNORECASE)
-            removals = [
-                name for name in instance_dict.keys()
-                if not regex.search(instance_dict[name]['flavor'])
-            ]
-            for name in removals:
-                log.debug(f'remove {name}: {instance_dict.pop(name)}')
+    if not all_compute_instances:
+        raise ServerlistError(
+            'No instances of "opentelekomcloud_compute_instance_v2" found in this tenant/stage'
+        )
 
-        if args.verbose:
-            log.info(
-                json.dumps(instance_dict, indent=2 if args.pretty else None))
+    instance_dict = {}
+    for instance in all_compute_instances:
+        instance_name = instance['instances'][0]['attributes']['name']
+        instance_dict[instance_name] = {}
+        instance_dict[instance_name]['type'] = instance_name[5:7]
+        instance_dict[instance_name]['num'] = instance_name[7:]
+        instance_dict[instance_name]['ip'] = instance['instances'][0][
+            'attributes']['access_ip_v4']
+        instance_dict[instance_name]['az'] = instance['instances'][0][
+            'attributes']['availability_zone']
+        instance_dict[instance_name]['flavor'] = instance['instances'][0][
+            'attributes']['flavor_id']
+    if args.type is not None:
+        regex = re.compile(args.type, re.IGNORECASE)
+        removals = [
+            name for name in instance_dict.keys()
+            if not regex.search(instance_dict[name]['type'])
+        ]
+        for name in removals:
+            log.debug(f'remove {name}: {instance_dict.pop(name)}')
+    if args.az is not None:
+        if args.az == "1":
+            az = "eu-ch-01"
+        elif args.az == "2":
+            az = "eu-ch-02"
         else:
-            format_string = "%name" if args.format is None else args.format
-            for instance_name in sorted(instance_dict.keys()):
-                out_line = format_string.replace('%name', instance_name)
-                out_line = out_line.replace('%type', instance_name[5:7])
-                out_line = out_line.replace('%num', instance_name[7:])
-                out_line = out_line.replace('%ip',
-                                            instance_dict[instance_name]['ip'])
-                out_line = out_line.replace('%az',
-                                            instance_dict[instance_name]['az'])
-                out_line = out_line.replace(
-                    '%flv', instance_dict[instance_name]['flavor'])
-                out_line = out_line.replace('%tenant', args.tenant)
-                out_line = out_line.replace('%stage', args.stage)
-                out_line = out_line.replace('%az',
-                                            instance_dict[instance_name]['az'])
+            raise ServerlistError(
+                f'Invalid AZ "{args.az}". Use "1" for AZ1/eu-ch-01 or "2" for AZ2/eu-ch-02'
+            )
+        removals = [
+            name for name in instance_dict.keys()
+            if not instance_dict[name]['az'] == az
+        ]
+        for name in removals:
+            log.debug(f'remove {name}: {instance_dict.pop(name)}')
+    if args.flv is not None:
+        regex = re.compile(args.flv, re.IGNORECASE)
+        removals = [
+            name for name in instance_dict.keys()
+            if not regex.search(instance_dict[name]['flavor'])
+        ]
+        for name in removals:
+            log.debug(f'remove {name}: {instance_dict.pop(name)}')
 
-                log.info(out_line)
+    if args.verbose:
+        log.info(json.dumps(instance_dict, indent=2 if args.pretty else None))
+    else:
+        format_string = "%name" if args.format is None else args.format
+        for instance_name in sorted(instance_dict.keys()):
+            out_line = format_string.replace('%name', instance_name)
+            out_line = out_line.replace('%type',
+                                        instance_dict[instance_name]['type'])
+            out_line = out_line.replace('%num',
+                                        instance_dict[instance_name]['num'])
+            out_line = out_line.replace('%ip',
+                                        instance_dict[instance_name]['ip'])
+            out_line = out_line.replace('%az',
+                                        instance_dict[instance_name]['az'])
+            out_line = out_line.replace('%flv',
+                                        instance_dict[instance_name]['flavor'])
+            out_line = out_line.replace('%tenant', args.tenant)
+            out_line = out_line.replace('%stage', args.stage)
+            out_line = out_line.replace('%az',
+                                        instance_dict[instance_name]['az'])
+
+            log.info(out_line)
 
 
 if __name__ == "__main__":
