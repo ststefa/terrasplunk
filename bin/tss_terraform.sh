@@ -11,15 +11,24 @@ if [ -z "${TF_VAR_username}" ] || [ -z "${TF_VAR_password}" ] ; then
     exit 1
 fi
 
+list_targets() {
+    TENANT=${1}
+    STAGE=${2}
+    shift;shift
+    FILTER="${*}"
+
+    "${BASEDIR}/bin/serverlist.py" ${FILTER} "${TENANT}" "${STAGE}"
+}
+
 do_terraform() {
     if (( $# < 3 )) ; then
         echo "${FUNCNAME[0]}: wrong number of arguments" >&2
         return 1
     fi
 
-    TENANT=${1}
-    STAGE=${2}
-    OPERATION=${3}
+    OPERATION=${1}
+    TENANT=${2}
+    STAGE=${3}
     shift;shift;shift
     FILTER=${*}
 
@@ -51,7 +60,10 @@ do_terraform() {
         fi
     fi
 
-    echo terraform workspace select ${WORKSPACE}
+    terraform workspace select ${WORKSPACE} 2>/dev/null
+    if (( $? != 0 )) ; then
+        terraform workspace new ${WORKSPACE} || return 1
+    fi
     if [ -z "${FILTER}" ] ; then
         terraform "${OPERATION}"
     else
@@ -70,19 +82,32 @@ do_terraform() {
 }
 
 usage() {
-    echo "Usage: $(basename "$0") (<tenant> <stage> <operation> (<filter>)) | (-h|--help)"
+    echo "Usage: $(basename "$0") (<operation> <tenant> <stage> (<filter>)) | (-h|--help)"
 }
 
-case $3 in
+case $1 in
+    list)
+        shift
+        list_targets "$@"
+        ;;
     apply)
         OP=$1
-        shift 1
-        do_terraform $OP "$@"
+        shift
+        do_terraform "$OP" "$@"
+        ;;
+    destroy)
+        OP=$1
+        shift
+        do_terraform "$OP" "$@"
         ;;
     -h|--help)
         echo 'Execute terraform activities'
         usage
         echo 'where:'
+        echo '  operation: an terraform operation, one of:'
+        echo '      list:    list of targeted VMs. Useful for testing filters.'
+        echo '      apply:   apply terraform model'
+        echo '      destroy: destroy terraform model. Use with caution!'
         echo '  tenant: target tenant, one of:'
         echo '      tsch_rz_t_001: test tenant'
         echo '      tsch_rz_p_001: production tenant'
@@ -93,16 +118,16 @@ case $3 in
         echo '      t0:     test'
         echo '      w0:     spielwiese'
         echo '      shared: shared state, e.g. networking and security groups'
-        echo '  operation: an terraform operation, one of:'
-        echo '      apply:   apply terraform model'
-        echo '      destroy: destroy terraform model. Use with caution!'
-        echo '  filter: optional filters to narrow down the operation to a subset of instances.'
-        echo '          If multiple filters are used they will be logically and-ed. Available'
-        echo '          filters are:'
+        echo '  filter: optional filters to narrow down the operation to a subset of target instances.'
+        echo '          If multiple filters are used they will be logically and-ed. Filters accept'
+        echo '          regex expressions, e.g. "--type '\''(ix|sh)'\''" Available filters are:'
         echo '      --az:   Only instances in this availability zone, one of 1 or 2'
-        echo '      --type: Only instances in this availability zone, one of'
+        echo '      --type: Only instances of this type/these types, one or more of'
         echo '              ix: indexers'
         echo '              sh: searchheads'
+        echo '              (more types exist, please see http://admin.splunk.sbb.ch/topology)'
+        echo '      --num:  Only instances with this number (last three digits). The number is compared'
+        echo '              using regex so make sure to always specify all three digits'
         ;;
     *)
         usage >&2

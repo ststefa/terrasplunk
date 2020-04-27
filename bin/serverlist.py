@@ -115,6 +115,11 @@ def init_parser(arg_defaults):
         help=
         'only show instances whose type matches this regex (e.g. "ix" -> all ix instances; "(sh|ix)" -> sh or ix instances; "^(?!ix)" -> all except ix instances; "^(?!(ix|sh))" -> all except ix or sh instances'
     )
+    parser.add_argument(
+        '--num',
+        help=
+        'only show instances whose number (last three digits) matches this regex (e.g. "001" -> instance named "*001*"; "(001|003)" -> instance named "*001*" or "*003*". Beware that the number is compared as a string, not as an integer. Thus, "1" would match any number containg "1" like "1", "10" or "213". Always specify three digits to be on the safe side.'
+    )
 
     parser.add_argument(
         '--format',
@@ -188,6 +193,14 @@ def print_servers(data, args):
             'attributes']['availability_zone']
         instance_dict[instance_name]['flavor'] = instance['instances'][0][
             'attributes']['flavor_id']
+    if args.num is not None:
+        regex = re.compile(args.num, re.IGNORECASE)
+        removals = [
+            name for name in instance_dict.keys()
+            if not regex.search(instance_dict[name]['num'])
+        ]
+        for name in removals:
+            log.debug(f'remove {name}: {instance_dict.pop(name)}')
     if args.type is not None:
         regex = re.compile(args.type, re.IGNORECASE)
         removals = [
