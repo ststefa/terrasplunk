@@ -7,8 +7,8 @@ After=network.target
 [Service]
 User=linux
 Group=linux
-Environment=ARG1=username_goes_here ARG2=password_goes_here
-ExecStart=/home/terraform/terrasplunk/bin/wsrv.py --user $ARG1 --password $ARG2 --health_score_watermark 90
+Environment=WSRV_USR=username_goes_here WSRV_PSW=password_goes_here
+ExecStart=/home/terraform/terrasplunk/bin/wsrv.py --low_watermark 100 --high_watermark 76 --user $WSRV_USR --password $WSRV_PSW
 Restart=on-failure
 RestartSec=10s
 Type=simple
@@ -17,3 +17,4 @@ StandardError=syslog
 
 [Install]
 WantedBy=multi-user.target
+
