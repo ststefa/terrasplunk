@@ -94,12 +94,7 @@ case $1 in
         shift
         list_targets "$@"
         ;;
-    apply)
-        OP=$1
-        shift
-        do_terraform "$OP" "$@"
-        ;;
-    destroy)
+    apply|destroy)
         OP=$1
         shift
         do_terraform "$OP" "$@"
@@ -139,4 +134,4 @@ case $1 in
         ;;
 esac
 
-exit $?
+exit ${?}
