@@ -5,7 +5,7 @@
 BASEDIR="$(cd "$(dirname "$0")" && cd .. && pwd)" || exit 1
 
 if [ -z "${TF_VAR_username}" ] || [ -z "${TF_VAR_password}" ] ; then
-    echo "Your terraform credentials are not exported. Please export them like so:" >&2
+    echo "Your terraform credentials are not exported to the shell. Please export them like so:" >&2
     echo "    export TF_VAR_username=<your-otc-tenant-username>" >&2
     echo "    export TF_VAR_password=<your-otc-tenant-password>" >&2
     exit 1
@@ -17,6 +17,7 @@ list_targets() {
     shift;shift
     FILTER="${*}"
 
+    # shellcheck disable=SC2086
     "${BASEDIR}/bin/serverlist.py" ${FILTER} "${TENANT}" "${STAGE}"
 }
 
@@ -61,6 +62,7 @@ do_terraform() {
     fi
 
     terraform workspace select ${WORKSPACE} 2>/dev/null
+    # shellcheck disable=SC2181
     if (( $? != 0 )) ; then
         terraform workspace new ${WORKSPACE} || return 1
     fi
@@ -70,11 +72,13 @@ do_terraform() {
         if [ "${STAGE}" == "shared" ] ; then
             terraform "${OPERATION}"
         else
+            # shellcheck disable=SC2086
             SERVERLIST=$("${BASEDIR}/bin/serverlist.py" ${FILTER} --format=-target=module.server-%type%num | paste -sd" ")
             if [ -z "${SERVERLIST}" ] ; then
-                echo "could not compile serverlist for filter \"${FILTER}\". Either there is no such instance or the filter was specified wrongly." >&2
+                echo "Could not compile serverlist for filter \"${FILTER}\". Either there is no such instance or the filter was specified wrongly." >&2
                 return 1
             else
+                # shellcheck disable=SC2086
                 terraform "${OPERATION}" ${SERVERLIST}
             fi
         fi
@@ -105,28 +109,28 @@ case $1 in
         usage
         echo 'where:'
         echo '  operation: an terraform operation, one of:'
-        echo '      list:    list of targeted VMs. Useful for testing filters.'
-        echo '      apply:   apply terraform model'
-        echo '      destroy: destroy terraform model. Use with caution!'
+        echo '      list     list of targeted VMs. Useful for testing filters.'
+        echo '      apply    apply terraform model'
+        echo '      destroy  destroy terraform model. Use with caution!'
         echo '  tenant: target tenant, one of:'
-        echo '      tsch_rz_t_001: test tenant'
-        echo '      tsch_rz_p_001: production tenant'
+        echo '      tsch_rz_t_001   test tenant'
+        echo '      tsch_rz_p_001   production tenant'
         echo '  stage:  target stage, one of:'
-        echo '      g0:     global'
-        echo '      h0:     historic'
-        echo '      p0:     production'
-        echo '      t0:     test'
-        echo '      w0:     spielwiese'
-        echo '      shared: shared state, e.g. networking and security groups'
+        echo '      g0       global'
+        echo '      h0       historic'
+        echo '      p0       production'
+        echo '      t0       test'
+        echo '      w0       spielwiese'
+        echo '      shared : shared state, e.g. networking and security groups'
         echo '  filter: optional filters to narrow down the operation to a subset of target instances.'
         echo '          If multiple filters are used they will be logically and-ed. Filters accept'
         echo '          regex expressions, e.g. "--type '\''(ix|sh)'\''" Available filters are:'
-        echo '      --az:   Only instances in this availability zone, one of 1 or 2'
-        echo '      --type: Only instances of this type/these types, one or more of'
-        echo '              ix: indexers'
-        echo '              sh: searchheads'
+        echo '      --az    Only instances in this availability zone, one of 1 or 2'
+        echo '      --type  Only instances of this type/these types, one or more of'
+        echo '              ix : indexers'
+        echo '              sh : searchheads'
         echo '              (more types exist, please see http://admin.splunk.sbb.ch/topology)'
-        echo '      --num:  Only instances with this number (last three digits). The number is compared'
+        echo '      --num   Only instances with this number (last three digits). The number is compared'
         echo '              using regex so make sure to always specify all three digits'
         ;;
     *)
