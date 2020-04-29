@@ -273,10 +273,10 @@ if __name__ == "__main__":
     try:
         if args.verbose and args.format is not None:
             raise ServerlistError(
-                'Cannot use --verbose togehter with --format')
+                'Cannot use --verbose together with --format')
         if args.pretty and not args.verbose:
             raise ServerlistError(
-                'Can only use --pretty togehter with --verbose')
+                'Cannot use --pretty without --verbose')
         if args.tenant is None or args.stage is None:
             raise ServerlistError(
                 'Not inside a terraform directory. Cannot determine tenant and stage automatically. Please supply tenant and stage explicitly.'

@@ -23,8 +23,6 @@
                 "myuser",
                 "--password",
                 "mypassword",
-                "--health_score_watermark",
-                "70"
             ],
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}/bin",
