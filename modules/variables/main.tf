@@ -84,6 +84,18 @@ output "sbb_infrastructure_stage" {
 #+--------------+--------+--------+
 #| ID           |    RAM |  VCPUs |
 #+--------------+--------+--------+
+#| s2.medium.1  |   1024 |      1 |
+#| s2.medium.2  |   2048 |      1 |
+#| s2.medium.4  |   4096 |      1 |
+#| s2.medium.8  |   8192 |      1 |
+#| s2.large.1   |   2048 |      2 |
+#| s2.large.2   |   4096 |      2 |
+#| s2.large.4   |   8192 |      2 |
+#| s2.large.8   |  16384 |      2 |
+#| s2.xlarge.1  |   4096 |      4 |
+#| s2.xlarge.2  |   8192 |      4 |
+#| s2.xlarge.4  |  16384 |      4 |
+#| s2.xlarge.8  |  32768 |      4 |
 #| s2.2xlarge.1 |   8192 |      8 |
 #| s2.2xlarge.2 |  16384 |      8 |
 #| s2.2xlarge.4 |  32768 |      8 |
@@ -96,18 +108,6 @@ output "sbb_infrastructure_stage" {
 #| s2.8xlarge.2 |  65536 |     32 |
 #| s2.8xlarge.4 | 131072 |     32 |
 #| s2.8xlarge.8 | 262144 |     32 |
-#| s2.large.1   |   2048 |      2 |
-#| s2.large.2   |   4096 |      2 |
-#| s2.large.4   |   8192 |      2 |
-#| s2.large.8   |  16384 |      2 |
-#| s2.medium.1  |   1024 |      1 |
-#| s2.medium.2  |   2048 |      1 |
-#| s2.medium.4  |   4096 |      1 |
-#| s2.medium.8  |   8192 |      1 |
-#| s2.xlarge.1  |   4096 |      4 |
-#| s2.xlarge.2  |   8192 |      4 |
-#| s2.xlarge.4  |  16384 |      4 |
-#| s2.xlarge.8  |  32768 |      4 |
 #+--------------+--------+--------+
 
 variable "flavor_ix_map" {
@@ -118,7 +118,7 @@ variable "flavor_ix_map" {
       # size test (almost) like prodution, maybe better idea anyway. The full size does not (currently 2019-08) fit and leads to errors
       p0 : "s3.4xlarge.1"
       t0 : "s2.4xlarge.1"
-      w0 : "s2.4xlarge.1"
+      w0 : "s2.xlarge.2"
     }
     production = {
       p0 : "s3.4xlarge.2"
@@ -140,7 +140,7 @@ variable "flavor_sh_map" {
     default = {
       p0 : "s3.4xlarge.1"
       t0 : "s2.4xlarge.1"
-      w0 : "s2.4xlarge.1"
+      w0 : "s2.xlarge.2"
     }
     production = {
       p0 : "s3.4xlarge.2"
@@ -161,7 +161,7 @@ variable "flavor_es_map" {
     default = {
       p0 : "s3.4xlarge.2"
       t0 : "s2.4xlarge.2"
-      w0 : "s2.4xlarge.2"
+      w0 : "s2.xlarge.2"
     }
     production = {
       p0 : "s3.4xlarge.2"
@@ -182,7 +182,7 @@ variable "flavor_si_map" {
     default = {
       p0 : "s3.4xlarge.2"
       t0 : "s2.4xlarge.2"
-      w0 : "s2.4xlarge.2"
+      w0 : "s2.xlarge.2"
     }
     production = {
       p0 : "s3.4xlarge.2"
@@ -215,7 +215,7 @@ variable "flavor_ds_map" {
   # Sizing agreed with customer on workshop 2020-02-12
   type        = map
   default = {
-    default    = "s2.2xlarge.2"
+    default    = "s2.xlarge.2"
     production = "s3.2xlarge.2"
   }
 }
@@ -248,7 +248,7 @@ variable "flavor_default_map" {
       h0 : "s2.4xlarge.1"
       p0 : "s3.4xlarge.1"
       t0 : "s2.4xlarge.1"
-      w0 : "s2.4xlarge.1"
+      w0 : "s2.xlarge.2"
     }
     production = {
       d0 : "s3.4xlarge.1"

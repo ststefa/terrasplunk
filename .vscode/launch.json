@@ -23,17 +23,33 @@
                 "myuser",
                 "--password",
                 "mypassword",
-                "--health_score_watermark",
-                "70"
             ],
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}/bin",
             "serverReadyAction": {
                 "pattern": "Server listening on",
-                "uriFormat": "http://localhost:8081/monitor/health_score",
+                "uriFormat": "http://10.104.146.36:8082/topology",
                 "action": "openExternally",
                 //"action": "debugWithChrome",
             }
-        }
+        },
+        {
+            "name": "Python: serverlist.py",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/bin/serverlist.py",
+            "cwd": "${workspaceFolder}/stages/t0",
+            "args": [
+                "tsch_rz_t_001",
+                "w0",
+                "--az",
+                "1",
+                "--name",
+                "sh",
+                "--format",
+                "%ip-%name-%num-%type",
+            ],
+            "console": "integratedTerminal",
+        },
     ]
 }

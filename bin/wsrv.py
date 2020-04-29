@@ -175,41 +175,41 @@ class TerraformServer(BaseHTTPRequestHandler):
         "si": ["single-searchhead"],
         "sy": ["syslog"],
     }
-    hardware_table = {
-        "2xlarge.1": "8 GB |  8 vCPU",
-        "2xlarge.2": "16 GB |  8 vCPU",
-        "2xlarge.4": "32 GB |  8 vCPU",
-        "2xlarge.8": "64 GB |  8 vCPU",
-        "4xlarge.1": "16 GB | 16 vCPU",
-        "4xlarge.2": "32 GB | 16 vCPU",
-        "4xlarge.4": "64 GB | 16 vCPU",
-        "4xlarge.8": "128 GB | 16 vCPU",
-        "8xlarge.1": "32 GB | 32 vCPU",
-        "8xlarge.2": "64 GB | 32 vCPU",
-        "8xlarge.4": "128 GB | 32 vCPU",
-        "8xlarge.8": "256 GB | 32 vCPU",
-        "large.1": "2 GB |  2 vCPU",
-        "large.2": "4 GB |  2 vCPU",
-        "large.4": "8 GB |  2 vCPU",
-        "large.8": "16 GB |  2 vCPU",
-        "medium.1": "1 GB |  1 vCPU",
-        "medium.2": "2 GB |  1 vCPU",
-        "medium.4": "4 GB |  1 vCPU",
-        "medium.8": "8 GB |  1 vCPU",
-        "xlarge.1": "4 GB |  4 vCPU",
-        "xlarge.2": "8 GB |  4 vCPU",
-        "xlarge.4": "16 GB |  4 vCPU",
-        "xlarge.8": "32 GB |  4 vCPU",
+    hardware_table = { # yapf:disable
+        "medium.1":  {'ram':1,   'vcpu':1},
+        "medium.2":  {'ram':2,   'vcpu':1},
+        "medium.4":  {'ram':4,   'vcpu':1},
+        "medium.8":  {'ram':8,   'vcpu':1},
+        "large.1":   {'ram':2,   'vcpu':2},
+        "large.2":   {'ram':4,   'vcpu':2},
+        "large.4":   {'ram':8,   'vcpu':2},
+        "large.8":   {'ram':16,  'vcpu':2},
+        "xlarge.1":  {'ram':4,   'vcpu':4},
+        "xlarge.2":  {'ram':8,   'vcpu':4},
+        "xlarge.4":  {'ram':16,  'vcpu':4},
+        "xlarge.8":  {'ram':32,  'vcpu':4},
+        "2xlarge.1": {'ram':8,   'vcpu':8},
+        "2xlarge.2": {'ram':16,  'vcpu':8},
+        "2xlarge.4": {'ram':32,  'vcpu':8},
+        "2xlarge.8": {'ram':64,  'vcpu':8},
+        "4xlarge.1": {'ram':16,  'vcpu':16},
+        "4xlarge.2": {'ram':32,  'vcpu':16},
+        "4xlarge.4": {'ram':64,  'vcpu':16},
+        "4xlarge.8": {'ram':128, 'vcpu':16},
+        "8xlarge.1": {'ram':32,  'vcpu':32},
+        "8xlarge.2": {'ram':64,  'vcpu':32},
+        "8xlarge.4": {'ram':128, 'vcpu':32},
+        "8xlarge.8": {'ram':256, 'vcpu':32},
     }
 
     @method_trace
     def hostname_to_link(self, hostname, tenant, stage):
-        domain="splunk.sbb.ch"
-        ecs_type=hostname[5:7]
-        ecs_stage=hostname[3:5]
-        ecs_number=hostname[7:]
+        domain = "splunk.sbb.ch"
+        ecs_type = hostname[5:7]
+        ecs_stage = hostname[3:5]
+        ecs_number = hostname[7:]
 
-        if tenant=="tsch_rz_p_001":
+        if tenant == "tsch_rz_p_001":
             if ecs_type == "hf":
                 return f'<a href="https://{ecs_type}{ecs_number}-{TerraformServer.stage_table[ecs_stage]}.{domain}">{hostname}</a>'
             if ecs_type in TerraformServer.type_table.keys():
@@ -218,7 +218,7 @@ class TerraformServer(BaseHTTPRequestHandler):
                 else:
                     return f'<a href="https://{TerraformServer.type_table[ecs_type]}-{TerraformServer.stage_table[ecs_stage]}.{domain}">{hostname}</a>'
         else:
-            if ecs_type == "hf" or ecs_type in TerraformServer.type_table.keys():
+            if ecs_type == "hf" or ecs_type in TerraformServer.type_table.keys(): # yapf:disable
                 data = TerraformServer._state_cache.get()[tenant][stage]
 
                 # find host in json data
@@ -226,7 +226,7 @@ class TerraformServer(BaseHTTPRequestHandler):
                 compute_instances = jsonpath.jsonpath(data, "$..resources[?(@.type=='opentelekomcloud_compute_instance_v2')]") # yapf: disable
                 for instance in compute_instances:
                     log.debug(f'instance:{instance}')
-                    if instance['instances'][0]['attributes']['name'] == hostname:
+                    if instance['instances'][0]['attributes']['name'] == hostname: # yapf:disable
                         this_host = instance
                         break
                 if this_host is not None:
@@ -408,7 +408,7 @@ class TerraformServer(BaseHTTPRequestHandler):
                 tr, th, td {text-align: left; vertical-align: top; border: 1px solid; padding: 2px; padding-left: 10px;; padding-right: 10px;}\
                 tr         {text-align: left; vertical-align: top; border: 1px solid;}\
                 footer     {padding: 10px; color: lightgrey; font-size: small;}\
-            </style>"                                                                                                                                                   , coding))
+            </style>", coding))
         self.wfile.write(bytes("</head>", coding))
 
         self.do_topology_body()
@@ -463,34 +463,68 @@ class TerraformServer(BaseHTTPRequestHandler):
         self.wfile.write(bytes("<table>", coding))
 
         try:
+            capacity = {'ram': 0, 'vcpu': 0, 'ssd': 0, 'sata': 0}
+
+            blockstorage_query = "$..resources[?(@.type=='opentelekomcloud_blockstorage_volume_v2')]" # yapf: disable
+            blockstorages = jsonpath.jsonpath(data, blockstorage_query)
+            if blockstorages:
+                for disk in blockstorages:
+                    d_type=disk['instances'][0]['attributes']['volume_type']
+                    if d_type == 'SATA':
+                        capacity['sata'] += disk['instances'][0]['attributes']['size']
+                    elif d_type == 'SSD':
+                        capacity['ssd'] += disk['instances'][0]['attributes']['size']
+                    else:
+                        log.warn(f'Unknown disk type {d_type}')
+
             instance_query = "$..resources[?(@.type=='opentelekomcloud_compute_instance_v2')]"
             all_compute_instances = jsonpath.jsonpath(data, instance_query)
+            has_instances = False
             if all_compute_instances:
+                has_instances = True
                 # create temp dict just for sorting
+                # yapf:disable
                 instance_dict = {}
                 for instance in all_compute_instances:
                     i_name = instance['instances'][0]['attributes']['name']
+                    i_ip = instance['instances'][0]['attributes']['access_ip_v4']
+                    i_id = instance['instances'][0]['attributes']['id']
+                    i_az = instance['instances'][0]['attributes']['availability_zone']
+                    i_flavor = instance['instances'][0]['attributes']['flavor_id']
                     instance_dict[i_name] = {}
-                    instance_dict[i_name]['ip'] = instance['instances'][0]['attributes']['access_ip_v4']
-                    instance_dict[i_name]['id'] = instance['instances'][0]['attributes']['id']
-                    instance_dict[i_name]['az'] = instance['instances'][0]['attributes']['availability_zone']
-                    instance_dict[i_name]['flavor'] = instance['instances'][0]['attributes']['flavor_id']
+                    instance_dict[i_name]['ip'] = i_ip
+                    instance_dict[i_name]['id'] = i_id
+                    instance_dict[i_name]['az'] = i_az
+                    instance_dict[i_name]['flavor'] = i_flavor
+                    capacity['ram'] += TerraformServer.hardware_table[i_flavor[3:]]['ram']
+                    capacity['vcpu'] += TerraformServer.hardware_table[i_flavor[3:]]['vcpu']
                 for i_name in sorted(instance_dict.keys()):
-                    i_type=i_name[5:7]
-                    i_ip=instance_dict[i_name]["ip"]
-                    i_az=instance_dict[i_name]["az"]
-                    i_flavor=TerraformServer.hardware_table[instance_dict[i_name]["flavor"][3:]]
-                    i_id=instance_dict[i_name]["id"]
+                    i_type = i_name[5:7]
+                    i_ip = instance_dict[i_name]["ip"]
+                    i_az = instance_dict[i_name]["az"]
+                    i_vcpu = TerraformServer.hardware_table[instance_dict[i_name]["flavor"][3:]]["vcpu"]
+                    i_ram = TerraformServer.hardware_table[instance_dict[i_name]["flavor"][3:]]["ram"]
+                    i_id = instance_dict[i_name]["id"]
                     self.wfile.write(bytes("<tr><td>", coding))
                     self.wfile.write(bytes(f'<b>{self.hostname_to_link(i_name, tenant, stage)}</b><br>', coding))
                     self.wfile.write(bytes(f'ip: {i_ip}<br>', coding))
                     self.wfile.write(bytes(f'az: {i_az}<br>', coding))
-                    self.wfile.write(bytes(f'fl: {i_flavor}<br>', coding))
+                    self.wfile.write(bytes(f'fl: {i_ram} GB | {i_vcpu} vCPU<br>', coding))
                     self.wfile.write(bytes(f'rl: {", ".join(TerraformServer.role_table[i_type])}<br>', coding))
                     self.wfile.write(bytes(f'id: {i_id}<br>', coding))
                     self.wfile.write(bytes('</td></tr>', coding))
-        except Exception as e:
-            log.warn(f'Creating stage failed with {e}')
+        except Exception:
+            log.warn(f'Creating stage failed with {traceback.format_exc()}')
+            self.wfile.write(bytes(f'Creating stage failed with {traceback.format_exc()}', "utf-8"))
+
+        if has_instances:
+            self.wfile.write(bytes("<tr><td>", coding))
+            self.wfile.write(bytes(f'<b>Total capacity:</b><br>', coding))
+            self.wfile.write(bytes(f'vcpu: {capacity["vcpu"]}, ', coding))
+            self.wfile.write(bytes(f'ram:  {capacity["ram"]}, ', coding))
+            self.wfile.write(bytes(f'sata: {capacity["sata"]}, ', coding))
+            self.wfile.write(bytes(f'ssd:  {capacity["ssd"]}', coding))
+            self.wfile.write(bytes('</td></tr>', coding))
 
         self.wfile.write(bytes("</table>", coding))
 
