@@ -271,7 +271,7 @@ if __name__ == "__main__":
     log.debug(f'args: {args}')
 
     try:
-        if args.verbose and args.format is not None:
+        if args.verbose and args.format:
             raise ServerlistError(
                 'Cannot use --verbose together with --format')
         if args.pretty and not args.verbose:
