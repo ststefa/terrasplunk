@@ -515,6 +515,7 @@ class TerraformServer(BaseHTTPRequestHandler):
                     self.wfile.write(bytes('</td></tr>', coding))
         except Exception:
             log.warn(f'Creating stage failed with {traceback.format_exc()}')
+            self.wfile.write(bytes(f'Creating stage failed with {traceback.format_exc()}', "utf-8"))
 
         if has_instances:
             self.wfile.write(bytes("<tr><td>", coding))
