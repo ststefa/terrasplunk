@@ -335,7 +335,13 @@ class TerraformServer(BaseHTTPRequestHandler):
         self.wfile.write(bytes(f'<p>Stage {stage} health_score (after converted to float) = {result_health_score}, {severity}_watermark = {health_score_watermark[severity]} ; therefore ...</p>', coding))
         self.wfile.write(bytes(f'<p><b>{interpreted_splunk_health}</b></p>', coding))
         self.wfile.write(bytes('<h1>Splunk System Health</h1>', coding))
-        self.wfile.write(bytes('<p>Go to <a href="https://search.splunk.sbb.ch/en-GB/app/itsi/serverhealth">system health dashboard</a></p>', coding))
+        db_link = f'https://search.splunk.sbb.ch/en-GB/app/itsi/serverhealth?form.stage='
+        if stage==None:
+            db_param = f'title!=splh0* AND title!=splw0* AND title=spl*'
+        else:
+            db_param = f'title=spl{stage}*'
+        # encode URL to get rid of '=', but leave '!' and '*'
+        self.wfile.write(bytes(f'<p>Go to <a href="{db_link}{urllib.parse.quote(db_param, safe="*!")}">system health dashboard</a></p>', coding))
         self.wfile.write(bytes('</body>', coding))
 
         #HTML End
