@@ -85,6 +85,17 @@ do_terraform() {
     fi
 }
 
+do_lock() {
+    if (( $# < 2 )) ; then
+        echo "${FUNCNAME[0]}: wrong number of arguments" >&2
+        return 1
+    fi
+
+    TENANT=${1}
+    STAGE=${2}
+    "${BASEDIR}/bin/lock_s3_state.py" "${TENANT}" "${STAGE}"
+}
+
 usage() {
     echo "Usage: $(basename "$0") (<operation> <tenant> <stage> (<filter>)) | (-h|--help)"
 }
@@ -99,6 +110,10 @@ case $1 in
         shift
         do_terraform "$OP" "$@"
         ;;
+    lock)
+        shift
+        do_lock "$@"
+        ;;
     -h|--help)
         echo 'Execute terraform activities'
         usage
@@ -107,6 +122,7 @@ case $1 in
         echo '      list     list of targeted VMs. Useful for testing filters.'
         echo '      apply    apply terraform model'
         echo '      destroy  destroy terraform model. Use with caution!'
+        echo '      lock     lock terraform state.Safety net to prevent errors.'
         echo '  tenant: target tenant, one of:'
         echo '      tsch_rz_t_001   test tenant'
         echo '      tsch_rz_p_001   production tenant'
