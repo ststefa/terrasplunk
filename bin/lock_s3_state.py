@@ -94,13 +94,17 @@ def lock_state(tenant, stage):
     #    "Info": "{\"ID\":\"ded9f55b-41ba-9d75-5321-3e8349bbe0d8\",\"Operation\":\"OperationTypeApply\",\"Info\":\"\",\"Who\":\"ue56070@splg0bd000.novalocal\",\"Version\":\"0.12.21\",\"Created\":\"2020-05-03T12:41:23.434398247Z\",\"Path\":\"sbb-splunkterraform-prod/w0.tfstate\"}"
     # },
 
+    # every state entry has an associated <key>-md5 entry which is created when
+    # the state is imported into S3. If there is no "-md5" entry then there is
+    # no state by that key. That's a reliable and maintenance-free way to
+    # determine whether the specified tenant/stage exists.
     md5_entry = db_key + '-md5'
     response = table.get_item(Key={
         'LockID': md5_entry,
     })
     if not 'Item' in response.keys():
         raise LockStateError(
-            f'Cannot find entry for this state in DynamoDB. Cannot set lock.')
+            f'Cannot find entry for {db_key} in DynamoDB. Tenant/Stage does not exist.')
 
     response = table.get_item(Key={
         'LockID': db_key,
