@@ -94,18 +94,20 @@ def lock_state(tenant, stage):
     #    "Info": "{\"ID\":\"ded9f55b-41ba-9d75-5321-3e8349bbe0d8\",\"Operation\":\"OperationTypeApply\",\"Info\":\"\",\"Who\":\"ue56070@splg0bd000.novalocal\",\"Version\":\"0.12.21\",\"Created\":\"2020-05-03T12:41:23.434398247Z\",\"Path\":\"sbb-splunkterraform-prod/w0.tfstate\"}"
     # },
 
-    md5_entry=db_key+'-md5'
+    md5_entry = db_key + '-md5'
     response = table.get_item(Key={
         'LockID': md5_entry,
     })
     if not 'Item' in response.keys():
-        raise LockStateError(f'Cannot find entry for this state in DynamoDB. Cannot set lock.')
+        raise LockStateError(
+            f'Cannot find entry for this state in DynamoDB. Cannot set lock.')
 
     response = table.get_item(Key={
         'LockID': db_key,
     })
     if 'Item' in response.keys():
-        raise LockStateError(f'Lock already present:\n{json.dumps(response["Item"], indent=2)}')
+        raise LockStateError(
+            f'Lock already present:\n{json.dumps(response["Item"], indent=2)}')
 
     chars = string.hexdigits.lower()
     id = ''.join(random.choice(chars) for x in range(8)) + '-' +\
@@ -147,5 +149,6 @@ if __name__ == "__main__":
     except LockStateError as e:
         log.error(e)
         sys.exit(1)
-
-    sys.exit()
+    except Exception as e:
+        log.exception(e)
+        sys.exit(1)
