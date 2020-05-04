@@ -135,6 +135,7 @@ def lock_state(tenant, stage):
             'Info':
             f'{{\"ID\":\"{id}\",\"Operation\":\"SafetyLock\",\"Info\":\"Intentionally locked\",\"Who\":\"{who}\",\"Version\":\"\",\"Created\":\"{date}\",\"Path\":\"{db_key}\"}}',
         })
+    log.info(f'Locked stage {stage}, tenant {tenant}')
 
 
 if __name__ == "__main__":
