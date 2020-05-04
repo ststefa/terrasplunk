@@ -4,14 +4,23 @@
 
 BASEDIR="$(cd "$(dirname "$0")" && cd .. && pwd)" || exit 1
 
-if [ -z "${TF_VAR_username}" ] || [ -z "${TF_VAR_password}" ] ; then
-    echo "Your terraform credentials are not exported to the shell. Please export them like so:" >&2
-    echo "    export TF_VAR_username=<your-otc-tenant-username>" >&2
-    echo "    export TF_VAR_password=<your-otc-tenant-password>" >&2
-    exit 1
-fi
+
+check_credentials() {
+    if [ -z "${TF_VAR_username}" ] || [ -z "${TF_VAR_password}" ] ; then
+        echo "Your terraform credentials are not exported to the shell. Please export them like" >&2
+        echo "so (escape special characters if necessary):" >&2
+        echo "    export TF_VAR_username=<your-otc-tenant-username>" >&2
+        echo "    export TF_VAR_password=<your-otc-tenant-password>" >&2
+        return 1
+    fi
+}
 
 list_targets() {
+    if (( $# < 2 )) ; then
+        echo "${FUNCNAME[0]}: wrong number of arguments" >&2
+        return 1
+    fi
+
     TENANT=${1}
     STAGE=${2}
     shift;shift
@@ -106,6 +115,7 @@ case $1 in
         list_targets "$@"
         ;;
     apply|destroy)
+        check_credentials || exit 1
         OP=$1
         shift
         do_terraform "$OP" "$@"
@@ -146,8 +156,6 @@ case $1 in
         ;;
     *)
         usage >&2
-        false
+        exit 1
         ;;
 esac
-
-exit ${?}
