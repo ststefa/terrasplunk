@@ -15,6 +15,11 @@
     - [To get started with this project](#to-get-started-with-this-project)
       - [on the test tenant](#on-the-test-tenant)
       - [on the production tenant](#on-the-production-tenant)
+  - [Operating](#operating)
+    - [Operating activities](#operating-activities)
+      - [lock](#lock)
+      - [apply, destroy](#apply-destroy)
+      - [list](#list)
   - [Provisioning](#provisioning)
     - [Thoughts on provisioning](#thoughts-on-provisioning)
     - [Implementation](#implementation)
@@ -143,10 +148,12 @@ To access the OTC the code assumes your credentials being exported as variables 
 
 ``` shell
 export TF_VAR_username=<otc-username>
-export TF_VAR_password='<otc-password>'
+export TF_VAR_password=<otc-password>
 ```
 
-If they do not exist you have to also setup the objects on AWS S3 and DynamoDB. The code assumes a bucket named **sbb-splunkterraform-prod** and a DynamoDB table called **splunkterraform**. For details on setting these up visit <https://www.terraform.io/docs/backends/types/s3.html>
+Make sure to escape the values properly in case they contain special characters which would otherwise be substituted by the shell. It is usually good practise to enclose the password in ''s.
+
+For the terraform remote state to work the required objects on AWS S3 and DynamoDB have to be created (if they do not exist already). The code assumes a bucket named **sbb-splunkterraform-prod** and a DynamoDB table called **splunkterraform**. For details on setting these up visit <https://www.terraform.io/docs/backends/types/s3.html>
 
 If you've prepared your cloud setup, resume...
 
@@ -185,6 +192,28 @@ If you've prepared your cloud setup, resume...
 Don't break stuff on the production tenant! Feel free to break everything on the test tenant. I.e.do not just yet create the terraform production workspace until you know what you're doing. As long as you stick with the default terraform workspace you can only break things on the test tenant. This is fine.
 
 As an additional security net you should use different credentials on the test and prod tenant. This will safe you from accidentally using the wrong workspace / wrong tenant.
+
+## Operating
+
+This project contains a central operator-friendly shell script `bin/tspl_terraform.sh`. The script is meant to make it easier to perform certain terraform operations by offering a uniform invocation mechanism. For the most part it is just a simple shell wrapper around more complex procedures. For the technically curious it might serve as an entrypoint to traverse and understand typical activities. Try `bin/tspl_terraform.sh -h` to get started.
+
+### Operating activities
+
+#### lock
+
+Explicitly lock the terraform remote state on AWS S3. This can be used to save oneself of appliying something to a stage he did not intend.
+
+A lock can be removed using `terraform force-unlock`.
+
+#### apply, destroy
+
+Wrapper around the terraform functions of the same name, but requiring tenant and stage as arguments. Terraform would natively choose tenant and stage based on current directory and terraform workspace instead.
+
+One may optionally specify filters which are used to narrow down the systems to smaller groups. E.g. "only indexers in AZ2" would translate to specifying "--type ix --az 2".
+
+#### list
+
+Query server instances from remote state. Useful for being used in other scripting to create lists of splunk server names. Its logic is also used for other operations which allow to specify filters. So it is useful to test out filter rules before applying or destroying.
 
 ## Provisioning
 
