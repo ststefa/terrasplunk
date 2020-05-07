@@ -285,20 +285,6 @@ output "pvsize_opt" {
   value       = 100
 }
 
-variable "secgrp_ix_map" {
-  description = "List of security groups for indexers (split by stage)"
-  type        = map
-  default = {
-    p0 : [data.terraform_remote_state.shared.outputs.indexer-secgrp_id, data.terraform_remote_state.shared.outputs.rest4someip-secgrp_id]
-    t0 : [data.terraform_remote_state.shared.outputs.indexer-secgrp_id]
-    w0 : [data.terraform_remote_state.shared.outputs.indexer-secgrp_id]
-  }
-}
-output "secgrp_ix_list" {
-  description = "List of security groups for indexers"
-  value       = contains(keys(var.secgrp_ix_map), var.stage) ? var.secgrp_ix_map[var.stage] : "missing"
-}
-
 variable "pvsize_kvstore_map" {
   description = "Size of /var/splunk/kvstore pv (split by stage)"
   type        = map
