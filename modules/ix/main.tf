@@ -22,8 +22,7 @@ module "ix-instance" {
   source         = "../../modules/genericecs"
   instance_name  = var.instance_name
   flavor         = module.variables.flavor_ix
-  secgrp_id_list = [data.terraform_remote_state.shared.outputs.indexer-secgrp_id]
-}
+  secgrp_id_list = module.variables.secgrp_ix_lis}
 
 resource "opentelekomcloud_blockstorage_volume_v2" "cold1" {
   availability_zone = module.ix-instance.az
