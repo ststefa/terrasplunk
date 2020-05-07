@@ -60,6 +60,9 @@ output "base-secgrp_id" {
 output "indexer-secgrp_id" {
   value = opentelekomcloud_compute_secgroup_v2.indexer-secgrp.name
 }
+output "rest4someip-secgrp_id" {
+  value = opentelekomcloud_compute_secgroup_v2.rest4someip-secgrp.name
+}
 output "hec-secgrp_id" {
   value = opentelekomcloud_compute_secgroup_v2.hec-secgrp.name
 }
