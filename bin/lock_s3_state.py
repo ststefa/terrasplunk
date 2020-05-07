@@ -133,7 +133,7 @@ def lock_state(tenant, stage):
             'LockID':
             f'{db_key}',
             'Info':
-            f'{{\"ID\":\"{id}\",\"Operation\":\"SafetyLock\",\"Info\":\"Intentionally locked\",\"Who\":\"{who}\",\"Version\":\"\",\"Created\":\"{date}\",\"Path\":\"{db_key}\"}}',
+            f'{{\"ID\":\"{id}\",\"Operation\":\"SafetyLock\",\"Info\":\"Intentionally locked, do NOT use -lock=false\",\"Who\":\"{who}\",\"Version\":\"\",\"Created\":\"{date}\",\"Path\":\"{db_key}\"}}',
         })
     log.info(f'Locked stage {stage}, tenant {tenant}')
 
