@@ -197,6 +197,8 @@ As an additional security net you should use different credentials on the test a
 
 This project contains a central operator-friendly shell script `bin/tspl_terraform.sh`. The script is meant to make it easier to perform certain terraform operations by offering a uniform invocation mechanism. For the most part it is just a simple shell wrapper around more complex procedures. For the technically curious it might serve as an entrypoint to traverse and understand typical activities. Try `bin/tspl_terraform.sh -h` to get started.
 
+You might want to symlink this script from your clone to your personal `~/bin` directory so that by default it will be in your `$PATH`. All splunk repositories follow this approach. If you also follow the convention to symlink the various `bin/tspl_<something>.sh` scripts to your `~/bin` directory then most splunk operating activities can start by simply typing `tspl<tab><tab>` and then using the online help.
+
 ### Operating activities
 
 #### lock

@@ -16,7 +16,7 @@ check_credentials() {
 
 list_targets() {
     if (( $# < 2 )) ; then
-        echo "${FUNCNAME[0]}: wrong number of arguments" >&2
+        echo "list: wrong number of arguments" >&2
         return 1
     fi
 
@@ -31,7 +31,7 @@ list_targets() {
 
 do_terraform() {
     if (( $# < 3 )) ; then
-        echo "${FUNCNAME[0]}: wrong number of arguments" >&2
+        echo "${1}: wrong number of arguments" >&2
         return 1
     fi
 
@@ -95,7 +95,7 @@ do_terraform() {
 
 do_lock() {
     if (( $# < 2 )) ; then
-        echo "${FUNCNAME[0]}: wrong number of arguments" >&2
+        echo "lock: wrong number of arguments" >&2
         return 1
     fi
 
