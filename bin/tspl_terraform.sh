@@ -2,8 +2,7 @@
 # $Id: 2020-04-26 ssteine2 $
 # shell wrapper to perform administrative commands with the terrasplunk module
 
-BASEDIR="$(cd "$(dirname "$0")" && cd .. && pwd)" || exit 1
-
+BASEDIR="$(dirname "$(dirname "$(readlink -f "${0}")")")" || exit 1
 
 check_credentials() {
     if [ -z "${TF_VAR_username}" ] || [ -z "${TF_VAR_password}" ] ; then
@@ -155,6 +154,7 @@ case $1 in
         echo '              using regex so make sure to always specify all three digits'
         ;;
     *)
+        echo "Unknown operation ${1}" >&2
         usage >&2
         exit 1
         ;;

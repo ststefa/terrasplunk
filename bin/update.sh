@@ -5,7 +5,8 @@
 
 #set -x
 
-BASE_DIR="$(cd "$(dirname "$0")"/.. && pwd)" || exit "$(false)"
+BASE_DIR="$(dirname "$(dirname "$(readlink -f "${0}")")")" || exit 1
+
 TF_DIRS="${BASE_DIR}/shared ${BASE_DIR}/stages/??"
 
 for DIR in ${TF_DIRS} ; do

@@ -3,7 +3,7 @@
 
 #set -x
 
-BASE_DIR="$(cd "$(dirname "$0")"/.. && pwd)" || exit
+BASE_DIR="$(dirname "$(dirname "$(readlink -f "${0}")")")" || exit 1
 
 echo "Formatting..."
 cd "${BASE_DIR}" || exit
