@@ -203,7 +203,9 @@ This project contains a central operator-friendly shell script `bin/tspl_terrafo
 
 Explicitly lock the terraform remote state on AWS S3. This can be used to save oneself of appliying something to a stage he did not intend.
 
-A lock can be removed using `terraform force-unlock`.
+A lock can be removed using `terraform force-unlock <Lock ID>`.
+
+For restoring back the lock, use `bin/tspl_terraform.sh lock <tenant> <stage>`.
 
 #### apply, destroy
 
