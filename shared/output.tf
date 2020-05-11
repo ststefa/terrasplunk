@@ -69,6 +69,12 @@ output "hec-secgrp_id" {
 output "searchhead-secgrp_id" {
   value = opentelekomcloud_compute_secgroup_v2.searchhead-secgrp.name
 }
+output "webgui-secgrp_id" {
+  value = opentelekomcloud_compute_secgroup_v2.webgui-secgrp.name
+}
+output "rest-secgrp_id" {
+  value = opentelekomcloud_compute_secgroup_v2.rest-secgrp.name
+}
 output "parser-secgrp_id" {
   value = opentelekomcloud_compute_secgroup_v2.parser-secgrp.name
 }
