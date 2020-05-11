@@ -65,10 +65,10 @@ do_terraform() {
         terraform workspace new ${WORKSPACE} || return 1
     fi
     if [ -z "${FILTER}" ] ; then
-        terraform "${OPERATION}"
+        terraform -parallelism=20 "${OPERATION}"
     else
         if [ "${STAGE}" == "shared" ] ; then
-            terraform "${OPERATION}"
+            terraform -parallelism=20 "${OPERATION}"
         else
             # shellcheck disable=SC2086
             SERVERLIST=$("${BASEDIR}/bin/serverlist.py" ${FILTER} --format=-target=module.server-%type%num | paste -sd" ")
@@ -77,7 +77,7 @@ do_terraform() {
                 return 1
             else
                 # shellcheck disable=SC2086
-                terraform "${OPERATION}" ${SERVERLIST}
+                terraform -parallelism=20 "${OPERATION}" ${SERVERLIST}
             fi
         fi
     fi
