@@ -37,4 +37,28 @@
         "editor.tabSize": 2,
         "files.eol": "\n", //required for ext:alanwalk.markdown-toc to work properly
     },
+    "cSpell.words": [
+        "Hashiconf",
+        "Hashicorp",
+        "Nicki",
+        "ansible",
+        "boto",
+        "commandline",
+        "entrypoint",
+        "genericecs",
+        "hostnames",
+        "openstack",
+        "splp",
+        "splunk",
+        "splunkprod",
+        "splunkterraform",
+        "symlink",
+        "syslog",
+        "terraforming",
+        "terralith",
+        "terraservice",
+        "tfstate",
+        "tsch",
+        "tspl"
+    ],
 }
