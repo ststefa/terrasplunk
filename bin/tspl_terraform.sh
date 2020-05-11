@@ -141,7 +141,7 @@ case $1 in
         echo '      p0       production'
         echo '      t0       test'
         echo '      w0       spielwiese'
-        echo '      shared : shared state, e.g. networking and security groups'
+        echo '      shared   shared state, e.g. networking and security groups'
         echo '  filter: optional filters to narrow down the operation to a subset of target instances.'
         echo '          If multiple filters are used they will be logically and-ed. Filters accept'
         echo '          regex expressions, e.g. "--type '\''(ix|sh)'\''" Available filters are:'
