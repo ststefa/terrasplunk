@@ -21,8 +21,7 @@
       - [apply, destroy](#apply-destroy)
       - [list](#list)
   - [Provisioning](#provisioning)
-    - [Thoughts on provisioning](#thoughts-on-provisioning)
-    - [Implementation](#implementation)
+    - [Implementation Details](#implementation-details)
   - [Contributing](#contributing)
   - [Open Points (notes to self)](#open-points-notes-to-self)
     - [Asymmetry between tenants](#asymmetry-between-tenants)
@@ -146,7 +145,7 @@ aws_secret_access_key = <sbb-splunk-secret-key>
 
 The AWS credentials are not personal. They are exclusively used for this project and shared among project members. The actual values for these keys are stored in PasswordSafe. Look for splunk_otc_2020.
 
-To access the OTC the code assumes your credentials are configured in the openstack configuration files `~/.config/openstack/clouds.yaml`. The cloud section need to be named like the tenants, i.e.
+To access the OTC the code assumes your credentials are configured in the openstack configuration file `~/.config/openstack/clouds.yaml`. The cloud section need to be named like the tenants, i.e.
 
 ``` shell
 $ cat  ~/.config/openstack/clouds.yaml
@@ -169,8 +168,6 @@ clouds:
         region_name: 'eu-ch'
 ```
 
-Make sure to escape the values properly in case they contain special characters which would otherwise be substituted by the shell. It is usually good practice to enclose the password in ''s.
-
 For the terraform remote state to work the required objects on AWS S3 and DynamoDB have to be created (if they do not exist already). The code assumes a bucket named **sbb-splunkterraform-prod** and a DynamoDB table called **splunkterraform**. For details on setting these up visit <https://www.terraform.io/docs/backends/types/s3.html>
 
 If you've prepared your cloud setup, resume...
@@ -179,7 +176,6 @@ If you've prepared your cloud setup, resume...
 
 - Create shared resources first:
   - `cd shared`
-  - Work through shared/README.md for required manual network setup
   - `terraform init`
   - `terraform plan`
   - `terraform apply`
@@ -195,7 +191,6 @@ If you've prepared your cloud setup, resume...
 - Create shared resources first:
   - `cd shared`
   - `terraform workspace new production`
-  - Work through shared/README.md for required manual network setup
   - `terraform init`
   - `terraform plan`
   - `terraform apply`
@@ -207,15 +202,13 @@ If you've prepared your cloud setup, resume...
   - `terraform plan`
   - `terraform apply`
 
-Don't break stuff on the production tenant! Feel free to break everything on the test tenant. I.e.do not just yet create the terraform production workspace until you know what you're doing. As long as you stick with the default terraform workspace you can only break things on the test tenant. This is fine.
-
-As an additional security net you should use different credentials on the test and prod tenant. This will safe you from accidentally using the wrong workspace / wrong tenant.
+Don't break stuff on the production tenant! Feel free to break everything on the test tenant. I.e. do not just yet create the terraform production workspace until you know what you're doing. As long as you stick with the default terraform workspace you can only break things on the test tenant. This is fine.
 
 ## Operating
 
-This project contains a central operator-friendly shell script `bin/tspl_terraform.sh`. The script is meant to make it easier to perform certain terraform operations by offering a uniform invocation mechanism. For the most part it is just a simple shell wrapper around more complex procedures. For the technically curious it might serve as an entrypoint to traverse and understand typical activities. Try `bin/tspl_terraform.sh -h` to get started.
+This project contains a central operator-friendly shell script `bin/tspl_terraform.sh`. The script is meant to make it easier to perform common terraform operations by offering a uniform invocation mechanism. For the most part it is just a simple shell wrapper around more complex procedures. For the technically curious it might serve as an entrypoint to understand how typical activities are implemented. Try `bin/tspl_terraform.sh -h` to get started.
 
-You might want to symlink this script from your clone to your personal `~/bin` directory so that by default it will be in your `$PATH`. All splunk repositories follow this approach. If you also follow the convention to symlink the various `bin/tspl_<something>.sh` scripts to your `~/bin` directory then most splunk operating activities can start by simply typing `tspl<tab><tab>` and then using the online help.
+You might want to symlink this script from your git clone to your personal `~/bin` directory so that by default it will be in your `$PATH`. All our splunk git repositories follow this approach. If you also follow the convention to symlink the various `bin/tspl_<something>.sh` scripts to your `~/bin` directory then most splunk operating activities can start by simply typing `tspl<tab><tab>` and then using the online help.
 
 ### Operating activities
 
@@ -223,7 +216,7 @@ You might want to symlink this script from your clone to your personal `~/bin` d
 
 Explicitly lock the terraform remote state on AWS S3. This can be used to save oneself of applying something to a stage he did not intend.
 
-A lock can be removed using `terraform force-unlock <Lock ID>`.
+A lock can be removed by changing to the appropriate terraform directory and workspace and then using `terraform force-unlock <Lock ID>`.
 
 For restoring back the lock, use `bin/tspl_terraform.sh lock <tenant> <stage>`.
 
@@ -231,33 +224,23 @@ For restoring back the lock, use `bin/tspl_terraform.sh lock <tenant> <stage>`.
 
 Wrapper around the terraform functions of the same name, but requiring tenant and stage as arguments. Terraform would natively choose tenant and stage based on current directory and terraform workspace instead.
 
-One may optionally specify filters which are used to narrow down the systems to smaller groups. E.g. "only indexers in AZ2" would translate to specifying "--type ix --az 2".
+One may optionally specify "filters" which are used to narrow down the systems to smaller groups. E.g. "only indexers in AZ2" would translate to specifying "--type ix --az 2".
 
 #### list
 
-Query server instances from remote state. Useful for being used in other scripting to create lists of splunk server names. Its logic is also used for other operations which allow to specify filters. So it is useful to test out filter rules before applying or destroying.
+Query server instances from remote terraform state using `serverlist.py`. Can be used in other scripting to create lists of splunk server names. Its logic is also used for other operations which allow to specify filters. So it is useful to test out filter rules before running actual terraform operations like apply or destroy.
 
 ## Provisioning
 
-### Thoughts on provisioning
+Once the base infrastructure has been created with terraform the next step is the provisioning. Provisioning is the process of turning the empty infrastructure into its real, usable state. It encompasses all the steps required from installing and configuring software, through configuring the relations between instances, to finally setting up and managing entry- and exit-points of the platform. A key point must be to ensure that this entire process is automated without exception so that rebuilds can be fluent and without human intervention.
 
-Once the base infrastructure has been created with terraform the next most important step is the provisioning. Provisioning is a term commonly used for the process of turning the empty infrastructure into its real, usable state. It encompasses all the steps required from installing and configuring software, through configuring the relations between instances, to finally setting up and managing entry- and exit-points of the platform. A key point must be to ensure that this entire process is automated without exception so that rebuilds can be fluent and without human intervention.
+We keep the terraform step separate from the provisioning step by first building everything up with terraform and then using that state as an input for the provisioning which is implemented using ansible. The terraform state contains a complete description of all parameters. required in the provisioning code.
 
-Multiple approaches how this can be done are available and there is (afaik) currently no proven and generally applicable "best of breed" solution. Some use state definition tools like salt or puppet which correspond to the declarative nature of terraform. Some prefer a more procedural way using ansible or plain bash. There are also tools like `packer` (<https://www.packer.io/>) which aim to use pre-configured images. Each of these have their pros and cons which are outside of the scope of this readme.
+### Implementation Details
 
-A key requirement is that arbitrary data from terraform can be passed to the provisioning step, e.g.disk device names and instance names. This is very important because it is likely that the provisioning will need arbitrary and not yet known pieces of information about the terraformed infrastructure. A good solution will thus have to use a generic mechanism which is capable of transferring arbitrary data to the provisioning process.
+We expose the complete terraform state including all tenants as a single json structure. It is then up to the provisioning process to extract the relevant information. While this sure is not the most efficient approach it is the simplest one and still allows maximum flexibility for the provisioning process. Optimizations could be implemented (e.g. just passing parts of the full state) but this will probably not be necessary considering the foreseeable dimensioning.
 
-There are multiple approaches how to pass arbitrary data to the provisioning, among them:
-
-- Keep the terraform step separate from the provisioning step by first building everything up with terraform and then using some code to use the terraform state as an input. The terraform state contains a complete description of all parameters. This has the drawback of having two separate processes which might complicate automation. Also it requires to execute steps in a specific, human-made order which is contrary to a declarative approach.
-
-- Use terraform `local-exec` provisioners which create parameter files. Any resource can add content to these parameter files. A separate provisioning process can use it as input data to perform the provisioning. While this might make it possible to couple terraforming and provisioning closer together it might also make the terraform code more complicated.
-
-### Implementation
-
-For now we've chosen to build a mechanism which fully exposes the complete terraform state including all tenants as a single json structure. It is then up to the provisioning process to extract the relevant information. While this sure is not the most efficient approach it is the simplest one and still allows maximum flexibility on the provisioner side. Optimizations could be implemented (e.g.just passing parts of the full state) if this becomes necessary. Tests have shown that this will probably not be necessary for what we have planned.
-
-To obtain the terraform data a provisioner uses the `bin/build_state.py` executable which will write the full terraform state as a json structure to stdout. The structure looks like this
+The provisioning queries the remote terraform state and combines it in a json structure like this
 
 ``` json
 {
@@ -288,10 +271,6 @@ To obtain the terraform data a provisioner uses the `bin/build_state.py` executa
     ...
 }
 ```
-
-While the structure is deterministic, the sort order is not. I.e.there is no guarantee in which order the tenants, shared or stages will appear in the output.
-
-A provisioning process can consume the json data from stdin and apply its parsing logic to extract required information.
 
 ## Contributing
 
