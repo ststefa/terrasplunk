@@ -23,7 +23,7 @@ provider "opentelekomcloud" {
   tenant_name = "eu-ch_splunk"
   #user_name   = var.username
   #password    = var.password
-  cloud       = module.variables.tenant
+  cloud = module.variables.tenant
   #delegated_project = "eu-ch_splunk"
   auth_url = "https://iam.eu-ch.o13bb.otc.t-systems.com/v3"
 }

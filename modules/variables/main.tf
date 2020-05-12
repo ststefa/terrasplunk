@@ -199,7 +199,7 @@ output "flavor_si" {
 variable "flavor_sy_map" {
   description = "Syslog VM size (split by tenant)"
   # Small enough so one size fits all. Can be made more granular if required (see e.g. sh or ix).
-  type        = map
+  type = map
   default = {
     default    = "s2.large.4"
     production = "s3.large.4"
@@ -213,7 +213,7 @@ output "flavor_sy" {
 variable "flavor_ds_map" {
   description = "Deployment server VM size (split by tenant)"
   # Sizing agreed with customer on workshop 2020-02-12
-  type        = map
+  type = map
   default = {
     default    = "s2.xlarge.2"
     production = "s3.2xlarge.2"
@@ -227,7 +227,7 @@ output "flavor_ds" {
 variable "flavor_lm_map" {
   description = "License master VM size (split by tenant)"
   # Sizing agreed with customer on workshop 2020-02-12
-  type        = map
+  type = map
   default = {
     default    = "s2.xlarge.2"
     production = "s3.xlarge.2"
