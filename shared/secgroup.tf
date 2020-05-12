@@ -134,11 +134,12 @@ resource "opentelekomcloud_compute_secgroup_v2" "hec-secgrp" {
   }
 }
 
+# TODO: this resource is to be replaced by the more modular webgui/rest groups. Remove once all instances are reconfigured to use these
 resource "opentelekomcloud_compute_secgroup_v2" "searchhead-secgrp" {
   name        = "${local.project}-searchhead-secgrp"
   description = "Specific rules for ${local.project} searchhead instances"
 
-  # search gui
+  # search gui (only from within RZ net)
   rule {
     from_port   = 8000
     to_port     = 8000
@@ -155,8 +156,33 @@ resource "opentelekomcloud_compute_secgroup_v2" "searchhead-secgrp" {
   }
 }
 
+resource "opentelekomcloud_compute_secgroup_v2" "webgui-secgrp" {
+  name        = "${local.project}-webgui-secgrp"
+  description = "Enable access to ${local.project} webgui"
+
+  # Splunk web GUI (only from within RZ net)
+  rule {
+    from_port   = 8000
+    to_port     = 8000
+    ip_protocol = "tcp"
+    cidr        = "10.104.0.0/16"
+  }
+}
+
+resource "opentelekomcloud_compute_secgroup_v2" "rest-secgrp" {
+  name        = "${local.project}-rest-secgrp"
+  description = "Enable access to ${local.project} REST API"
+
+  # Splunk REST API (only from within RZ net)
+  rule {
+    from_port   = 8089
+    to_port     = 8089
+    ip_protocol = "tcp"
+    cidr        = "10.104.0.0/16"
+  }
+}
+
 resource "opentelekomcloud_compute_secgroup_v2" "parser-secgrp" {
-  # TODO: Extend/fix ports, see splunk doc above
   name        = "${local.project}-parser-secgrp"
   description = "Specific rules for ${local.project} parser instances (sy, hf)"
 

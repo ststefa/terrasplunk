@@ -15,7 +15,7 @@ data "terraform_remote_state" "shared" {
   #  path = module.variables.shared_statefile
   #}
   backend = "s3"
-  config = module.variables.s3_shared_config
+  config  = module.variables.s3_shared_config
 }
 
 module "sh-instance" {

@@ -3,7 +3,7 @@
 
 #set -x
 
-BASE_DIR="$(cd "$(dirname "$0")"/.. && pwd)" || exit "$(false)"
+BASE_DIR="$(dirname "$(dirname "$(readlink -f "${0}")")")" || exit 1
 STAGE_DIRS="${BASE_DIR}/shared ${BASE_DIR}/stages"
 CODE_DIRS="${STAGE_DIRS} ${BASE_DIR}/modules"
 

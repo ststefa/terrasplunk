@@ -14,6 +14,12 @@ The test tenant will be used for (and only for) non-customer-facing components, 
 
 The **d0** (aka *dev*) stage is used to produce multiple development instances built similar to production but on a single VM each. This is not currently implemented.
 
+The **g0** (aka *global*) stage is used for systems which are shared across stages. Currently this contains the splunk license master (lm) to whom all stages are connected to handle their licensing.
+
+The **h0** (aka *history*) stage contains systems which are built as part of this platform but actually serve certain functions for use with the old splunk platform.
+
+The **p0** (aka *prod*) stage is used for ingesting all data from all sources (regardless of the sources stage).
+
 The **t0** (aka *test*) stage is used for splunk application testing tasks such as
 
 - Data onboarding
@@ -21,7 +27,5 @@ The **t0** (aka *test*) stage is used for splunk application testing tasks such 
 - Testing data injection (indexer, HF)
 - Testing interfaces to surrounding systems
 - Verification of critical changes (indexes.conf, limits.conf, authorize.conf, ...)
-
-The **p0** (aka *prod*) stage is used for ingesting all data from all sources (reagardless of the sources stage).
 
 The **w0** (aka *spielwiese* or *pg*) stage is used for platform testing tasks such as installing new Splunk versions, using different OS versions or other fundamental IAC changes and to develop deployment automation code.

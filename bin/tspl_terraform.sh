@@ -2,22 +2,11 @@
 # $Id: 2020-04-26 ssteine2 $
 # shell wrapper to perform administrative commands with the terrasplunk module
 
-BASEDIR="$(cd "$(dirname "$0")" && cd .. && pwd)" || exit 1
-
-
-check_credentials() {
-    if [ -z "${TF_VAR_username}" ] || [ -z "${TF_VAR_password}" ] ; then
-        echo "Your terraform credentials are not exported to the shell. Please export them like" >&2
-        echo "so (escape special characters if necessary):" >&2
-        echo "    export TF_VAR_username=<your-otc-tenant-username>" >&2
-        echo "    export TF_VAR_password=<your-otc-tenant-password>" >&2
-        return 1
-    fi
-}
+BASEDIR="$(dirname "$(dirname "$(readlink -f "${0}")")")" || exit 1
 
 list_targets() {
     if (( $# < 2 )) ; then
-        echo "${FUNCNAME[0]}: wrong number of arguments" >&2
+        echo "list: wrong number of arguments" >&2
         return 1
     fi
 
@@ -32,7 +21,7 @@ list_targets() {
 
 do_terraform() {
     if (( $# < 3 )) ; then
-        echo "${FUNCNAME[0]}: wrong number of arguments" >&2
+        echo "${1}: wrong number of arguments" >&2
         return 1
     fi
 
@@ -76,10 +65,10 @@ do_terraform() {
         terraform workspace new ${WORKSPACE} || return 1
     fi
     if [ -z "${FILTER}" ] ; then
-        terraform "${OPERATION}"
+        terraform -parallelism=20 "${OPERATION}"
     else
         if [ "${STAGE}" == "shared" ] ; then
-            terraform "${OPERATION}"
+            terraform -parallelism=20 "${OPERATION}"
         else
             # shellcheck disable=SC2086
             SERVERLIST=$("${BASEDIR}/bin/serverlist.py" ${FILTER} --format=-target=module.server-%type%num | paste -sd" ")
@@ -88,7 +77,7 @@ do_terraform() {
                 return 1
             else
                 # shellcheck disable=SC2086
-                terraform "${OPERATION}" ${SERVERLIST}
+                terraform -parallelism=20 "${OPERATION}" ${SERVERLIST}
             fi
         fi
     fi
@@ -96,7 +85,7 @@ do_terraform() {
 
 do_lock() {
     if (( $# < 2 )) ; then
-        echo "${FUNCNAME[0]}: wrong number of arguments" >&2
+        echo "lock: wrong number of arguments" >&2
         return 1
     fi
 
@@ -115,7 +104,6 @@ case $1 in
         list_targets "$@"
         ;;
     apply|destroy)
-        check_credentials || exit 1
         OP=$1
         shift
         do_terraform "$OP" "$@"
@@ -142,7 +130,7 @@ case $1 in
         echo '      p0       production'
         echo '      t0       test'
         echo '      w0       spielwiese'
-        echo '      shared : shared state, e.g. networking and security groups'
+        echo '      shared   shared state, e.g. networking and security groups'
         echo '  filter: optional filters to narrow down the operation to a subset of target instances.'
         echo '          If multiple filters are used they will be logically and-ed. Filters accept'
         echo '          regex expressions, e.g. "--type '\''(ix|sh)'\''" Available filters are:'
@@ -155,6 +143,7 @@ case $1 in
         echo '              using regex so make sure to always specify all three digits'
         ;;
     *)
+        echo "Unknown operation ${1}" >&2
         usage >&2
         exit 1
         ;;

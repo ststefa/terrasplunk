@@ -23,7 +23,7 @@ The difference between the `core` module and the `shared` directory is that
 
 ## `genericecs`
 
-Contains the definition for a single default instance as defined for splunk. Multiple instances of this module are instantiated on every stage. The module is parameterizable in several ways (see `input.tf`), more might be added. The values for these parameters should usually come from the `variables` module.
+Contains the definition for a single default instance as defined for splunk. Multiple instances of this module are instantiated on every stage. The module can be parameterized in several ways (see `input.tf`), more might be added. The values for these parameters should usually come from the `variables` module.
 
 This module contains the "placement logic", i.e. the rules which define in which availability zone (AZ) the instance will be located. This logic is based on the VM name. Even names (e.g. splp0id**000**) are placed in AZ1, odd names (e.g. splp0id**001**) are placed in AZ2.
 
