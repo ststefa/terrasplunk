@@ -6,6 +6,7 @@
         "ms-python.python",
         "msjsdiag.debugger-for-chrome",
         "rogalmic.bash-debug",
+        "streetsidesoftware.code-spell-checker",
         "timonwong.shellcheck",
     ]
 }
