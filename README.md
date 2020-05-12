@@ -274,7 +274,7 @@ The provisioning queries the remote terraform state and combines it in a json st
 
 ## Contributing
 
-For any suggestion, improvement, correction, etc.open a branch with a descriptive name (which explains the goal of the update) and assign it to a repo maintainer.
+For any suggestion, improvement, correction, etc. open a branch with a descriptive name (which explains the goal of the update) and assign it to a repo maintainer.
 
 Otherwise, if you don't feel brave enough to edit code (this shouldn't be the case :simple_smile:), open an issue and assign it to a repo maintainer.
 
