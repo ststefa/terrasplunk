@@ -208,7 +208,7 @@ Don't break stuff on the production tenant! Feel free to break everything on the
 
 This project contains a central operator-friendly shell script `bin/tspl_terraform.sh`. The script is meant to make it easier to perform common terraform operations by offering a uniform invocation mechanism. For the most part it is just a simple shell wrapper around more complex procedures. For the technically curious it might serve as an entrypoint to understand how typical activities are implemented. Try `bin/tspl_terraform.sh -h` to get started.
 
-You might want to symlink this script from your git clone to your personal `~/bin` directory so that by default it will be in your `$PATH`. All our splunk git repositories follow this approach. If you also follow the convention to symlink the various `bin/tspl_<something>.sh` scripts to your `~/bin` directory then most splunk operating activities can start by simply typing `tspl<tab><tab>` and then using the online help.
+You might want to create a symbolic link of this script from your git clone to your personal `~/bin` directory so that by default it will be in your `$PATH`. All our splunk git repositories follow this approach. If you also follow the convention to link the various `bin/tspl_<something>.sh` scripts to your `~/bin` directory then most splunk operating activities can start by simply typing `tspl<tab><tab>` and then using the online help.
 
 ### Operating activities
 
