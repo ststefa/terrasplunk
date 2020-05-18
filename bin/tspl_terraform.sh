@@ -15,8 +15,10 @@ list_targets() {
     shift;shift
     FILTER="${*}"
 
+    set -x
     # shellcheck disable=SC2086
     "${BASEDIR}/bin/serverlist.py" ${FILTER} "${TENANT}" "${STAGE}"
+    { set +x; } 2> /dev/null
 }
 
 do_terraform() {
@@ -59,25 +61,38 @@ do_terraform() {
         fi
     fi
 
+    set -x
     terraform workspace select ${WORKSPACE} 2>/dev/null
+    { set +x; } 2> /dev/null
     # shellcheck disable=SC2181
     if (( $? != 0 )) ; then
+        set -x
         terraform workspace new ${WORKSPACE} || return 1
+        { set +x; } 2> /dev/null
     fi
+
     if [ -z "${FILTER}" ] ; then
-        terraform -parallelism=20 "${OPERATION}"
+        set -x
+        terraform "${OPERATION}" -parallelism=20
+        { set +x; } 2> /dev/null
     else
         if [ "${STAGE}" == "shared" ] ; then
-            terraform -parallelism=20 "${OPERATION}"
+            set -x
+            terraform "${OPERATION}" -parallelism=20
+            { set +x; } 2> /dev/null
         else
+            set -x
             # shellcheck disable=SC2086
-            SERVERLIST=$("${BASEDIR}/bin/serverlist.py" ${FILTER} --format=-target=module.server-%type%num | paste -sd" ")
+            SERVERLIST=$("${BASEDIR}/bin/serverlist.py" ${FILTER} --format=-target=module.server-%type%num | paste -sd' ')
+            { set +x; } 2> /dev/null
             if [ -z "${SERVERLIST}" ] ; then
                 echo "Could not compile serverlist for filter \"${FILTER}\". Either there is no such instance or the filter was specified wrongly." >&2
                 return 1
             else
+                set -x
                 # shellcheck disable=SC2086
-                terraform -parallelism=20 "${OPERATION}" ${SERVERLIST}
+                terraform "${OPERATION}" -parallelism=20 ${SERVERLIST}
+                { set +x; } 2> /dev/null
             fi
         fi
     fi
@@ -91,7 +106,10 @@ do_lock() {
 
     TENANT=${1}
     STAGE=${2}
+
+    set -x
     "${BASEDIR}/bin/lock_s3_state.py" "${TENANT}" "${STAGE}"
+    { set +x; } 2> /dev/null
 }
 
 usage() {
