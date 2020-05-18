@@ -147,7 +147,7 @@ class TerraformServer(BaseHTTPRequestHandler):
         "lm": "license",
         "mt": "deployer",
         "sh": "search",
-        "si": "search-uat", #ugly hack because there is not u0 stage anymore
+        # hf and si are treated specially
     }
     stage_table = {
         "d0": "dev",
@@ -212,6 +212,12 @@ class TerraformServer(BaseHTTPRequestHandler):
         if tenant == "tsch_rz_p_001":
             if ecs_type == "hf":
                 return f'<a href="https://{ecs_type}{ecs_number}-{TerraformServer.stage_table[ecs_stage]}.{domain}">{hostname}</a>'
+            if ecs_type == "si":
+                if stage == "p0" and ecs_number == "000":
+                    # Exception for uat searchhead due to discarded u0 stage
+                    return f'<a href="https://search-uat.{domain}">{hostname}</a>'
+                else:
+                    return f'<a href="https://{ecs_type}{ecs_number}-{TerraformServer.stage_table[ecs_stage]}.{domain}">{hostname}</a>'
             if ecs_type in TerraformServer.type_table.keys():
                 if ecs_type == "si":
                     return f'<a href="https://{TerraformServer.type_table[ecs_type]}.{domain}">{hostname}</a>'
@@ -272,7 +278,7 @@ class TerraformServer(BaseHTTPRequestHandler):
                     "<!DOCTYPE html><html><body>Cannot handle this. Humans please use <a href='/topology'>/topology</a>, machines use <a href='/tfstate'>/tfstate</a> and monitors use <a href='/monitor/health_score'>/monitor/health_score</a></body></html>", coding)) #yapf: disable
         except requests.exceptions.HTTPError as http_err:
             self.send_error(http_err.response.status_code,
-                            f'{http_err.__class__.__name__} occured',
+                            f'{http_err.__class__.__name__} occurred',
                             f'{traceback.format_exc()}')
             log.exception(http_err)
         except Exception as err:
@@ -414,7 +420,7 @@ class TerraformServer(BaseHTTPRequestHandler):
                 tr, th, td {text-align: left; vertical-align: top; border: 1px solid; padding: 2px; padding-left: 10px;; padding-right: 10px;}\
                 tr         {text-align: left; vertical-align: top; border: 1px solid;}\
                 footer     {padding: 10px; color: lightgrey; font-size: small;}\
-            </style>", coding))
+            </style>"                     , coding))
         self.wfile.write(bytes("</head>", coding))
 
         self.do_topology_body()
