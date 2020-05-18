@@ -17,7 +17,7 @@ list_targets() {
 
     set -x
     # shellcheck disable=SC2086
-    "${BASEDIR}/bin/serverlist.py" ${FILTER} "${TENANT}" "${STAGE}"
+    "${BASEDIR}/bin/serverlist.py" ${FILTER} "${TENANT}" "${STAGE}" || return 1
     { set +x; } 2> /dev/null
 }
 
@@ -61,11 +61,19 @@ do_terraform() {
         fi
     fi
 
+    # terrible hack
+    if [ "${OPERATION}" == "init" ] ; then
+        PARALLELISM=""
+    else
+        PARALLELISM="-parallelism=20"
+    fi
+
     set -x
     terraform workspace select ${WORKSPACE} 2>/dev/null
+    RC=${?}
     { set +x; } 2> /dev/null
     # shellcheck disable=SC2181
-    if (( $? != 0 )) ; then
+    if (( "${RC}" != 0 )) ; then
         set -x
         terraform workspace new ${WORKSPACE} || return 1
         { set +x; } 2> /dev/null
@@ -73,17 +81,18 @@ do_terraform() {
 
     if [ -z "${FILTER}" ] ; then
         set -x
-        terraform "${OPERATION}" -parallelism=20
+        terraform "${OPERATION}" ${PARALLELISM} || return 1
         { set +x; } 2> /dev/null
     else
         if [ "${STAGE}" == "shared" ] ; then
+            # there are no vms in shared so just do operation
             set -x
-            terraform "${OPERATION}" -parallelism=20
+            terraform "${OPERATION}" ${PARALLELISM} || return 1
             { set +x; } 2> /dev/null
         else
             set -x
             # shellcheck disable=SC2086
-            SERVERLIST=$("${BASEDIR}/bin/serverlist.py" ${FILTER} --format=-target=module.server-%type%num | paste -sd' ')
+            SERVERLIST="$("${BASEDIR}/bin/serverlist.py" ${FILTER} --format=-target=module.server-%type%num | paste -sd' ')"
             { set +x; } 2> /dev/null
             if [ -z "${SERVERLIST}" ] ; then
                 echo "Could not compile serverlist for filter \"${FILTER}\". Either there is no such instance or the filter was specified wrongly." >&2
@@ -91,7 +100,7 @@ do_terraform() {
             else
                 set -x
                 # shellcheck disable=SC2086
-                terraform "${OPERATION}" -parallelism=20 ${SERVERLIST}
+                terraform "${OPERATION}" ${PARALLELISM} ${SERVERLIST} || return 1
                 { set +x; } 2> /dev/null
             fi
         fi
@@ -108,7 +117,7 @@ do_lock() {
     STAGE=${2}
 
     set -x
-    "${BASEDIR}/bin/lock_s3_state.py" "${TENANT}" "${STAGE}"
+    "${BASEDIR}/bin/lock_s3_state.py" "${TENANT}" "${STAGE}" || return 1
     { set +x; } 2> /dev/null
 }
 
@@ -121,7 +130,7 @@ case $1 in
         shift
         list_targets "$@"
         ;;
-    apply|destroy)
+    apply|destroy|init)
         OP=$1
         shift
         do_terraform "$OP" "$@"
@@ -138,6 +147,7 @@ case $1 in
         echo '      list     list of targeted VMs. Useful for testing filters.'
         echo '      apply    apply terraform model'
         echo '      destroy  destroy terraform model. Use with caution!'
+        echo '      init     install missing providers and modules into terraform workspace'
         echo '      lock     lock terraform state.Safety net to prevent errors.'
         echo '  tenant: target tenant, one of:'
         echo '      tsch_rz_t_001   test tenant'
@@ -166,3 +176,5 @@ case $1 in
         exit 1
         ;;
 esac
+
+exit ${?}
