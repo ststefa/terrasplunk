@@ -17,7 +17,7 @@ list_targets() {
 
     set -x
     # shellcheck disable=SC2086
-    "${BASEDIR}/bin/serverlist.py" ${FILTER} "${TENANT}" "${STAGE}"
+    "${BASEDIR}/bin/serverlist.py" ${FILTER} "${TENANT}" "${STAGE}" || return 1
     { set +x; } 2> /dev/null
 }
 
@@ -73,12 +73,12 @@ do_terraform() {
 
     if [ -z "${FILTER}" ] ; then
         set -x
-        terraform "${OPERATION}" -parallelism=20
+        terraform "${OPERATION}" -parallelism=20 || return 1
         { set +x; } 2> /dev/null
     else
         if [ "${STAGE}" == "shared" ] ; then
             set -x
-            terraform "${OPERATION}" -parallelism=20
+            terraform "${OPERATION}" -parallelism=20 || return 1
             { set +x; } 2> /dev/null
         else
             set -x
@@ -91,7 +91,7 @@ do_terraform() {
             else
                 set -x
                 # shellcheck disable=SC2086
-                terraform "${OPERATION}" -parallelism=20 ${SERVERLIST}
+                terraform "${OPERATION}" -parallelism=20 ${SERVERLIST} || return 1
                 { set +x; } 2> /dev/null
             fi
         fi
@@ -108,7 +108,7 @@ do_lock() {
     STAGE=${2}
 
     set -x
-    "${BASEDIR}/bin/lock_s3_state.py" "${TENANT}" "${STAGE}"
+    "${BASEDIR}/bin/lock_s3_state.py" "${TENANT}" "${STAGE}" || return 1
     { set +x; } 2> /dev/null
 }
 
@@ -166,3 +166,5 @@ case $1 in
         exit 1
         ;;
 esac
+
+exit ${?}
