@@ -109,6 +109,7 @@ do_lock() {
 
     set -x
     "${BASEDIR}/bin/lock_s3_state.py" "${TENANT}" "${STAGE}"
+    { set +x; } 2> /dev/null
 }
 
 usage() {
