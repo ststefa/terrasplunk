@@ -81,16 +81,16 @@ do_terraform() {
             terraform "${OPERATION}" -parallelism=20
             { set +x; } 2> /dev/null
         else
-            # shellcheck disable=SC2086
             set -x
+            # shellcheck disable=SC2086
             SERVERLIST=$("${BASEDIR}/bin/serverlist.py" ${FILTER} --format=-target=module.server-%type%num | paste -sd' ')
             { set +x; } 2> /dev/null
             if [ -z "${SERVERLIST}" ] ; then
                 echo "Could not compile serverlist for filter \"${FILTER}\". Either there is no such instance or the filter was specified wrongly." >&2
                 return 1
             else
-                # shellcheck disable=SC2086
                 set -x
+                # shellcheck disable=SC2086
                 terraform "${OPERATION}" -parallelism=20 ${SERVERLIST}
                 { set +x; } 2> /dev/null
             fi
