@@ -18,6 +18,7 @@ list_targets() {
     set -x
     # shellcheck disable=SC2086
     "${BASEDIR}/bin/serverlist.py" ${FILTER} "${TENANT}" "${STAGE}"
+    { set +x; } 2> /dev/null
 }
 
 do_terraform() {
