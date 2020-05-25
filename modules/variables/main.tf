@@ -362,24 +362,14 @@ variable "pvsize_splunkvar_map" {
   description = "splunkvar pv sizes (split by tenant and stage)"
   type        = map
   default = {
-    default = {
-      d0 : 20
-      p0 : 50
-      t0 : 20
-      w0 : 20
-    }
-    production = {
-      # sizing agreed with customer, see https://issues.sbb.ch/browse/MON-1675
-      d0 : 50
-      p0 : 50
-      t0 : 50
-      w0 : 50
-    }
+    # sizing agreed with customer, see https://issues.sbb.ch/browse/MON-1675
+    default    = 25
+    production = 50
   }
 }
 output "pvsize_splunkvar" {
   description = "Size of splunk/var pv for current tenant/stage"
-  value       = contains(keys(var.pvsize_splunkvar_map[var.workspace]), var.stage) ? var.pvsize_splunkvar_map[var.workspace][var.stage] : "missing"
+  value       = contains(keys(var.pvsize_splunkvar_map), var.workspace) ? var.pvsize_splunkvar_map[var.workspace] : "missing"
 }
 
 
