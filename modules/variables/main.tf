@@ -359,7 +359,7 @@ output "pvsize_cold" {
 }
 
 variable "pvsize_splunkvar_map" {
-  description = "splunkvar pv sizes (split by tenant and stage)"
+  description = "splunkvar pv sizes (split by tenant)"
   type        = map
   default = {
     # sizing agreed with customer, see https://issues.sbb.ch/browse/MON-1675
@@ -368,7 +368,7 @@ variable "pvsize_splunkvar_map" {
   }
 }
 output "pvsize_splunkvar" {
-  description = "Size of splunk/var pv for current tenant/stage"
+  description = "Size of splunk/var pv for current tenant"
   value       = contains(keys(var.pvsize_splunkvar_map), var.workspace) ? var.pvsize_splunkvar_map[var.workspace] : "missing"
 }
 
