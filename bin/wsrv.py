@@ -295,7 +295,15 @@ class TerraformServer(BaseHTTPRequestHandler):
     def do_monitor(self, severity='low', stage=None):
         splunk_app = 'itsi'
         splunk_auth = requests.auth.HTTPBasicAuth(user, password)
-        stage_filter = 'title!=splh0* AND title!=splw0*' if stage==None else f'title=spl{stage}*'
+        if stage == None:
+            stage_filter = 'title=spl* AND title!=splh0* AND title!=splw0*'
+        elif stage == 'p0':
+            stage_filter = f'title=splp0* AND title!=splp0si*'
+        elif stage == 't0':
+            stage_filter = f'title=splt0* OR title=splp0si*'
+        else:
+            stage_filter = f'title=spl{stage}*'
+        db_param = f'title=spl* AND NOT (title=splh0* OR title=splw0*)' if stage == None else stage_filter
         splunk_search = f"|inputlookup itsi_entities| search {stage_filter} " \
                         f"AND title!=spl*0sy* | fields title |tschcheckserverhealth " \
                         f"| eval health_weight=case(health=\"black\", 7, health=\"green\", 0, health=\"yellow\", 3, " \
@@ -342,10 +350,6 @@ class TerraformServer(BaseHTTPRequestHandler):
         self.wfile.write(bytes(f'<p><b>{interpreted_splunk_health}</b></p>', coding))
         self.wfile.write(bytes('<h1>Splunk System Health</h1>', coding))
         db_link = f'https://search.splunk.sbb.ch/en-GB/app/itsi/serverhealth?form.stage='
-        if stage==None:
-            db_param = f'title!=splh0* AND title!=splw0* AND title=spl*'
-        else:
-            db_param = f'title=spl{stage}*'
         # encode URL to get rid of '=', but leave '!' and '*'
         self.wfile.write(bytes(f'<p>Go to <a href="{db_link}{urllib.parse.quote(db_param, safe="*!")}">system health dashboard</a></p>', coding))
         self.wfile.write(bytes('</body>', coding))
