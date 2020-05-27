@@ -24,3 +24,16 @@ module "es-instance" {
   flavor         = module.variables.flavor_es
   secgrp_id_list = [data.terraform_remote_state.shared.outputs.searchhead-secgrp_id]
 }
+
+resource "opentelekomcloud_blockstorage_volume_v2" "splunkvar" {
+  availability_zone = module.es-instance.az
+  name              = "${module.es-instance.name}-splunkvar"
+  size              = module.variables.pvsize_splunkvar
+  volume_type       = "SSD"
+}
+
+resource "opentelekomcloud_compute_volume_attach_v2" "splunkvar_attach" {
+  instance_id = module.es-instance.id
+  volume_id   = opentelekomcloud_blockstorage_volume_v2.splunkvar.id
+  depends_on  = [module.es-instance]
+}

@@ -358,6 +358,21 @@ output "pvsize_cold" {
   value       = contains(keys(var.pvsize_cold_map[var.workspace]), var.stage) ? var.pvsize_cold_map[var.workspace][var.stage] : "missing"
 }
 
+variable "pvsize_splunkvar_map" {
+  description = "splunkvar pv sizes (split by tenant)"
+  type        = map
+  default = {
+    # sizing agreed with customer, see https://issues.sbb.ch/browse/MON-1675
+    default    = 25
+    production = 50
+  }
+}
+output "pvsize_splunkvar" {
+  description = "Size of splunk/var pv for current tenant"
+  value       = contains(keys(var.pvsize_splunkvar_map), var.workspace) ? var.pvsize_splunkvar_map[var.workspace] : "missing"
+}
+
+
 variable "subnet_cidr_list_map" {
   description = "Subnet CIDRs (split by tenant)"
   type        = map

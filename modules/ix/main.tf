@@ -70,6 +70,12 @@ resource "opentelekomcloud_blockstorage_volume_v2" "hot4" {
   size              = module.variables.pvsize_hot
   volume_type       = "SSD"
 }
+resource "opentelekomcloud_blockstorage_volume_v2" "splunkvar" {
+  availability_zone = module.ix-instance.az
+  name              = "${module.ix-instance.name}-splunkvar"
+  size              = module.variables.pvsize_splunkvar
+  volume_type       = "SSD"
+}
 
 resource "opentelekomcloud_compute_volume_attach_v2" "cold1_attach" {
   instance_id = module.ix-instance.id
@@ -110,4 +116,9 @@ resource "opentelekomcloud_compute_volume_attach_v2" "hot4_attach" {
   instance_id = module.ix-instance.id
   volume_id   = opentelekomcloud_blockstorage_volume_v2.hot4.id
   depends_on  = [opentelekomcloud_compute_volume_attach_v2.hot3_attach]
+}
+resource "opentelekomcloud_compute_volume_attach_v2" "splunkvar_attach" {
+  instance_id = module.ix-instance.id
+  volume_id   = opentelekomcloud_blockstorage_volume_v2.splunkvar.id
+  depends_on  = [opentelekomcloud_compute_volume_attach_v2.hot4_attach]
 }
