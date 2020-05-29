@@ -489,7 +489,7 @@ variable "pmdns_list_map" {
       ########## : "10.104.198.249",
       ########## : "10.104.198.250",
       ########## : "10.104.198.251",
-      ########## : "10.104.198.252",
+      #--------- : "10.104.198.252", used temporarily for baseimage creation (os_upgrade_vm)
       #--------- : "10.104.198.253", OTC System interface
       #--------- : "10.104.198.254", OTC DHCP service
     }
@@ -685,7 +685,7 @@ variable "pmdns_list_map" {
       ########## : "10.104.146.249",
       ########## : "10.104.146.250",
       ########## : "10.104.146.251",
-      ########## : "10.104.146.252",
+      #--------- : "10.104.146.252", used temporarily for baseimage creation (os_upgrade_vm)
       #--------- : "10.104.146.253", OTC System interface
       #--------- : "10.104.146.254", OTC DHCP service
     }
