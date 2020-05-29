@@ -105,6 +105,22 @@ module "server-hf001" {
   source        = "../../modules/hf"
   instance_name = "${local.prefix}hf001"
 }
+module "server-hf002" {
+  source        = "../../modules/hf"
+  instance_name = "${local.prefix}hf002"
+}
+module "server-hf003" {
+  source        = "../../modules/hf"
+  instance_name = "${local.prefix}hf003"
+}
+module "server-hf004" {
+  source        = "../../modules/hf"
+  instance_name = "${local.prefix}hf004"
+}
+module "server-hf005" {
+  source        = "../../modules/hf"
+  instance_name = "${local.prefix}hf005"
+}
 
 module "server-sy000" {
   source        = "../../modules/sy"
