@@ -414,9 +414,15 @@ class TerraformServer(BaseHTTPRequestHandler):
         if error_string != '':
             self.wfile.write(bytes(f'<p><pre>{error_string}</pre></p>', coding))
         else:
-            self.wfile.write(bytes(f'<p><pre>Currently there are {incident_count} incidents with severity &ge; {severity}, therefore:</pre></p>', coding))
+            self.wfile.write(bytes(f'<p><pre>Currently there are {incident_count} incidents with severity &ge; {severity}</pre></p>', coding))
+            for incident in data_json:
+                link = f'https://{server}/en-GB/app/itsi/itsi_event_management?earliest=0&episodeid={incident["_key"]}&tabid=impact'
+                self.wfile.write(bytes(f'<a href="{link}">{link}</a><br>', coding))
             self.wfile.write(bytes(f'<p><b>{interpreted_splunk_health}</b></p>', coding))
-        self.wfile.write(bytes('<p>Go to <a href="https://search.splunk.sbb.ch/en-GB/app/itsi/itsi_event_management?earliest=0">ITSI Episode Review</a> to see the incidents.</p>', coding))
+            if incident_count > 0:
+                self.wfile.write(bytes(f'Please, copy the link to the episodes in Splunk to the ticket in SM9, open the link to each episode and click on "Acknowledge" .' \
+                                       f'Once that the incident is resolved, please go to its episode in Splunk and close it.', coding))
+        self.wfile.write(bytes('<p>Go to <a href="https://search.splunk.sbb.ch/en-GB/app/itsi/itsi_event_management?earliest=0">ITSI Episode Review</a> to see all the incidents.</p>', coding))
         self.wfile.write(bytes('</body>', coding))
 
         #HTML End
