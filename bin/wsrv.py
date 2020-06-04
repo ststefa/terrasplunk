@@ -263,6 +263,15 @@ class TerraformServer(BaseHTTPRequestHandler):
                     if 'stage' in parsed:
                         stage = parsed['stage'][0]
                 self.do_monitor(severity, stage)
+            elif self.path.startswith('/monitor/incidents'):
+                self.send_header("Content-type", "text/html")
+                self.end_headers()
+                severity = 'low'
+                if "?" in self.path:
+                    parsed = urllib.parse.parse_qs(self.path.split('?')[1])
+                    if 'severity' in parsed:
+                        severity = parsed['severity'][0]
+                self.do_incidents(severity)
             elif self.path == '/topology':
                 self.send_header("Content-type", "text/html")
                 self.end_headers()
@@ -352,6 +361,62 @@ class TerraformServer(BaseHTTPRequestHandler):
         db_link = f'https://search.splunk.sbb.ch/en-GB/app/itsi/serverhealth?form.stage='
         # encode URL to get rid of '=', but leave '!' and '*'
         self.wfile.write(bytes(f'<p>Go to <a href="{db_link}{urllib.parse.quote(db_param, safe="*!")}">system health dashboard</a></p>', coding))
+        self.wfile.write(bytes('</body>', coding))
+
+        #HTML End
+        self.wfile.write(bytes('</html>', coding))
+
+    @method_trace
+    def do_incidents(self, severity='low'):
+        splunk_app = 'itsi'
+        splunk_auth = requests.auth.HTTPBasicAuth(user, password)
+        itsi_episode_severities = {'info' : 1, 'normal' : 2, 'low' : 3, 'medium' : 4, 'high' : 5, 'critical' : 6 }
+        severity_n = itsi_episode_severities[severity]
+        server = 'search.splunk.sbb.ch'
+        # status 1 = New; severity should be >= than the one specified, e.g., 'high' means high or critical
+        path = f'/servicesNS/{user}/{splunk_app}/event_management_interface/notable_event_group?filter={{"status":"1","severity":{{"$gte":"{severity_n}"}}}}'
+        splunkURL = f'https://{server}:8089{path}'
+        splunk_params = {'output_mode': 'json'}
+
+        incident_count = -1
+        error_string = ''
+        try:
+            resp = requests.get(splunkURL, auth=(splunk_auth), params=splunk_params)
+            resp.raise_for_status()
+            log.info(f'HTTP {resp.status_code} for URL: {resp.url}')
+            data_json = resp.json()
+            log.debug(f'HTTP output (JSON): {data_json}')
+            incident_count = len(data_json)
+            if incident_count > 0:
+                interpreted_splunk_health = 'SBB NoOK'
+            else:
+                interpreted_splunk_health = 'SBB OK'
+        except requests.exceptions.HTTPError as http_err:
+            log.error(f'Error trying to communicate to {server}: {http_err}')
+            error_string=str(http_err)
+        except ValueError as err:
+            log.error(f'Error trying to communicate to {server}: {err}')
+            error_string=str(err)
+        except Exception as err:
+            log.error(f'Error trying to communicate to {server}: {err}')
+            error_string=str(err)
+
+        #HTML Header
+        self.wfile.write(bytes('<!DOCTYPE html>', coding))
+        self.wfile.write(bytes('<html>', coding))
+        self.wfile.write(bytes('<head><title>Splunk Incidents</title></head>', coding))
+
+        #HTML Body
+        self.wfile.write(bytes(f'<body>', coding))
+        self.wfile.write(bytes('<h1>Input to Splunk</h1>', coding))
+        self.wfile.write(bytes(f'<p>REST call: <a href="https://{server}:8089{urllib.parse.quote(path, safe="{{}}/$?=,:")}">{splunkURL}</a></p>', coding))
+        self.wfile.write(bytes('<h1>Output from Splunk</h1>', coding))
+        if error_string != '':
+            self.wfile.write(bytes(f'<p><pre>{error_string}</pre></p>', coding))
+        else:
+            self.wfile.write(bytes(f'<p><pre>Currently there are {incident_count} incidents with severity &ge; {severity}, therefore:</pre></p>', coding))
+            self.wfile.write(bytes(f'<p><b>{interpreted_splunk_health}</b></p>', coding))
+        self.wfile.write(bytes('<p>Go to <a href="https://search.splunk.sbb.ch/en-GB/app/itsi/itsi_event_management?earliest=0">ITSI Episode Review</a> to see the incidents.</p>', coding))
         self.wfile.write(bytes('</body>', coding))
 
         #HTML End
