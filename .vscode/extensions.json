@@ -2,7 +2,7 @@
     "recommendations": [
         "alanwalk.markdown-toc",
         "davidanson.vscode-markdownlint",
-        "mauve.terraform",
+        "hashicorp.terraform",
         "ms-python.python",
         "msjsdiag.debugger-for-chrome",
         "rogalmic.bash-debug",
