@@ -490,12 +490,12 @@ class TerraformServer(BaseHTTPRequestHandler):
         self.wfile.write(bytes("<title>Splunk Overview</title>", coding))
         self.wfile.write(bytes("\
             <style>\
-                body       {font-family: verdana;}\
-                h1         {color: green;}\
-                table      {border-collapse: collapse; font-size: small;}\
-                tr, th, td {text-align: left; vertical-align: top; border: 1px solid; padding: 2px; padding-left: 5px; padding-right: 5px;}\
+                body           {font-family: verdana;}\
+                h1             {color: green;}\
+                table          {border-collapse: collapse; font-size: small;}\
+                tr, th, td     {text-align: left; vertical-align: top; border: 1px solid; padding: 2px; padding-left: 5px; padding-right: 5px;}\
                 tr.raw, td.raw {border: none; padding: 0px; padding-left: 20px; padding-right: 0px;}\
-                footer     {padding: 10px; color: lightgrey; font-size: small;}\
+                footer         {padding: 10px; color: lightgrey; font-size: small;}\
             </style>"                     , coding))
         self.wfile.write(bytes("</head>", coding))
 
@@ -566,7 +566,6 @@ class TerraformServer(BaseHTTPRequestHandler):
         def type_counter_to_html_table():
             result = "<table>"
 
-            iterator = iter(sorted(type_counter.keys()))
             args = [iter(sorted(type_counter.keys()))] * 3
 
             for one, two, three in itertools.zip_longest(fillvalue=None, *args):
@@ -626,7 +625,7 @@ class TerraformServer(BaseHTTPRequestHandler):
                     instance_dict[i_name]['flavor'] = i_flavor
                     capacity['ram'] += TerraformServer.hardware_table[i_flavor[3:]]['ram']
                     capacity['vcpu'] += TerraformServer.hardware_table[i_flavor[3:]]['vcpu']
-                # add couter cell
+                # add counter cell
                 self.wfile.write(bytes("<tr><td>Instance count</td></tr>", coding))
                 self.wfile.write(bytes("<tr><td>", coding))
                 self.wfile.write(bytes(f'{type_counter_to_html_table()}', coding))
@@ -678,7 +677,7 @@ class TerraformServer(BaseHTTPRequestHandler):
                 instance_dict[i_name]['flavor'] = instance['instances'][0]['attributes']['flavor_id']
                 increment_type_counter(instance_dict[i_name]['type'])
 
-            # add couter cell
+            # add counter cell
             self.wfile.write(bytes("<tr><td>Instance count</td></tr>", coding))
             self.wfile.write(bytes("<tr><td>", coding))
             self.wfile.write(bytes(f'{type_counter_to_html_table()}', coding))
