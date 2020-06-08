@@ -494,9 +494,9 @@ class TerraformServer(BaseHTTPRequestHandler):
                 h1             {color: green;}\
                 table          {border-collapse: collapse; font-size: small;}\
                 tr, th, td     {text-align: left; vertical-align: top; border: 1px solid; padding: 2px; padding-left: 5px; padding-right: 5px;}\
-                tr.raw, td.raw {border: none; padding: 0px; padding-left: 20px; padding-right: 0px;}\
+                tr.sum, td.sum {border: none; padding: 0px; padding-left: 5px; padding-right: 5px;}\
                 footer         {padding: 10px; color: lightgrey; font-size: small;}\
-            </style>"                     , coding))
+            </style>", coding))
         self.wfile.write(bytes("</head>", coding))
 
         self.do_topology_body()
@@ -553,34 +553,24 @@ class TerraformServer(BaseHTTPRequestHandler):
     @method_trace
     def do_topology_stage(self, tenant, stage):
 
-        # counter dict for instance sums
-        type_counter={}
+        def dict_to_html_table(data_dict, columns):
+            def divide_chunks(my_list, num_chunks):
+                chunks_list = []
+                for i in range(0, len(my_list), num_chunks):
+                    # in case we get dict.keys() we need to cast it to a list, see https://stackoverflow.com/questions/17322668/typeerror-dict-keys-object-does-not-support-indexing
+                    chunks_list.append(list(my_list)[i:i + num_chunks])
+                return chunks_list
 
-        # incremant type counters
-        def increment_type_counter(type):
-            if type in type_counter.keys():
-                type_counter[type] +=1
-            else:
-                type_counter[type] =1
+            chunks = divide_chunks(sorted(data_dict.keys()), columns)
 
-        def type_counter_to_html_table():
-            result = "<table>"
-
-            args = [iter(sorted(type_counter.keys()))] * 3
-
-            for one, two, three in itertools.zip_longest(fillvalue=None, *args):
-                result += "<tr class='raw'>"
-                result += "<td class='raw'>"
-                result += f"{one}: {type_counter[one]}"
-                result += "</td>"
-                result += "<td class='raw'>"
-                result += f"{two}: {type_counter[two]}" if two != None else ""
-                result += "</td>"
-                result += "<td class='raw'>"
-                result += f"{three}: {type_counter[three]}" if three != None else ""
-                result += "</td>"
+            result = '<table width="100%">'
+            for line in chunks:
+                result += "<tr class='sum'>"
+                for elem in line:
+                    result += "<td class='sum'>"
+                    result += f"{elem}: {data_dict[elem] if elem in data_dict.keys() else ''}"
+                    result += "</td>"
                 result += "</tr>"
-
             result += "</table>"
             return result
 
@@ -590,7 +580,10 @@ class TerraformServer(BaseHTTPRequestHandler):
         self.wfile.write(bytes("<table>", coding))
 
         try:
+            # summarize resource allocation
             capacity = {'ram': 0, 'vcpu': 0, 'ssd': 0, 'sata': 0}
+            # counter number of instances
+            type_counter = {}
 
             blockstorage_query = "$..resources[?(@.type=='opentelekomcloud_blockstorage_volume_v2')]" # yapf: disable
             blockstorages = jsonpath.jsonpath(data, blockstorage_query)
@@ -609,31 +602,32 @@ class TerraformServer(BaseHTTPRequestHandler):
             has_instances = False
             if all_compute_instances:
                 has_instances = True
-                # create temp dict just for sorting
+                # create temp dict for sorting and counting
                 # yapf:disable
                 instance_dict = {}
                 for instance in all_compute_instances:
                     i_name = instance['instances'][0]['attributes']['name']
+                    i_type = i_name[5:7] # e.g. "splp0sh001" -> "sh"
                     i_ip = instance['instances'][0]['attributes']['access_ip_v4']
                     i_id = instance['instances'][0]['attributes']['id']
                     i_az = instance['instances'][0]['attributes']['availability_zone']
                     i_flavor = instance['instances'][0]['attributes']['flavor_id']
                     instance_dict[i_name] = {}
+                    instance_dict[i_name]['type'] = i_type
                     instance_dict[i_name]['ip'] = i_ip
                     instance_dict[i_name]['id'] = i_id
                     instance_dict[i_name]['az'] = i_az
                     instance_dict[i_name]['flavor'] = i_flavor
                     capacity['ram'] += TerraformServer.hardware_table[i_flavor[3:]]['ram']
                     capacity['vcpu'] += TerraformServer.hardware_table[i_flavor[3:]]['vcpu']
-                # add counter cell
-                self.wfile.write(bytes("<tr><td>Instance count</td></tr>", coding))
-                self.wfile.write(bytes("<tr><td>", coding))
-                self.wfile.write(bytes(f'{type_counter_to_html_table()}', coding))
-                self.wfile.write(bytes('</td></tr>', coding))
+                    if i_type in type_counter.keys():
+                        type_counter[i_type] += 1
+                    else:
+                        type_counter[i_type] = 1
 
                 # add instance cells
                 for i_name in sorted(instance_dict.keys()):
-                    i_type = i_name[5:7]
+                    i_type = instance_dict[i_name]["type"]
                     i_ip = instance_dict[i_name]["ip"]
                     i_az = instance_dict[i_name]["az"]
                     i_vcpu = TerraformServer.hardware_table[instance_dict[i_name]["flavor"][3:]]["vcpu"]
@@ -653,51 +647,14 @@ class TerraformServer(BaseHTTPRequestHandler):
 
         if has_instances:
             self.wfile.write(bytes("<tr><td>", coding))
-            self.wfile.write(bytes(f'<b>Total capacity:</b><br>', coding))
-            self.wfile.write(bytes(f'vcpu: {capacity["vcpu"]}, ', coding))
-            self.wfile.write(bytes(f'ram:  {capacity["ram"]}, ', coding))
-            self.wfile.write(bytes(f'sata: {capacity["sata"]}, ', coding))
-            self.wfile.write(bytes(f'ssd:  {capacity["ssd"]}', coding))
+            self.wfile.write(bytes("<b>Instance count</b><br>", coding))
+            self.wfile.write(bytes(dict_to_html_table(type_counter, 4), coding))
             self.wfile.write(bytes('</td></tr>', coding))
 
-        self.wfile.write(bytes("</table>", coding))
-        instance_query = "$..resources[?(@.type=='opentelekomcloud_compute_instance_v2')]"
-        all_compute_instances = jsonpath.jsonpath(data, instance_query)
-        if all_compute_instances:
-
-            # create temp dict just for sorting
-            instance_dict = {}
-            for instance in all_compute_instances:
-                i_name = instance['instances'][0]['attributes']['name']
-                instance_dict[i_name] = {}
-                instance_dict[i_name]['type'] = i_name[5:7] # e.g. "splp0sh001" -> "sh"
-                instance_dict[i_name]['ip'] = instance['instances'][0]['attributes']['access_ip_v4']
-                instance_dict[i_name]['id'] = instance['instances'][0]['attributes']['id']
-                instance_dict[i_name]['az'] = instance['instances'][0]['attributes']['availability_zone']
-                instance_dict[i_name]['flavor'] = instance['instances'][0]['attributes']['flavor_id']
-                increment_type_counter(instance_dict[i_name]['type'])
-
-            # add counter cell
-            self.wfile.write(bytes("<tr><td>Instance count</td></tr>", coding))
-            self.wfile.write(bytes("<tr><td>", coding))
-            self.wfile.write(bytes(f'{type_counter_to_html_table()}', coding))
+            self.wfile.write(bytes("<tr class='sum'><td>", coding))
+            self.wfile.write(bytes(f'<b>Total capacity</b><br>', coding))
+            self.wfile.write(bytes(dict_to_html_table(capacity, 2), coding))
             self.wfile.write(bytes('</td></tr>', coding))
-
-            # add instance cells
-            for i_name in sorted(instance_dict.keys()):
-                i_type=instance_dict[i_name]["type"]
-                i_ip=instance_dict[i_name]["ip"]
-                i_az=instance_dict[i_name]["az"]
-                i_flavor=TerraformServer.hardware_table[instance_dict[i_name]["flavor"][3:]]
-                i_id=instance_dict[i_name]["id"]
-                self.wfile.write(bytes("<tr><td>", coding))
-                self.wfile.write(bytes(f'<b>{self.hostname_to_link(i_name, tenant, stage)}</b><br>', coding))
-                self.wfile.write(bytes(f'ip: {i_ip}<br>', coding))
-                self.wfile.write(bytes(f'az: {i_az}<br>', coding))
-                self.wfile.write(bytes(f'fl: {i_flavor}<br>', coding))
-                self.wfile.write(bytes(f'rl: {", ".join(TerraformServer.role_table[i_type])}<br>', coding))
-                self.wfile.write(bytes(f'id: {i_id}<br>', coding))
-                self.wfile.write(bytes('</td></tr>', coding))
 
         self.wfile.write(bytes("</table>", coding))
 
