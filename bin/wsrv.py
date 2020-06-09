@@ -28,6 +28,8 @@ user = 'to_be_replaced_as_arg'
 password = 'to_be_replaced_as_arg'
 health_score_watermark = { 'low' : 100, 'high' : 76, 'critical' : 50 }
 coding = 'utf-8'
+splunk_sh_server = 'search.splunk.sbb.ch'
+splunk_sh_port = 8089
 
 log = logging.getLogger(__name__)
 # set to DEBUG for early-stage debugging
@@ -319,7 +321,7 @@ class TerraformServer(BaseHTTPRequestHandler):
                         f"health=\"red\", 5)|eval _time=now() | stats sum(health_weight) as total | eval health_score=100-total"
         splunk_search_params = {'output_mode': 'json', 'search': f'{splunk_search}'}
         splunkREST_search = f'/servicesNS/{user}/{splunk_app}/search/jobs/export'
-        splunkURL = f'https://search.splunk.sbb.ch:8089{splunkREST_search}'
+        splunkURL = f'https://{splunk_sh_server}:{splunk_sh_port}{splunkREST_search}'
 
         resp = requests.get(splunkURL, auth=(splunk_auth), params=splunk_search_params)
         resp.raise_for_status()
@@ -350,7 +352,7 @@ class TerraformServer(BaseHTTPRequestHandler):
         #HTML Body
         self.wfile.write(bytes(f'<body>', coding))
         self.wfile.write(bytes('<h1>Input to Splunk</h1>', coding))
-        search_url = f'https://search.splunk.sbb.ch/app/search/search?q={urllib.parse.quote_plus(splunk_search)}'
+        search_url = f'https://{splunk_sh_server}/app/search/search?q={urllib.parse.quote_plus(splunk_search)}'
         self.wfile.write(bytes(f'<p>Run this <a href="{search_url}">search</a> directly in Splunk</p>', coding))
         self.wfile.write(bytes('<h1>Output from Splunk</h1>', coding))
         self.wfile.write(bytes(f'<p><pre>{json.dumps(data_json, indent=4)}</pre></p>', coding))
@@ -358,7 +360,7 @@ class TerraformServer(BaseHTTPRequestHandler):
         self.wfile.write(bytes(f'<p>Stage {stage} health_score (after converted to float) = {result_health_score}, {severity}_watermark = {health_score_watermark[severity]} ; therefore ...</p>', coding))
         self.wfile.write(bytes(f'<p><b>{interpreted_splunk_health}</b></p>', coding))
         self.wfile.write(bytes('<h1>Splunk System Health</h1>', coding))
-        db_link = f'https://search.splunk.sbb.ch/en-GB/app/itsi/serverhealth?form.stage='
+        db_link = f'https://{splunk_sh_server}/en-GB/app/itsi/serverhealth?form.stage='
         # encode URL to get rid of '=', but leave '!' and '*'
         self.wfile.write(bytes(f'<p>Go to <a href="{db_link}{urllib.parse.quote(db_param, safe="*!")}">system health dashboard</a></p>', coding))
         self.wfile.write(bytes('</body>', coding))
@@ -372,10 +374,9 @@ class TerraformServer(BaseHTTPRequestHandler):
         splunk_auth = requests.auth.HTTPBasicAuth(user, password)
         itsi_episode_severities = {'info' : 1, 'normal' : 2, 'low' : 3, 'medium' : 4, 'high' : 5, 'critical' : 6 }
         severity_n = itsi_episode_severities[severity]
-        server = 'search.splunk.sbb.ch'
         # status 1 = New; severity should be >= than the one specified, e.g., 'high' means high or critical
         path = f'/servicesNS/{user}/{splunk_app}/event_management_interface/notable_event_group?filter={{"status":"1","severity":{{"$gte":"{severity_n}"}}}}'
-        splunkURL = f'https://{server}:8089{path}'
+        splunkURL = f'https://{splunk_sh_server}:{splunk_sh_port}{path}'
         splunk_params = {'output_mode': 'json'}
 
         incident_count = -1
@@ -392,13 +393,13 @@ class TerraformServer(BaseHTTPRequestHandler):
             else:
                 interpreted_splunk_health = 'SBB OK'
         except requests.exceptions.HTTPError as http_err:
-            log.error(f'Error trying to communicate to {server}: {http_err}')
+            log.error(f'Error trying to communicate to {splunk_sh_server}: {http_err}')
             error_string=str(http_err)
         except ValueError as err:
-            log.error(f'Error trying to communicate to {server}: {err}')
+            log.error(f'Error trying to communicate to {splunk_sh_server}: {err}')
             error_string=str(err)
         except Exception as err:
-            log.error(f'Error trying to communicate to {server}: {err}')
+            log.error(f'Error trying to communicate to {splunk_sh_server}: {err}')
             error_string=str(err)
 
         #HTML Header
@@ -409,20 +410,20 @@ class TerraformServer(BaseHTTPRequestHandler):
         #HTML Body
         self.wfile.write(bytes(f'<body>', coding))
         self.wfile.write(bytes('<h1>Input to Splunk</h1>', coding))
-        self.wfile.write(bytes(f'<p>REST call: <a href="https://{server}:8089{urllib.parse.quote(path, safe="{{}}/$?=,:")}">{splunkURL}</a></p>', coding))
+        self.wfile.write(bytes(f'<p>REST call: <a href="https://{splunk_sh_server}:{splunk_sh_port}{urllib.parse.quote(path, safe="{{}}/$?=,:")}">{splunkURL}</a></p>', coding))
         self.wfile.write(bytes('<h1>Output from Splunk</h1>', coding))
         if error_string != '':
             self.wfile.write(bytes(f'<p><pre>{error_string}</pre></p>', coding))
         else:
             self.wfile.write(bytes(f'<p><pre>Currently there are {incident_count} incidents with severity &ge; {severity}</pre></p>', coding))
             for incident in data_json:
-                link = f'https://{server}/en-GB/app/itsi/itsi_event_management?earliest=0&episodeid={incident["_key"]}&tabid=impact'
+                link = f'https://{splunk_sh_server}/en-GB/app/itsi/itsi_event_management?earliest=0&episodeid={incident["_key"]}&tabid=impact'
                 self.wfile.write(bytes(f'<a href="{link}">{link}</a><br>', coding))
             self.wfile.write(bytes(f'<p><b>{interpreted_splunk_health}</b></p>', coding))
             if incident_count > 0:
                 self.wfile.write(bytes(f'Please, copy the link to the episodes in Splunk to the ticket in SM9, open the link to each episode and click on "Acknowledge" .' \
                                        f'Once that the incident is resolved, please go to its episode in Splunk and close it.', coding))
-        self.wfile.write(bytes('<p>Go to <a href="https://search.splunk.sbb.ch/en-GB/app/itsi/itsi_event_management?earliest=0">ITSI Episode Review</a> to see all the incidents.</p>', coding))
+        self.wfile.write(bytes(f'<p>Go to <a href="https://{splunk_sh_server}/en-GB/app/itsi/itsi_event_management?earliest=0">ITSI Episode Review</a> to see all the incidents.</p>', coding))
         self.wfile.write(bytes('</body>', coding))
 
         #HTML End
@@ -432,10 +433,9 @@ class TerraformServer(BaseHTTPRequestHandler):
     def do_investigate(self, server):
         splunk_auth = requests.auth.HTTPBasicAuth(user, password)
         splunkREST_endpoint = f'/servicesNS/{user}/itsi/search/jobs/export'
-        splunk_sh = 'search.splunk.sbb.ch'
         splunk_search = f'|makeresults | eval server="{server}" | tschcheckserverhealthdetail'
         splunk_search_params = {'output_mode': 'json', 'search': f'{splunk_search}'}
-        splunkURL = f'https://{splunk_sh}:8089{splunkREST_endpoint}'
+        splunkURL = f'https://{splunk_sh_server}:{splunk_sh_port}{splunkREST_endpoint}'
 
         url='error'
         data_json='error'
