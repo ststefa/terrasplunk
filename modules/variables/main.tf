@@ -30,7 +30,7 @@ output "tenant" {
 #  value       = var.shared_statefile_map[var.workspace]
 #}
 
-# autoselect the proper S3 remote state. Terraform does not interpolate this by workspace automatically
+# auto-select the proper S3 remote state. Terraform does not interpolate this by workspace automatically
 variable "s3_shared_config_map" {
   description = "1:1 assignment from workspace name to S3 state filename"
   type        = map
@@ -115,7 +115,7 @@ variable "flavor_ix_map" {
   type        = map
   default = {
     default = {
-      # size test (almost) like prodution, maybe better idea anyway. The full size does not (currently 2019-08) fit and leads to errors
+      # size test (almost) like production, maybe better idea anyway. The full size does not (currently 2019-08) fit and leads to errors
       p0 : "s3.4xlarge.1"
       t0 : "s2.4xlarge.1"
       w0 : "s2.xlarge.2"
@@ -430,6 +430,11 @@ output "gateway_list" {
 variable "pmdns_list_map" {
   description = "Assignment of system to IP"
   # For servers name nomenclature refer to http://wiki.t-systems.ch/x/ieMLAg
+
+  # The Splunk network subnets are
+  #
+  #   Prod tenant tsch_rz_p_001: 10.104.146.0/24
+  #   Test tenant tsch_rz_t_001: 10.104.198.192/26
 
   default = {
     default = {
