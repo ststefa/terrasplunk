@@ -53,10 +53,14 @@ do_terraform() {
 
     # change to terraform directory
     if [ "${STAGE}" == "shared" ] ; then
+        set -x
         cd "${BASEDIR}/shared" || return 1
+        { set +x; } 2> /dev/null
     else
         if [ -d "${BASEDIR}/stages/${STAGE}" ] ; then
+            set -x
             cd "${BASEDIR}/stages/${STAGE}" || return 1
+            { set +x; } 2> /dev/null
         else
             echo "No such stage \"${STAGE}\"" >&2
             return 1
@@ -187,12 +191,11 @@ case $1 in
         echo '               possible filter for non-existing servers, i.e. if a new server is'
         echo '               added. Specify the module as "module.server-<type><num>", e.g.'
         echo '               "--target=module.server-ix005"'
-
         ;;
     *)
         echo "Unknown operation ${1}" >&2
         usage >&2
-        exit 1
+        false
         ;;
 esac
 
