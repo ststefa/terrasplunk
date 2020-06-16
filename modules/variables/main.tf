@@ -325,6 +325,7 @@ variable "pvsize_hot_map" {
     production = {
       d0 : 5
       p0 : 250
+      #p0 : 625 new sizing, see MON-1631
       t0 : 25
       w0 : 5
     }
@@ -348,6 +349,7 @@ variable "pvsize_cold_map" {
     production = {
       d0 : 50
       p0 : 2500
+      #p0 : 3750 new sizing, see MON-1631
       t0 : 250
       w0 : 50
     }

@@ -96,6 +96,14 @@ module "server-ix003" {
   source        = "../../modules/ix"
   instance_name = "${local.prefix}ix003"
 }
+module "server-ix004" {
+  source        = "../../modules/ix"
+  instance_name = "${local.prefix}ix004"
+}
+module "server-ix005" {
+  source        = "../../modules/ix"
+  instance_name = "${local.prefix}ix005"
+}
 
 module "server-hf000" {
   source        = "../../modules/hf"
