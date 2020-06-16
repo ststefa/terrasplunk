@@ -130,9 +130,9 @@ Basic terraform setup
 
 You might want to install the `openstack` and `aws` commandline clients. This is not strictly a requirement. It's just handy for debugging if you prefer typing over clicking. Start at <https://docs.openstack.org/python-openstackclient/> and <https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html> if you don't know how to do that.
 
-Some of the support scripts use Amazons `boto3` python code so make sure that it's installed. It is available through `pip` (`pip3 install boto3`).
+Some of the support scripts use Amazons `boto3` python code so make sure that it's installed. It is available through `pip3`. To check whether it's already installed use `pip3 list`. If it's not installed you can run `sudo pip3 install boto3`.
 
-Next, setup your cloud credentials. The terraform state is kept on AWS S3. The infrastructure is built on OTC. Hence you need access to both cloud providers.
+Next, setup your cloud credentials. The terraform state is kept on AWS S3. The infrastructure is built on OTC. Hence you need access to both of these cloud providers.
 
 For AWS, the code assumes a profile named **sbb-splunk** in your `~/.aws/credentials` like this:
 
@@ -143,9 +143,11 @@ aws_access_key_id = <sbb-splunk-access-key>
 aws_secret_access_key = <sbb-splunk-secret-key>
 ```
 
+Make sure this file is chmod 600 for security reasons.
+
 The AWS credentials are not personal. They are exclusively used for this project and shared among project members. The actual values for these keys are stored in PasswordSafe. Look for splunk_otc_2020.
 
-To access the OTC the code assumes your credentials are configured in the openstack configuration file `~/.config/openstack/clouds.yaml`. The cloud section need to be named like the tenants, i.e.
+To access the OTC the code assumes your credentials are configured in the openstack configuration file `~/.config/openstack/clouds.yaml`. The `clouds` sections need to be named like the tenants, i.e.
 
 ``` shell
 $ cat  ~/.config/openstack/clouds.yaml
@@ -168,7 +170,10 @@ clouds:
         region_name: 'eu-ch'
 ```
 
-For the terraform remote state to work the required objects on AWS S3 and DynamoDB have to be created (if they do not exist already). The code assumes a bucket named **sbb-splunkterraform-prod** and a DynamoDB table called **splunkterraform**. For details on setting these up visit <https://www.terraform.io/docs/backends/types/s3.html>
+Unlike the terraform credentials, the OTC credentials *are* personalized. Make sure this file is also chmod 600 for security reasons.
+
+
+For the terraform remote state to work, the required objects on AWS S3 and DynamoDB have to be created (if they do not exist already). The code assumes a bucket named **sbb-splunkterraform-prod** and a DynamoDB table called **splunkterraform**. For details on setting these up visit <https://www.terraform.io/docs/backends/types/s3.html>
 
 If you've prepared your cloud setup, resume...
 
@@ -208,15 +213,17 @@ Don't break stuff on the production tenant! Feel free to break everything on the
 
 This project contains a central operator-friendly shell script `bin/tspl_terraform.sh`. The script is meant to make it easier to perform common terraform operations by offering a uniform invocation mechanism. For the most part it is just a simple shell wrapper around more complex procedures. For the technically curious it might serve as an entrypoint to understand how typical activities are implemented. Try `bin/tspl_terraform.sh -h` to get started.
 
-You might want to create a symbolic link of this script from your git clone to your personal `~/bin` directory so that by default it will be in your `$PATH`. All our splunk git repositories follow this approach. If you also follow the convention to link the various `bin/tspl_<something>.sh` scripts to your `~/bin` directory then most splunk operating activities can start by simply typing `tspl<tab><tab>` and then using the online help.
+You should create a symbolic link of this script from your git clone to your personal `~/bin` directory so that by default it will be in your `$PATH`. All our splunk git repositories follow this approach. If you also follow the convention to link the various `bin/tspl_<something>.sh` scripts to your `~/bin` directory then most splunk operating activities can start by simply typing `tspl<tab><tab>` and then using the online help.
 
 ### Operating activities
 
+Most commands support optional filters to narrow down the systems to smaller groups. E.g. "only indexers in availability zone 2" would translate to `--type ix --az 2`.
+
 #### lock
 
-Explicitly lock the terraform remote state on AWS S3. This can be used to save oneself of applying something to a stage he did not intend.
+Explicitly lock the terraform remote state on AWS S3. This can be used to save oneself of applying something to a stage he did not intend. It is considered good practice to lock production at all times except when actively working on it.
 
-A lock can be removed by changing to the appropriate terraform directory and workspace and then using `terraform force-unlock <Lock ID>`.
+A lock can be removed by cd-ing to the appropriate terraform directory and workspace and then using `terraform force-unlock <Lock ID>`. If this does not sound familiar then you should get some terraform practice before continuing.
 
 For restoring back the lock, use `bin/tspl_terraform.sh lock <tenant> <stage>`.
 
@@ -224,11 +231,10 @@ For restoring back the lock, use `bin/tspl_terraform.sh lock <tenant> <stage>`.
 
 Wrapper around the terraform functions of the same name, but requiring tenant and stage as arguments. Terraform would natively choose tenant and stage based on current directory and terraform workspace instead.
 
-One may optionally specify "filters" which are used to narrow down the systems to smaller groups. E.g. "only indexers in AZ2" would translate to specifying "--type ix --az 2".
 
 #### list
 
-Query server instances from remote terraform state using `serverlist.py`. Can be used in other scripting to create lists of splunk server names. Its logic is also used for other operations which allow to specify filters. So it is useful to test out filter rules before running actual terraform operations like apply or destroy.
+Query server instances from remote terraform state using `serverlist.py`. Can be used in other scripting to create lists of splunk server names. Its logic is also used for other operations which allow to specify filters. So it is useful to test out filter rules before running actual terraform operations like apply or destroy. Be aware that this mechanism is based on the current terraform state which means that it cannot be used to limit to VMs which do not (yet) exist.
 
 ## Provisioning
 
@@ -238,7 +244,7 @@ We keep the terraform step separate from the provisioning step by first building
 
 ### Implementation Details
 
-We expose the complete terraform state including all tenants as a single json structure. It is then up to the provisioning process to extract the relevant information. While this sure is not the most efficient approach it is the simplest one and still allows maximum flexibility for the provisioning process. Optimizations could be implemented (e.g. just passing parts of the full state) but this will probably not be necessary considering the foreseeable dimensioning.
+We expose the complete terraform state including all tenants as a single json structure. It is then up to the provisioning process to extract the relevant information. While this sure is not the most efficient approach it is the simplest one and still allows maximum flexibility for the provisioning process. Optimizations could be implemented (e.g. just passing parts of the full state) but this will probably not be necessary considering the foreseeable sizing.
 
 The provisioning queries the remote terraform state and combines it in a json structure like this
 
