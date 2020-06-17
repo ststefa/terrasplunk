@@ -33,13 +33,14 @@ do_terraform() {
     shift;shift;shift
     FILTER=${*}
 
+    # figure out proper terraform workspace
     if [ "${TENANT}" == "tsch_rz_t_001" ] ; then
         WORKSPACE="default"
     elif [ "${TENANT}" == "tsch_rz_p_001" ] ; then
         WORKSPACE="production"
         echo "WARNING! You're about to make changes to the production hardware layer. This is a"
         echo "dangerous operation. Please confirm that this is really what you want to do and"
-        echo "you understand the possible consequuences by answering 'KEN SENT ME'"
+        echo "you understand the possible consequences by answering 'KEN SENT ME'"
         read -rp "Who sent you? " ANSWER
         if [[ ${ANSWER} != "KEN SENT ME" ]] ; then
             echo "Aborting"
@@ -50,61 +51,76 @@ do_terraform() {
         return 1
     fi
 
+    # change to terraform directory
     if [ "${STAGE}" == "shared" ] ; then
+        set -x
         cd "${BASEDIR}/shared" || return 1
+        { set +x; } 2> /dev/null
     else
         if [ -d "${BASEDIR}/stages/${STAGE}" ] ; then
+            set -x
             cd "${BASEDIR}/stages/${STAGE}" || return 1
+            { set +x; } 2> /dev/null
         else
             echo "No such stage \"${STAGE}\"" >&2
             return 1
         fi
     fi
 
-    # terrible hack
-    if [ "${OPERATION}" == "init" ] ; then
-        PARALLELISM=""
-    else
-        PARALLELISM="-parallelism=20"
-    fi
-
+    # switch to requested terraform workspace
     set -x
     terraform workspace select ${WORKSPACE} 2>/dev/null
     RC=${?}
     { set +x; } 2> /dev/null
-    # shellcheck disable=SC2181
-    if (( "${RC}" != 0 )) ; then
+    if (( RC != 0 )) ; then
         set -x
         terraform workspace new ${WORKSPACE} || return 1
         { set +x; } 2> /dev/null
     fi
 
-    if [ -z "${FILTER}" ] ; then
+    case "${OPERATION}" in
+    init)
         set -x
-        terraform "${OPERATION}" ${PARALLELISM} || return 1
+        terraform init -upgrade=true || return 1
         { set +x; } 2> /dev/null
-    else
+        ;;
+    apply|destroy)
+        PARALLELISM="-parallelism=20"
         if [ "${STAGE}" == "shared" ] ; then
             # there are no vms in shared so just do operation
             set -x
-            terraform "${OPERATION}" ${PARALLELISM} || return 1
+            terraform "${OPERATION}" "${PARALLELISM}" || return 1
             { set +x; } 2> /dev/null
         else
+            if [ -n "${FILTER}" ] ; then
+                if [[ "${FILTER}" =~ ^--target  ]]; then
+                    # strip off first "-"
+                    SERVERLIST="${FILTER:1}"
+                else
+                    # Generate target list by querying terraform state data.
+                    # Beware that this is only possible for *already existing*
+                    # servers.
+                    set -x
+                    # shellcheck disable=SC2086
+                    SERVERLIST="$("${BASEDIR}/bin/serverlist.py" ${FILTER} --format=-target=module.server-%type%num | paste -sd' ')"
+                    { set +x; } 2> /dev/null
+                    if [ -z "${SERVERLIST}" ] ; then
+                        echo "Could not compile serverlist for filter \"${FILTER}\". Either there is no such instance or the filter was specified wrongly." >&2
+                        return 1
+                    fi
+                fi
+            fi
             set -x
             # shellcheck disable=SC2086
-            SERVERLIST="$("${BASEDIR}/bin/serverlist.py" ${FILTER} --format=-target=module.server-%type%num | paste -sd' ')"
+            terraform "${OPERATION}" "${PARALLELISM}" ${SERVERLIST} || return 1
             { set +x; } 2> /dev/null
-            if [ -z "${SERVERLIST}" ] ; then
-                echo "Could not compile serverlist for filter \"${FILTER}\". Either there is no such instance or the filter was specified wrongly." >&2
-                return 1
-            else
-                set -x
-                # shellcheck disable=SC2086
-                terraform "${OPERATION}" ${PARALLELISM} ${SERVERLIST} || return 1
-                { set +x; } 2> /dev/null
-            fi
         fi
-    fi
+        ;;
+    *)
+        echo "Unknown operation ${1}, error in callers case statement" >&2
+        return 1
+        ;;
+   esac
 }
 
 do_lock() {
@@ -147,8 +163,10 @@ case $1 in
         echo '      list     list of targeted VMs. Useful for testing filters.'
         echo '      apply    apply terraform model'
         echo '      destroy  destroy terraform model. Use with caution!'
-        echo '      init     install missing providers and modules into terraform workspace'
-        echo '      lock     lock terraform state.Safety net to prevent errors.'
+        echo '      init     install missing providers and modules into terraform workspace.'
+        echo '               This will also perform an implicit upgrade of providers so they'
+        echo '               are kept up to date.'
+        echo '      lock     lock terraform state. Safety net to prevent errors.'
         echo '  tenant: target tenant, one of:'
         echo '      tsch_rz_t_001   test tenant'
         echo '      tsch_rz_p_001   production tenant'
@@ -159,21 +177,28 @@ case $1 in
         echo '      t0       test'
         echo '      w0       spielwiese'
         echo '      shared   shared state, e.g. networking and security groups'
-        echo '  filter: optional filters to narrow down the operation to a subset of target instances.'
-        echo '          If multiple filters are used they will be logically and-ed. Filters accept'
-        echo '          regex expressions, e.g. "--type '\''(ix|sh)'\''" Available filters are:'
-        echo '      --az    Only instances in this availability zone, one of 1 or 2'
-        echo '      --type  Only instances of this type/these types, one or more of'
-        echo '              ix : indexers'
-        echo '              sh : searchheads'
-        echo '              (more types exist, please see http://admin.splunk.sbb.ch/topology)'
-        echo '      --num   Only instances with this number (last three digits). The number is compared'
-        echo '              using regex so make sure to always specify all three digits'
+        echo '  filter: optional filters to narrow down the operation to a subset of target'
+        echo '          instances. If multiple filters are used they will be logically'
+        echo '          and-ed. Filters (except --target) accept regex expressions, e.g.'
+        echo '          --type '\''(ix|sh)'\''"'
+        echo '          Available filters are:'
+        echo '      --az     Only instances in this availability zone, one of 1 or 2'
+        echo '      --type   Only instances of this type/these types, one or more of'
+        echo '               ix : indexers'
+        echo '               sh : searchheads'
+        echo '               (more types exist, please see http://admin.splunk.sbb.ch/topology)'
+        echo '      --num    Only instances with this number (last three digits). The number'
+        echo '               is compared using regex so make sure to always specify all three'
+        echo '               digits (e.g. "--num 001")'
+        echo '      --target Specify a single terraform server module. This is the only'
+        echo '               possible filter for non-existing servers, i.e. if a new server is'
+        echo '               added. Specify the module as "module.server-<type><num>", e.g.'
+        echo '               "--target=module.server-ix005"'
         ;;
     *)
         echo "Unknown operation ${1}" >&2
         usage >&2
-        exit 1
+        false
         ;;
 esac
 

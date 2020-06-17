@@ -30,7 +30,7 @@ output "tenant" {
 #  value       = var.shared_statefile_map[var.workspace]
 #}
 
-# autoselect the proper S3 remote state. Terraform does not interpolate this by workspace automatically
+# auto-select the proper S3 remote state. Terraform does not interpolate this by workspace automatically
 variable "s3_shared_config_map" {
   description = "1:1 assignment from workspace name to S3 state filename"
   type        = map
@@ -115,7 +115,7 @@ variable "flavor_ix_map" {
   type        = map
   default = {
     default = {
-      # size test (almost) like prodution, maybe better idea anyway. The full size does not (currently 2019-08) fit and leads to errors
+      # size test (almost) like production, maybe better idea anyway. The full size does not (currently 2019-08) fit and leads to errors
       p0 : "s3.4xlarge.1"
       t0 : "s2.4xlarge.1"
       w0 : "s2.xlarge.2"
@@ -325,6 +325,7 @@ variable "pvsize_hot_map" {
     production = {
       d0 : 5
       p0 : 250
+      #p0 : 625 new sizing, see MON-1631
       t0 : 25
       w0 : 5
     }
@@ -348,6 +349,7 @@ variable "pvsize_cold_map" {
     production = {
       d0 : 50
       p0 : 2500
+      #p0 : 3750 new sizing, see MON-1631
       t0 : 250
       w0 : 50
     }
@@ -431,6 +433,11 @@ variable "pmdns_list_map" {
   description = "Assignment of system to IP"
   # For servers name nomenclature refer to http://wiki.t-systems.ch/x/ieMLAg
 
+  # The Splunk network subnets are
+  #
+  #   Prod tenant tsch_rz_p_001: 10.104.146.0/24
+  #   Test tenant tsch_rz_t_001: 10.104.198.192/26
+
   default = {
     default = {
       # Test tenant > Prod subnet > netA (AZ1 network) > 10.104.198.194 - 10.104.198.206
@@ -474,7 +481,7 @@ variable "pmdns_list_map" {
       splw0si000 : "10.104.198.233",
       ########## : "10.104.198.234",
       ########## : "10.104.198.235",
-      splw0ix002 : "10.104.198.236",
+      ########## : "10.104.198.236",
       #--------- : "10.104.198.237", OTC System interface
       #--------- : "10.104.198.238", OTC DHCP service
 
@@ -482,7 +489,7 @@ variable "pmdns_list_map" {
       splw0ix001 : "10.104.198.242",
       splw0sh001 : "10.104.198.243",
       ########## : "10.104.198.244",
-      splw0ix003 : "10.104.198.245",
+      ########## : "10.104.198.245",
       splw0es001 : "10.104.198.246",
       ########## : "10.104.198.247",
       ########## : "10.104.198.248",
@@ -509,7 +516,7 @@ variable "pmdns_list_map" {
       splg0lm000 : "10.104.146.13",
       splp0hf002 : "10.104.146.14",
       splp0hf004 : "10.104.146.15",
-      ########## : "10.104.146.16",
+      splp0ix004 : "10.104.146.16",
       ########## : "10.104.146.17",
       ########## : "10.104.146.18",
       ########## : "10.104.146.19",
@@ -568,7 +575,7 @@ variable "pmdns_list_map" {
       splp0sh001 : "10.104.146.73",
       splp0hf003 : "10.104.146.74",
       splp0hf005 : "10.104.146.75",
-      ########## : "10.104.146.76",
+      splp0ix005 : "10.104.146.76",
       ########## : "10.104.146.77",
       ########## : "10.104.146.78",
       ########## : "10.104.146.79",

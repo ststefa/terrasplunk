@@ -65,7 +65,6 @@ def init_logging():
 
 @method_trace
 def prep_arg_defaults():
-    # initialize all dynamic defaults with None
     result = {'tenant': None, 'stage': None}
 
     cwd = pathlib.Path('.')
@@ -77,7 +76,7 @@ def prep_arg_defaults():
         elif workspace == "production":
             result['tenant'] = "tsch_rz_p_001"
         result['stage'] = cwd.resolve().name
-        # This might be confusing becuase its potentially overriden
+        # This might be confusing because its explicitly given as arg
         #log.warn( f'Using tenant {result["tenant"]} and stage {result["stage"]} derived from current terraform workspace')
 
     return result
@@ -109,7 +108,7 @@ def init_parser(arg_defaults):
     parser.add_argument('--az',
                         help='only show instances in availability zone 1 or 2')
     parser.add_argument(
-        '--flv', help='only show instances whose flavor matches this regex')
+        '--flv', help='only show instances whose OTC flavor matches this regex (e.g. "xlarge.2")')
     parser.add_argument(
         '--type',
         help=
