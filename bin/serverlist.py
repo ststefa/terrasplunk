@@ -108,7 +108,7 @@ def init_parser(arg_defaults):
     parser.add_argument('--az',
                         help='only show instances in availability zone 1 or 2')
     parser.add_argument(
-        '--flv', help='only show instances whose flavor matches this regex')
+        '--flv', help='only show instances whose OTC flavor matches this regex (e.g. "xlarge.2")')
     parser.add_argument(
         '--type',
         help=
