@@ -85,13 +85,13 @@ do_terraform() {
         { set +x; } 2> /dev/null
         ;;
     apply|destroy)
+        PARALLELISM="-parallelism=20"
         if [ "${STAGE}" == "shared" ] ; then
             # there are no vms in shared so just do operation
             set -x
-            terraform "${OPERATION}" || return 1
+            terraform "${OPERATION}" "${PARALLELISM}" || return 1
             { set +x; } 2> /dev/null
         else
-            PARALLELISM="-parallelism=20"
             if [ -n "${FILTER}" ] ; then
                 if [[ "${FILTER}" =~ ^--target  ]]; then
                     # strip off first "-"
