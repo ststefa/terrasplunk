@@ -88,7 +88,7 @@ do_terraform() {
         if [ "${STAGE}" == "shared" ] ; then
             # there are no vms in shared so just do operation
             set -x
-            terraform "${OPERATION}" "${PARALLELISM}" || return 1
+            terraform "${OPERATION}" || return 1
             { set +x; } 2> /dev/null
         else
             PARALLELISM="-parallelism=20"
