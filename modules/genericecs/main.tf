@@ -73,7 +73,7 @@ resource "opentelekomcloud_compute_instance_v2" "instance" {
   metadata = {
     sbb_accounting_number    = "70031944"
     sbb_infrastructure_stage = module.variables.sbb_infrastructure_stage
-    sbb_mega_id              = "F52C083E529E0250"
+    sbb_mega_id              = "8FD790A15E212AEF"
     sbb_requester            = "ursula.buehlmann@sbb.ch"
     sbb_os                   = "linux"
     sbb_contact              = "ursula.buehlmann@sbb.ch"
