@@ -100,6 +100,7 @@ do_terraform() {
                     # Generate target list by querying terraform state data.
                     # Beware that this is only possible for *already existing*
                     # servers.
+                    set -x
                     # shellcheck disable=SC2086
                     SERVERLIST="$("${BASEDIR}/bin/serverlist.py" ${FILTER} --format=-target=module.server-%type%num | paste -sd' ')"
                     { set +x; } 2> /dev/null
