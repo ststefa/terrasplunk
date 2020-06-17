@@ -96,14 +96,15 @@ module "server-ix003" {
   source        = "../../modules/ix"
   instance_name = "${local.prefix}ix003"
 }
-module "server-ix004" {
-  source        = "../../modules/ix"
-  instance_name = "${local.prefix}ix004"
-}
-module "server-ix005" {
-  source        = "../../modules/ix"
-  instance_name = "${local.prefix}ix005"
-}
+# Temporarily removed due to lack of OTC Resources, see https://issues.sbb.ch/browse/MON-1758
+#module "server-ix004" {
+#  source        = "../../modules/ix"
+#  instance_name = "${local.prefix}ix004"
+#}
+#module "server-ix005" {
+#  source        = "../../modules/ix"
+#  instance_name = "${local.prefix}ix005"
+#}
 
 module "server-hf000" {
   source        = "../../modules/hf"
