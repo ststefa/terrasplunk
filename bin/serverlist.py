@@ -76,7 +76,7 @@ def prep_arg_defaults():
         elif workspace == "production":
             result['tenant'] = "tsch_rz_p_001"
         result['stage'] = cwd.resolve().name
-        # This might be confusing because its potentially explicitly given as arg
+        # This might be confusing because its explicitly given as arg
         #log.warn( f'Using tenant {result["tenant"]} and stage {result["stage"]} derived from current terraform workspace')
 
     return result
