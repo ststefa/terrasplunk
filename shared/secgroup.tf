@@ -40,7 +40,7 @@ resource "opentelekomcloud_compute_secgroup_v2" "base-secgrp" {
   name        = "${local.project}-base-secgrp"
   description = "Base rules for all ${local.project} compute instances"
 
-  # allow free communication among all our splunk ecs's in the tenant
+  # allow free communication among all our splunk ecs instances in the tenant
   rule {
     from_port   = 1
     to_port     = 65535
@@ -83,7 +83,7 @@ resource "opentelekomcloud_compute_secgroup_v2" "indexer-secgrp" {
   name        = "${local.project}-indexer-secgrp"
   description = "Specific rules for ${local.project} indexer instances"
 
-  # indexr port
+  # indexer port
   rule {
     from_port   = 9997
     to_port     = 9997
@@ -91,7 +91,7 @@ resource "opentelekomcloud_compute_secgroup_v2" "indexer-secgrp" {
     cidr        = "0.0.0.0/0"
   }
 
-  # indexr port SSL
+  # indexer port SSL
   rule {
     from_port   = 9998
     to_port     = 9998
@@ -179,6 +179,21 @@ resource "opentelekomcloud_compute_secgroup_v2" "rest-secgrp" {
     to_port     = 8089
     ip_protocol = "tcp"
     cidr        = "10.104.0.0/16"
+  }
+}
+
+resource "opentelekomcloud_compute_secgroup_v2" "webhook-secgrp" {
+  name        = "${local.project}-webhook-secgrp"
+  description = "Enable access to ${local.project} webhook for deployment-server concept"
+
+  # Splunk REST API (only from within RZ net)
+  rule {
+    from_port   = 7003
+    to_port     = 7003
+    ip_protocol = "tcp"
+    # maybe access needs to be more limited. As of 2020-06-23 the bitbucket
+    # server had ip 10.171.161.30. Leaving open for now for maximum flexibility
+    cidr        = "0.0.0.0/0"
   }
 }
 
