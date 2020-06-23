@@ -52,7 +52,7 @@ output "subnetC-az2_id" {
 #  value = ""
 #}
 
-# Reference secgroups name instead of id, see https://www.terraform.io/docs/providers/opentelekomcloud/r/compute_secgroup_v2.html#referencing-security-groups
+# Reference secgroups with name instead of id, see https://www.terraform.io/docs/providers/opentelekomcloud/r/compute_secgroup_v2.html#referencing-security-groups
 # We should monitor whether this recommendation changes
 output "base-secgrp_id" {
   value = opentelekomcloud_compute_secgroup_v2.base-secgrp.name
@@ -74,6 +74,9 @@ output "webgui-secgrp_id" {
 }
 output "rest-secgrp_id" {
   value = opentelekomcloud_compute_secgroup_v2.rest-secgrp.name
+}
+output "webhook-secgrp_id" {
+  value = opentelekomcloud_compute_secgroup_v2.webhook-secgrp.name
 }
 output "parser-secgrp_id" {
   value = opentelekomcloud_compute_secgroup_v2.parser-secgrp.name
