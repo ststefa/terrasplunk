@@ -193,7 +193,7 @@ resource "opentelekomcloud_compute_secgroup_v2" "webhook-secgrp" {
     ip_protocol = "tcp"
     # maybe access needs to be more limited. As of 2020-06-23 the bitbucket
     # server had ip 10.171.161.30. Leaving open for now for maximum flexibility
-    cidr        = "0.0.0.0/0"
+    cidr = "0.0.0.0/0"
   }
 }
 
