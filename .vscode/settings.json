@@ -4,28 +4,31 @@
     "python.formatting.provider": "yapf",
     //"python.formatting.yapfArgs": ["--style", "{based_on_style: chromium, indent_width: 20}"]
 
-    "terraform.format": {
-        //"ignoreExtensionsOnSave": [
-        //	".tfsmurf"
-        //]
-    },
-    "terraform.indexing": {
-        "enabled": true,
-        "liveIndexing": false,
-        "delay": 500,
-        "exclude": [
-            ".terraform/**/*",
-            "**/.terraform/**/*"
-        ]
-    },
-    "terraform.languageServer": {
-        "enabled": true,
-        "args": []
-    },
-    "terraform.paths": [
-        "shared/",
-        "stages/*/",
-    ],
+    // with the takeover of the terraform extension by hashicorp, terrafomrm
+    // settings are no longer possible on module-level but must be at workspace
+    // level instead. The feature hopefully comes back soon :-/
+    //"terraform.format": {
+    //    //"ignoreExtensionsOnSave": [
+    //    //	".tfsmurf"
+    //    //]
+    //},
+    //"terraform.indexing": {
+    //    "enabled": true,
+    //    "liveIndexing": false,
+    //    "delay": 500,
+    //    "exclude": [
+    //        ".terraform/**/*",
+    //        "**/.terraform/**/*"
+    //    ]
+    //},
+    //"terraform.languageServer": {
+    //    "enabled": true,
+    //    "args": []
+    //},
+    //"terraform.paths": [
+    //    "shared/",
+    //    "stages/*/",
+    //],
 
     "[terraform]": {
         "editor.insertSpaces": true,
@@ -51,14 +54,17 @@
         "boto",
         "clmaster",
         "commandline",
+        "dotglob",
         "dpserver",
         "entp",
         "entrypoint",
         "genericecs",
         "hostnames",
         "icmp",
+        "itertools",
         "itsi",
         "kvstore",
+        "nullglob",
         "openstack",
         "opentelekomcloud",
         "pmdns",
@@ -69,6 +75,7 @@
         "secgrp",
         "serverlist",
         "shellcheck",
+        "shopt",
         "siem",
         "spielwiese",
         "splg",
@@ -88,6 +95,7 @@
         "terralith",
         "terraservice",
         "terrasplunk",
+        "tflint",
         "tfstate",
         "tsch",
         "tschcheckserverhealth",

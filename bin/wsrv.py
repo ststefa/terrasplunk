@@ -19,6 +19,7 @@ import traceback
 import base64
 import re
 import urllib.parse
+import itertools
 
 import build_state
 
@@ -489,13 +490,13 @@ class TerraformServer(BaseHTTPRequestHandler):
         self.wfile.write(bytes("<title>Splunk Overview</title>", coding))
         self.wfile.write(bytes("\
             <style>\
-                body       {font-family: verdana;}\
-                h1         {color: green;}\
-                table      {border-collapse: collapse; font-size: small;}\
-                tr, th, td {text-align: left; vertical-align: top; border: 1px solid; padding: 2px; padding-left: 10px;; padding-right: 10px;}\
-                tr         {text-align: left; vertical-align: top; border: 1px solid;}\
-                footer     {padding: 10px; color: lightgrey; font-size: small;}\
-            </style>"                     , coding))
+                body           {font-family: verdana;}\
+                h1             {color: green;}\
+                table          {border-collapse: collapse; font-size: small;}\
+                tr, th, td     {text-align: left; vertical-align: top; border: 1px solid; padding: 2px; padding-left: 5px; padding-right: 5px;}\
+                tr.sum, td.sum {border: none; padding: 0px; padding-left: 5px; padding-right: 5px;}\
+                footer         {padding: 10px; color: lightgrey; font-size: small;}\
+            </style>", coding))
         self.wfile.write(bytes("</head>", coding))
 
         self.do_topology_body()
@@ -512,7 +513,10 @@ class TerraformServer(BaseHTTPRequestHandler):
         for tenant in sorted(TerraformServer._state_cache.get().keys()):
             self.wfile.write(bytes(f'<h2>Tenant {tenant}</h2>', coding))
 
-            self.do_topology_tenant(tenant)
+            try:
+                self.do_topology_tenant(tenant)
+            except Exception:
+                self.wfile.write(bytes(f'tenant failed with {traceback.format_exc()}', coding))
 
         self.wfile.write(
             bytes(f'<footer>Created with &hearts; on {socket.gethostname()} showing live terraform data as of {time.asctime(time.localtime(round(TerraformServer._state_cache.issue())))}</footer>', coding))
@@ -537,7 +541,10 @@ class TerraformServer(BaseHTTPRequestHandler):
         self.wfile.write(bytes("<tr>", coding))
         for stage in stages:
             self.wfile.write(bytes("<td>", coding))
-            self.do_topology_stage(tenant, stage)
+            try:
+                self.do_topology_stage(tenant, stage)
+            except Exception:
+                self.wfile.write(bytes(f'stage failed with {traceback.format_exc()}', coding))
             self.wfile.write(bytes("</td>", coding))
         self.wfile.write(bytes("</tr>", coding))
 
@@ -545,12 +552,39 @@ class TerraformServer(BaseHTTPRequestHandler):
 
     @method_trace
     def do_topology_stage(self, tenant, stage):
+
+        def dict_to_html_table(data_dict, columns):
+            def divide_chunks(my_list, num_chunks):
+                chunks_list = []
+                for i in range(0, len(my_list), num_chunks):
+                    # in case we get dict.keys() we need to cast it to a list, see https://stackoverflow.com/questions/17322668/typeerror-dict-keys-object-does-not-support-indexing
+                    chunks_list.append(list(my_list)[i:i + num_chunks])
+                return chunks_list
+
+            chunks = divide_chunks(sorted(data_dict.keys()), columns)
+
+            result = '<table width="100%">'
+            for line in chunks:
+                result += "<tr class='sum'>"
+                for elem in line:
+                    result += "<td class='sum'>"
+                    result += f"{elem}: {data_dict[elem] if elem in data_dict.keys() else ''}"
+                    result += "</td>"
+                result += "</tr>"
+            result += "</table>"
+            return result
+
+        # get terraform state
         data = TerraformServer._state_cache.get()[tenant][stage]
 
         self.wfile.write(bytes("<table>", coding))
 
+        has_instances = False
         try:
+            # summarize resource allocation
             capacity = {'ram': 0, 'vcpu': 0, 'ssd': 0, 'sata': 0}
+            # counter number of instances
+            type_counter = {}
 
             blockstorage_query = "$..resources[?(@.type=='opentelekomcloud_blockstorage_volume_v2')]" # yapf: disable
             blockstorages = jsonpath.jsonpath(data, blockstorage_query)
@@ -566,27 +600,34 @@ class TerraformServer(BaseHTTPRequestHandler):
 
             instance_query = "$..resources[?(@.type=='opentelekomcloud_compute_instance_v2')]"
             all_compute_instances = jsonpath.jsonpath(data, instance_query)
-            has_instances = False
             if all_compute_instances:
                 has_instances = True
-                # create temp dict just for sorting
+                # create temp dict for sorting and counting
                 # yapf:disable
                 instance_dict = {}
                 for instance in all_compute_instances:
                     i_name = instance['instances'][0]['attributes']['name']
+                    i_type = i_name[5:7] # e.g. "splp0sh001" -> "sh"
                     i_ip = instance['instances'][0]['attributes']['access_ip_v4']
                     i_id = instance['instances'][0]['attributes']['id']
                     i_az = instance['instances'][0]['attributes']['availability_zone']
                     i_flavor = instance['instances'][0]['attributes']['flavor_id']
                     instance_dict[i_name] = {}
+                    instance_dict[i_name]['type'] = i_type
                     instance_dict[i_name]['ip'] = i_ip
                     instance_dict[i_name]['id'] = i_id
                     instance_dict[i_name]['az'] = i_az
                     instance_dict[i_name]['flavor'] = i_flavor
                     capacity['ram'] += TerraformServer.hardware_table[i_flavor[3:]]['ram']
                     capacity['vcpu'] += TerraformServer.hardware_table[i_flavor[3:]]['vcpu']
+                    if i_type in type_counter.keys():
+                        type_counter[i_type] += 1
+                    else:
+                        type_counter[i_type] = 1
+
+                # add instance cells
                 for i_name in sorted(instance_dict.keys()):
-                    i_type = i_name[5:7]
+                    i_type = instance_dict[i_name]["type"]
                     i_ip = instance_dict[i_name]["ip"]
                     i_az = instance_dict[i_name]["az"]
                     i_vcpu = TerraformServer.hardware_table[instance_dict[i_name]["flavor"][3:]]["vcpu"]
@@ -602,15 +643,17 @@ class TerraformServer(BaseHTTPRequestHandler):
                     self.wfile.write(bytes('</td></tr>', coding))
         except Exception:
             log.warn(f'Creating stage failed with {traceback.format_exc()}')
-            self.wfile.write(bytes(f'Creating stage failed with {traceback.format_exc()}', "utf-8"))
+            self.wfile.write(bytes(f'Creating stage failed with {traceback.format_exc()}', coding))
 
         if has_instances:
             self.wfile.write(bytes("<tr><td>", coding))
-            self.wfile.write(bytes(f'<b>Total capacity:</b><br>', coding))
-            self.wfile.write(bytes(f'vcpu: {capacity["vcpu"]}, ', coding))
-            self.wfile.write(bytes(f'ram:  {capacity["ram"]}, ', coding))
-            self.wfile.write(bytes(f'sata: {capacity["sata"]}, ', coding))
-            self.wfile.write(bytes(f'ssd:  {capacity["ssd"]}', coding))
+            self.wfile.write(bytes("<b>Instance count</b><br>", coding))
+            self.wfile.write(bytes(dict_to_html_table(type_counter, 4), coding))
+            self.wfile.write(bytes('</td></tr>', coding))
+
+            self.wfile.write(bytes("<tr class='sum'><td>", coding))
+            self.wfile.write(bytes(f'<b>Total capacity</b><br>', coding))
+            self.wfile.write(bytes(dict_to_html_table(capacity, 2), coding))
             self.wfile.write(bytes('</td></tr>', coding))
 
         self.wfile.write(bytes("</table>", coding))

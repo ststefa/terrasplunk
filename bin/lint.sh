@@ -5,30 +5,46 @@
 
 BASE_DIR="$(dirname "$(dirname "$(readlink -f "${0}")")")" || exit 1
 STAGE_DIRS="${BASE_DIR}/shared ${BASE_DIR}/stages"
-CODE_DIRS="${STAGE_DIRS} ${BASE_DIR}/modules"
+MODULE_DIRS="${BASE_DIR}/modules"
 
 # Unfortunately tflint is quite useless on non-AWS. Anyway...
-echo "Linting..."
-# https://stackoverflow.com/questions/91368/checking-from-shell-script-if-a-directory-contains-files
-shopt -s nullglob dotglob
-for D in $(find "${CODE_DIRS}" -type d |grep -v "\..*") ; do
-    FILES=("${D}"/*.tf)
-    if [ ${#FILES[@]} -gt 0 ] ; then
-        echo "${D}"
-        cd "${D}" || exit
-        tflint --module --deep
-        cd - > /dev/null || exit
-    fi
-done
+echo "Linting modules ..."
 
-echo "Validating..."
-shopt -s nullglob dotglob
-for D in $(find "${STAGE_DIRS}" -type d |grep -v "\..*") ; do
-    FILES=("${D}"/*.tf)
+# shellcheck disable=SC2086
+while read -r DIR ; do
+    shopt -s nullglob dotglob
+    # https://stackoverflow.com/questions/91368/checking-from-shell-script-if-a-directory-contains-files
+    FILES=("${DIR}"/*.tf)
     if [ ${#FILES[@]} -gt 0 ] ; then
-        echo "${D}"
-        cd "${D}" || exit
-        terraform validate
-        cd - > /dev/null || exit
+        echo "${DIR}"
+        cd "${DIR}" || exit 1
+        tflint
+        cd - > /dev/null || exit 1
     fi
-done
+done < <(find ${MODULE_DIRS} -type d)
+
+echo "Linting stages ..."
+# shellcheck disable=SC2086
+while read -r DIR ; do
+    shopt -s nullglob dotglob
+    # https://stackoverflow.com/questions/91368/checking-from-shell-script-if-a-directory-contains-files
+    FILES=("${DIR}"/*.tf)
+    if [ ${#FILES[@]} -gt 0 ] ; then
+        echo "${DIR}"
+        cd "${DIR}" || exit 1
+        tflint --module
+        cd - > /dev/null || exit 1
+    fi
+done < <(find ${STAGE_DIRS} -type d)
+
+echo "Terraform-validating stages ..."
+# shellcheck disable=SC2086
+while read -r DIR ; do
+    FILES=("${DIR}"/*.tf)
+    if [ ${#FILES[@]} -gt 0 ] ; then
+        echo "${DIR}"
+        cd "${DIR}" || exit 1
+        terraform validate
+        cd - > /dev/null || exit 1
+    fi
+done < <(find ${STAGE_DIRS} -type d)

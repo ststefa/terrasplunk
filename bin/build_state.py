@@ -115,9 +115,9 @@ def get_state_from_s3():
     for obj in bucket.objects.all():
         key = obj.key
         if not key.endswith('.tfstate'):
-            # not a terraform state file
+            log.debug(f'skipping non-state file {key}')
             continue
-        if key.startswith('env:'):
+        if key.startswith('env:/production/'):
             tenant='tsch_rz_p_001'
             # key e.g. "env:/production/p0.tfstate", reduce to "p0"
             stage=key[key.rfind('/')+1:key.rfind('.')]
