@@ -579,6 +579,7 @@ class TerraformServer(BaseHTTPRequestHandler):
 
         self.wfile.write(bytes("<table>", coding))
 
+        has_instances = False
         try:
             # summarize resource allocation
             capacity = {'ram': 0, 'vcpu': 0, 'ssd': 0, 'sata': 0}
@@ -599,7 +600,6 @@ class TerraformServer(BaseHTTPRequestHandler):
 
             instance_query = "$..resources[?(@.type=='opentelekomcloud_compute_instance_v2')]"
             all_compute_instances = jsonpath.jsonpath(data, instance_query)
-            has_instances = False
             if all_compute_instances:
                 has_instances = True
                 # create temp dict for sorting and counting
