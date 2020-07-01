@@ -13,5 +13,5 @@ done < <(find ${CODE_DIRS} -name "*.tf") | wc -l
 
 echo "Lines of comments in terraform code"
 while read -r FILE ; do
-    cat "${FILE}" | grep '^\ *#'
+    grep '^\ *#' "${FILE}"
 done < <(find ${CODE_DIRS} -name "*.tf") | wc -l
