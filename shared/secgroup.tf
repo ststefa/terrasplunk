@@ -130,7 +130,7 @@ resource "opentelekomcloud_compute_secgroup_v2" "hec-secgrp" {
     from_port   = 8088
     to_port     = 8088
     ip_protocol = "tcp"
-    cidr        = "0.0.0.0/0"
+    cidr        = "10.104.0.0/16"
   }
 }
 
