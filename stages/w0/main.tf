@@ -27,6 +27,13 @@ provider "opentelekomcloud" {
   auth_url = "https://iam.eu-ch.o13bb.otc.t-systems.com/v3"
 }
 
+provider "openstack" {
+  domain_name = "tsch_rz_t_001"
+  tenant_name = "eu-ch_splunk"
+  cloud       = "tsch_rz_t_001"
+  auth_url    = "https://iam.eu-ch.o13bb.otc.t-systems.com/v3"
+}
+
 module "variables" {
   source    = "../../modules/variables"
   workspace = terraform.workspace
