@@ -64,7 +64,7 @@ resource "opentelekomcloud_compute_instance_v2" "instance" {
   # However: "Error: Unsupported argument" although documented on https://www.terraform.io/docs/providers/opentelekomcloud/r/compute_instance_v2.html
   #force_delete        = true
 
-  # Tagging does not work on OTC. See terraform project https://gitlab-tss.sbb.ch/ssteine2/tagtest for in depth details
+  # Tagging does not work on OTC. See terraform project https://gitlab-tss.sbb.ch/splunk/otctagtest for in depth details
   #tag = {
   #  application = "splunk"
   #}
