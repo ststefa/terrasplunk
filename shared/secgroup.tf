@@ -104,7 +104,9 @@ resource "opentelekomcloud_compute_secgroup_v2" "rest4someip-secgrp" {
   name        = "${local.project}-rest4someip-secgrp"
   description = "Specific rules for accessing P0 ${local.project} indexer instances from Security SH"
 
-  # api access for SH1, 172.17.19.133, requested on Issue https://issues.sbb.ch/browse/MON-1586
+  # api access for SH1, 172.17.19.133 and 172.17.19.134, requested on Issues:
+  # https://issues.sbb.ch/browse/MON-1586
+  # https://issues.sbb.ch/browse/MON-1924
   rule {
     from_port   = 8089
     to_port     = 8089
@@ -112,7 +114,6 @@ resource "opentelekomcloud_compute_secgroup_v2" "rest4someip-secgrp" {
     cidr        = "172.17.19.133/32"
   }
 
-  # api access for SH2, 172.17.19.134, requested on Issue https://issues.sbb.ch/browse/MON-1586
   rule {
     from_port   = 8089
     to_port     = 8089
