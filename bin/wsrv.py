@@ -586,7 +586,20 @@ class TerraformServer(BaseHTTPRequestHandler):
             # counter number of instances
             type_counter = {}
 
+            # sum up opentelekomcloud_blockstorage_volume_v2
             blockstorage_query = "$..resources[?(@.type=='opentelekomcloud_blockstorage_volume_v2')]" # yapf: disable
+            blockstorages = jsonpath.jsonpath(data, blockstorage_query)
+            if blockstorages:
+                for disk in blockstorages:
+                    d_type=disk['instances'][0]['attributes']['volume_type']
+                    if d_type == 'SATA':
+                        capacity['sata'] += disk['instances'][0]['attributes']['size']
+                    elif d_type == 'SSD':
+                        capacity['ssd'] += disk['instances'][0]['attributes']['size']
+                    else:
+                        log.warn(f'Unknown disk type {d_type}')
+            # sum up openstack_blockstorage_volume_v3
+            blockstorage_query = "$..resources[?(@.type=='openstack_blockstorage_volume_v3')]" # yapf: disable
             blockstorages = jsonpath.jsonpath(data, blockstorage_query)
             if blockstorages:
                 for disk in blockstorages:
