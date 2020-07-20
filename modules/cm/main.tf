@@ -21,6 +21,6 @@ data "terraform_remote_state" "shared" {
 module "cm-instance" {
   source         = "../../modules/genericecs"
   instance_name  = var.instance_name
-  secgrp_id_list = [data.terraform_remote_state.shared.outputs.searchhead-secgrp_id]
+  secgrp_id_list = [data.terraform_remote_state.shared.outputs.searchhead-secgrp_id, data.terraform_remote_state.shared.outputs.rest4someip-secgrp_id]
   autorecover    = "true"
 }
