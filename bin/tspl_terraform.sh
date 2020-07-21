@@ -84,6 +84,11 @@ do_terraform() {
         terraform init -upgrade=true || return 1
         { set +x; } 2> /dev/null
         ;;
+    refresh)
+        set -x
+        terraform refresh || return 1
+        { set +x; } 2> /dev/null
+        ;;
     apply|destroy)
         PARALLELISM="-parallelism=20"
         if [ "${STAGE}" == "shared" ] ; then
@@ -146,7 +151,7 @@ case $1 in
         shift
         list_targets "$@"
         ;;
-    apply|destroy|init)
+    apply|destroy|init|refresh)
         OP=$1
         shift
         do_terraform "$OP" "$@"
@@ -167,6 +172,8 @@ case $1 in
         echo '               This will also perform an implicit upgrade of providers so they'
         echo '               are kept up to date.'
         echo '      lock     lock terraform state. Safety net to prevent errors.'
+        echo '      refresh  refresh terraform state. Use in case there are inconsistencies'
+        echo '               between terraform state and cloud resources'
         echo '  tenant: target tenant, one of:'
         echo '      tsch_rz_t_001   test tenant'
         echo '      tsch_rz_p_001   production tenant'

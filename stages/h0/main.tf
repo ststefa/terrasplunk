@@ -21,10 +21,15 @@ locals {
 provider "opentelekomcloud" {
   domain_name = module.variables.tenant
   tenant_name = "eu-ch_splunk"
-  #user_name   = var.username
-  #password    = var.password
-  cloud    = module.variables.tenant
-  auth_url = "https://iam.eu-ch.o13bb.otc.t-systems.com/v3"
+  cloud       = module.variables.tenant
+  auth_url    = "https://iam.eu-ch.o13bb.otc.t-systems.com/v3"
+}
+
+provider "openstack" {
+  domain_name = module.variables.tenant
+  tenant_name = "eu-ch_splunk"
+  cloud       = module.variables.tenant
+  auth_url    = "https://iam.eu-ch.o13bb.otc.t-systems.com/v3"
 }
 
 module "variables" {

@@ -21,10 +21,15 @@ locals {
 provider "opentelekomcloud" {
   domain_name = module.variables.tenant
   tenant_name = "eu-ch_splunk"
-  #user_name   = var.username
-  #password    = var.password
-  cloud    = module.variables.tenant
-  auth_url = "https://iam.eu-ch.o13bb.otc.t-systems.com/v3"
+  cloud       = module.variables.tenant
+  auth_url    = "https://iam.eu-ch.o13bb.otc.t-systems.com/v3"
+}
+
+provider "openstack" {
+  domain_name = module.variables.tenant
+  tenant_name = "eu-ch_splunk"
+  cloud       = module.variables.tenant
+  auth_url    = "https://iam.eu-ch.o13bb.otc.t-systems.com/v3"
 }
 
 module "variables" {
@@ -96,15 +101,22 @@ module "server-ix003" {
   source        = "../../modules/ix"
   instance_name = "${local.prefix}ix003"
 }
-# Temporarily removed due to lack of OTC Resources, see https://issues.sbb.ch/browse/MON-1758
-#module "server-ix004" {
-#  source        = "../../modules/ix"
-#  instance_name = "${local.prefix}ix004"
-#}
-#module "server-ix005" {
-#  source        = "../../modules/ix"
-#  instance_name = "${local.prefix}ix005"
-#}
+module "server-ix004" {
+  source        = "../../modules/ix"
+  instance_name = "${local.prefix}ix004"
+}
+module "server-ix005" {
+  source        = "../../modules/ix"
+  instance_name = "${local.prefix}ix005"
+}
+module "server-ix006" {
+  source        = "../../modules/ix"
+  instance_name = "${local.prefix}ix006"
+}
+module "server-ix007" {
+  source        = "../../modules/ix"
+  instance_name = "${local.prefix}ix007"
+}
 
 module "server-hf000" {
   source        = "../../modules/hf"

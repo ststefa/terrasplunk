@@ -324,8 +324,8 @@ variable "pvsize_hot_map" {
     }
     production = {
       d0 : 5
-      p0 : 250
-      #p0 : 625 new sizing, see MON-1631
+      #p0 : 625, see https://issues.sbb.ch/browse/MON-1631, obsolete
+      p0 : 250 # see https://issues.sbb.ch/browse/MON-1900
       t0 : 25
       w0 : 5
     }
@@ -348,8 +348,8 @@ variable "pvsize_cold_map" {
     }
     production = {
       d0 : 50
-      p0 : 2500
-      #p0 : 3750 new sizing, see MON-1631
+      #p0 : 3750, see https://issues.sbb.ch/browse/MON-1631, obsolete
+      p0 : 1750 # see https://issues.sbb.ch/browse/MON-1900
       t0 : 250
       w0 : 50
     }
@@ -517,7 +517,7 @@ variable "pmdns_list_map" {
       splp0hf002 : "10.104.146.14",
       splp0hf004 : "10.104.146.15",
       splp0ix004 : "10.104.146.16",
-      ########## : "10.104.146.17",
+      splp0ix006 : "10.104.146.17",
       ########## : "10.104.146.18",
       ########## : "10.104.146.19",
       ########## : "10.104.146.20",
@@ -576,7 +576,7 @@ variable "pmdns_list_map" {
       splp0hf003 : "10.104.146.74",
       splp0hf005 : "10.104.146.75",
       splp0ix005 : "10.104.146.76",
-      ########## : "10.104.146.77",
+      splp0ix007 : "10.104.146.77",
       ########## : "10.104.146.78",
       ########## : "10.104.146.79",
       ########## : "10.104.146.80",
