@@ -88,7 +88,7 @@ def lock_state(tenant, stage):
 
     table = dynamodb.Table('splunkterraform')  # pylint: disable=no-member
 
-    # terraform lock entry looks like this:
+    # terraform lock entry looks like this (values in '<>' to be replaced):
     # {
     #    "LockID": "sbb-splunkterraform-prod/w0.tfstate",
     #    "Info": "{\"ID\":\"<UUID>\",\"Operation\":\"OperationTypeApply\",\"Info\":\"\",\"Who\":\"<user@host>\",\"Version\":\"<terraform version>\",\"Created\":\"<lockCreationDate>\",\"Path\":\"sbb-splunkterraform-<tenant>/<stage>.tfstate\"}"
