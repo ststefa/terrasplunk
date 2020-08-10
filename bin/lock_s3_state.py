@@ -91,7 +91,7 @@ def lock_state(tenant, stage):
     # terraform lock entry looks like this:
     # {
     #    "LockID": "sbb-splunkterraform-prod/w0.tfstate",
-    #    "Info": "{\"ID\":\"<UUID>\",\"Operation\":\"OperationTypeApply\",\"Info\":\"\",\"Who\":\"<SBBuser>@splg0bd000.novalocal\",\"Version\":\"<terraform version>\",\"Created\":\"<lockCreationDate>\",\"Path\":\"sbb-splunkterraform-<tenant>/<stage>.tfstate\"}"
+    #    "Info": "{\"ID\":\"<UUID>\",\"Operation\":\"OperationTypeApply\",\"Info\":\"\",\"Who\":\"<user@host>\",\"Version\":\"<terraform version>\",\"Created\":\"<lockCreationDate>\",\"Path\":\"sbb-splunkterraform-<tenant>/<stage>.tfstate\"}"
     # },
 
     # every state entry has an associated <key>-md5 entry which is created when
