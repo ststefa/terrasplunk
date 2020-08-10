@@ -1,5 +1,5 @@
 terraform {
-  required_version = ">= 0.12.21"
+  required_version = ">= 0.12.29"
   backend "s3" {
     # Unfortunately interpolations are not allowed in backend config
     profile = "sbb-splunk"
