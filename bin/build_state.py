@@ -109,9 +109,9 @@ def get_state_from_s3():
 
     result=dict([(key, {}) for key in ['tsch_rz_t_001', 'tsch_rz_p_001']])
 
-    session = boto3.Session(profile_name='sbb-splunk')
+    session = boto3.Session(profile_name='foo-splunk')
     s3r = session.resource('s3')
-    bucket = s3r.Bucket('sbb-splunkterraform-prod') # pylint: disable=no-member
+    bucket = s3r.Bucket('foo-splunkterraform-prod') # pylint: disable=no-member
     for obj in bucket.objects.all():
         key = obj.key
         if not key.endswith('.tfstate'):
@@ -129,16 +129,16 @@ def get_state_from_s3():
 
     # other possible ways to read from s3
     #s3 = session.client('s3')
-    #objs = s3.list_objects_v2(Bucket='sbb-splunkterraform-prod')
+    #objs = s3.list_objects_v2(Bucket='foo-splunkterraform-prod')
     #objs_contents = objs['Contents']
     #for obj in range(len(objs_contents)):
     #    key = objs_contents[obj]['Key']
     #    f = io.BytesIO()
-    #    s3.download_fileobj('sbb-splunkterraform-prod', key, f)
+    #    s3.download_fileobj('foo-splunkterraform-prod', key, f)
     #    result['tsch_rz_t_001'][key] = json.loads(f.getvalue().decode())
     #
     #paginator = s3.get_paginator('list_objects')
-    #paginator_result = paginator.paginate(Bucket='sbb-splunkterraform-prod', Delimiter='/')
+    #paginator_result = paginator.paginate(Bucket='foo-splunkterraform-prod', Delimiter='/')
     #for prefix in paginator_result:
     #    print(prefix.get('Prefix'))
 

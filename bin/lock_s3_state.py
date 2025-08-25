@@ -76,22 +76,22 @@ def init_parser():
 
 
 def lock_state(tenant, stage):
-    db_key = 'sbb-splunkterraform-prod/'
+    db_key = 'foo-splunkterraform-prod/'
     if tenant.lower() == "tsch_rz_p_001":
         db_key += "env:/production/"
     db_key = f'{db_key}{stage}.tfstate'
 
     log.debug(f'db_key:{db_key}')
 
-    session = boto3.Session(profile_name='sbb-splunk')
+    session = boto3.Session(profile_name='foo-splunk')
     dynamodb = session.resource('dynamodb', region_name='eu-central-1')
 
     table = dynamodb.Table('splunkterraform')  # pylint: disable=no-member
 
     # terraform lock entry looks like this (values in '<>' to be replaced):
     # {
-    #    "LockID": "sbb-splunkterraform-prod/w0.tfstate",
-    #    "Info": "{\"ID\":\"<UUID>\",\"Operation\":\"OperationTypeApply\",\"Info\":\"\",\"Who\":\"<user@host>\",\"Version\":\"<terraform version>\",\"Created\":\"<lockCreationDate>\",\"Path\":\"sbb-splunkterraform-<tenant>/<stage>.tfstate\"}"
+    #    "LockID": "foo-splunkterraform-prod/w0.tfstate",
+    #    "Info": "{\"ID\":\"<UUID>\",\"Operation\":\"OperationTypeApply\",\"Info\":\"\",\"Who\":\"<user@host>\",\"Version\":\"<terraform version>\",\"Created\":\"<lockCreationDate>\",\"Path\":\"foo-splunkterraform-<tenant>/<stage>.tfstate\"}"
     # },
 
     # every state entry has an associated <key>-md5 entry which is created when

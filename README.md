@@ -134,13 +134,13 @@ Some of the support scripts use Amazons `boto3` python code so make sure that it
 
 Next, setup your cloud credentials. The terraform state is kept on AWS S3. The infrastructure is built on OTC. Hence you need access to both of these cloud providers.
 
-For AWS, the code assumes a profile named **sbb-splunk** in your `~/.aws/credentials` like this:
+For AWS, the code assumes a profile named **foo-splunk** in your `~/.aws/credentials` like this:
 
 ``` shell
 $ cat ~/.aws/credentials
-[sbb-splunk]
-aws_access_key_id = <sbb-splunk-access-key>
-aws_secret_access_key = <sbb-splunk-secret-key>
+[foo-splunk]
+aws_access_key_id = <foo-splunk-access-key>
+aws_secret_access_key = <foo-splunk-secret-key>
 ```
 
 Make sure this file is chmod 600 for security reasons.
@@ -154,7 +154,7 @@ $ cat  ~/.config/openstack/clouds.yaml
 clouds:
     tsch_rz_t_001:
         auth:
-            auth_url: 'https://auth.o13bb.otc.t-systems.com/v3'
+            auth_url: 'https://auth.o13bb.otc.example.com/v3'
             project_name: 'eu-ch_splunk'
             domain_name: 'tsch_rz_t_001'
             username: 'your-otc-uid-for-test-tenant'
@@ -162,7 +162,7 @@ clouds:
         region_name: 'eu-ch'
     tsch_rz_p_001:
         auth:
-            auth_url: 'https://auth.o13bb.otc.t-systems.com/v3'
+            auth_url: 'https://auth.o13bb.otc.example.com/v3'
             project_name: 'eu-ch_splunk'
             domain_name: 'tsch_rz_p_001'
             username: 'your-otc-uid-for-prod-tenant'
@@ -173,7 +173,7 @@ clouds:
 Unlike the terraform credentials, the OTC credentials *are* personalized. Make sure this file is also chmod 600 for security reasons.
 
 
-For the terraform remote state to work, the required objects on AWS S3 and DynamoDB have to be created (if they do not exist already). The code assumes a bucket named **sbb-splunkterraform-prod** and a DynamoDB table called **splunkterraform**. For details on setting these up visit <https://www.terraform.io/docs/backends/types/s3.html>
+For the terraform remote state to work, the required objects on AWS S3 and DynamoDB have to be created (if they do not exist already). The code assumes a bucket named **foo-splunkterraform-prod** and a DynamoDB table called **splunkterraform**. For details on setting these up visit <https://www.terraform.io/docs/backends/types/s3.html>
 
 If you've prepared your cloud setup, resume...
 

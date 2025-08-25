@@ -24,7 +24,7 @@ module "sy-instance" {
   flavor        = module.variables.flavor_sy
   # sy systems need to be open for
   # - syslog
-  # - splunkforwarder REST (see https://issues.sbb.ch/browse/MON-1566)
+  # - splunkforwarder REST (see https://issues.foo.ch/browse/MON-1566)
   secgrp_id_list = [data.terraform_remote_state.shared.outputs.parser-secgrp_id, data.terraform_remote_state.shared.outputs.rest-secgrp_id]
 }
 

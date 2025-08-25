@@ -127,7 +127,7 @@ def init_parser(arg_defaults):
     )
 
     parser.add_argument('--profile',
-                        default='sbb-splunk',
+                        default='foo-splunk',
                         help='use a non-default AWS profile for credentials')
 
     parser.add_argument(
@@ -162,7 +162,7 @@ def get_state_from_s3(profile, tenant, stage):
         log.debug(f'Fetching {s3_key}from S3')
         session = boto3.Session(profile_name=profile)
         s3 = session.client('s3')
-        s3_object = s3.get_object(Bucket='sbb-splunkterraform-prod',
+        s3_object = s3.get_object(Bucket='foo-splunkterraform-prod',
                                   Key=s3_key)
         data = json.loads(s3_object['Body'].read())
         return data

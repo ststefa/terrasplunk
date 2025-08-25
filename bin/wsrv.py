@@ -29,7 +29,7 @@ user = 'to_be_replaced_as_arg'
 password = 'to_be_replaced_as_arg'
 health_score_watermark = { 'low' : 100, 'high' : 76, 'critical' : 50 }
 coding = 'utf-8'
-splunk_sh_server = 'search.splunk.sbb.ch'
+splunk_sh_server = 'search.splunk.foo.ch'
 splunk_sh_port = 8089
 
 log = logging.getLogger(__name__)
@@ -207,7 +207,7 @@ class TerraformServer(BaseHTTPRequestHandler):
 
     @method_trace
     def hostname_to_link(self, hostname, tenant, stage):
-        domain = "splunk.sbb.ch"
+        domain = "splunk.foo.ch"
         ecs_type = hostname[5:7]
         ecs_stage = hostname[3:5]
         ecs_number = hostname[7:]
@@ -337,12 +337,12 @@ class TerraformServer(BaseHTTPRequestHandler):
             result_health_score = float(result_health_score_str)
         except ValueError:
             result_health_score = -1.0  #Splunk ITSI health_score is always between 0 - 100 or 'N/A', with -1 we report that service was in maintenance ('N/A')
-            interpreted_splunk_health = 'SBB maintenance'
+            interpreted_splunk_health = 'FOO maintenance'
         else:
             if result_health_score < health_score_watermark[severity]:
-                interpreted_splunk_health = 'SBB NoOK'
+                interpreted_splunk_health = 'FOO NoOK'
             else:
-                interpreted_splunk_health = 'SBB OK'
+                interpreted_splunk_health = 'FOO OK'
         log.info(f'HTTP output: result {{ health_score = {result_health_score_str}, ...}}, watermark = {health_score_watermark[severity]}; therefore: {interpreted_splunk_health}')
 
         #HTML Header
@@ -390,9 +390,9 @@ class TerraformServer(BaseHTTPRequestHandler):
             log.debug(f'HTTP output (JSON): {data_json}')
             incident_count = len(data_json)
             if incident_count > 0:
-                interpreted_splunk_health = 'SBB NoOK'
+                interpreted_splunk_health = 'FOO NoOK'
             else:
-                interpreted_splunk_health = 'SBB OK'
+                interpreted_splunk_health = 'FOO OK'
         except requests.exceptions.HTTPError as http_err:
             log.error(f'Error trying to communicate to {splunk_sh_server}: {http_err}')
             error_string=str(http_err)

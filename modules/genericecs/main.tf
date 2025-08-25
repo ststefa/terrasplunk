@@ -64,20 +64,20 @@ resource "opentelekomcloud_compute_instance_v2" "instance" {
   # However: "Error: Unsupported argument" although documented on https://www.terraform.io/docs/providers/opentelekomcloud/r/compute_instance_v2.html
   #force_delete        = true
 
-  # Tagging does not work on OTC. See terraform project https://gitlab-tss.sbb.ch/splunk/otctagtest for in depth details
+  # Tagging does not work on OTC. See terraform project https://gitlab-tss.foo.ch/splunk/otctagtest for in depth details
   #tag = {
   #  application = "splunk"
   #}
 
-  # SBB required metadata as per https://issues.sbb.ch/browse/UOS-112
+  # FOO required metadata as per https://issues.foo.ch/browse/UOS-112
   metadata = {
-    sbb_accounting_number    = "70031944"
-    sbb_infrastructure_stage = module.variables.sbb_infrastructure_stage
-    sbb_mega_id              = "8FD790A15E212AEF"
-    sbb_requester            = "ursula.buehlmann@sbb.ch"
-    sbb_os                   = "linux"
-    sbb_contact              = "ursula.buehlmann@sbb.ch"
-    sbb_sla                  = module.variables.tenant == "tsch_rz_t_001" ? "none" : "2b"
+    foo_accounting_number    = "70031944"
+    foo_infrastructure_stage = module.variables.foo_infrastructure_stage
+    foo_mega_id              = "8FD790A15E212AEF"
+    foo_requester            = "ursula.buehlmann@foo.ch"
+    foo_os                   = "linux"
+    foo_contact              = "ursula.buehlmann@foo.ch"
+    foo_sla                  = module.variables.tenant == "tsch_rz_t_001" ? "none" : "2b"
     uos_managed              = module.variables.tenant == "tsch_rz_t_001" ? "false" : "true"
     uos_group                = "DG_RBT_UOS_ADMIN"
     uos_monitoring           = module.variables.tenant == "tsch_rz_t_001" ? "false" : "true"
@@ -120,7 +120,7 @@ data "template_file" "provtest" {
   template = "${file("${path.module}/templates/cloudinit.tpl")}"
 
   vars = {
-    fqdn     = "${var.instance_name}.splunk.sbb.ch"
+    fqdn     = "${var.instance_name}.splunk.foo.ch"
     hostname = "${var.instance_name}"
   }
 }

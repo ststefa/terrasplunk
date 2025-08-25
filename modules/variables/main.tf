@@ -42,15 +42,15 @@ variable "s3_shared_config_map" {
 output "s3_shared_config" {
   description = "Connection properties for accessing S3 shared state file"
   value = {
-    profile        = "sbb-splunk"
-    bucket         = "sbb-splunkterraform-prod"
+    profile        = "foo-splunk"
+    bucket         = "foo-splunkterraform-prod"
     region         = "eu-central-1"
     key            = var.s3_shared_config_map[var.workspace]
     dynamodb_table = "splunkterraform"
   }
 }
 
-variable "sbb_infrastructure_stage_map" {
+variable "foo_infrastructure_stage_map" {
   description = "1:1 assignment from workspace name to tenant name"
   type        = map
   default = {
@@ -61,9 +61,9 @@ variable "sbb_infrastructure_stage_map" {
     w0 = "dev"
   }
 }
-output "sbb_infrastructure_stage" {
-  description = "SBB stage definition as per https://confluence.sbb.ch/display/OTC/Tagging+Policy"
-  value       = contains(keys(var.sbb_infrastructure_stage_map), var.stage) ? var.sbb_infrastructure_stage_map[var.stage] : "missing"
+output "foo_infrastructure_stage" {
+  description = "FOO stage definition as per https://confluence.foo.ch/display/OTC/Tagging+Policy"
+  value       = contains(keys(var.foo_infrastructure_stage_map), var.stage) ? var.foo_infrastructure_stage_map[var.stage] : "missing"
 }
 
 
@@ -80,7 +80,7 @@ output "sbb_infrastructure_stage" {
 #   no module should be created but the flavor should be passed to genericecs
 #   from <stage>/main.tf
 # --- List of supported OTC flavors
-#$ openstack --os-cloud otc-sbb-p flavor list #(some columns discarded for brevity)
+#$ openstack --os-cloud otc-foo-p flavor list #(some columns discarded for brevity)
 #+--------------+--------+--------+
 #| ID           |    RAM |  VCPUs |
 #+--------------+--------+--------+
@@ -187,7 +187,7 @@ variable "flavor_si_map" {
     production = {
       p0 : "s3.4xlarge.2"
       t0 : "s3.4xlarge.2"
-      w0 : "s3.4xlarge.1" # unsupported sizing requested by customer, see https://issues.sbb.ch/browse/MON-1596
+      w0 : "s3.4xlarge.1" # unsupported sizing requested by customer, see https://issues.foo.ch/browse/MON-1596
     }
   }
 }
@@ -324,8 +324,8 @@ variable "pvsize_hot_map" {
     }
     production = {
       d0 : 5
-      #p0 : 625, see https://issues.sbb.ch/browse/MON-1631, obsolete
-      p0 : 250 # see https://issues.sbb.ch/browse/MON-1900
+      #p0 : 625, see https://issues.foo.ch/browse/MON-1631, obsolete
+      p0 : 250 # see https://issues.foo.ch/browse/MON-1900
       t0 : 25
       w0 : 5
     }
@@ -348,8 +348,8 @@ variable "pvsize_cold_map" {
     }
     production = {
       d0 : 50
-      #p0 : 3750, see https://issues.sbb.ch/browse/MON-1631, obsolete
-      p0 : 1750 # see https://issues.sbb.ch/browse/MON-1900
+      #p0 : 3750, see https://issues.foo.ch/browse/MON-1631, obsolete
+      p0 : 1750 # see https://issues.foo.ch/browse/MON-1900
       t0 : 250
       w0 : 50
     }
@@ -364,7 +364,7 @@ variable "pvsize_splunkvar_map" {
   description = "splunkvar pv sizes (split by tenant)"
   type        = map
   default = {
-    # sizing agreed with customer, see https://issues.sbb.ch/browse/MON-1675
+    # sizing agreed with customer, see https://issues.foo.ch/browse/MON-1675
     default    = 25
     production = 50
   }
@@ -431,8 +431,6 @@ output "gateway_list" {
 # Poor Mans DNS
 variable "pmdns_list_map" {
   description = "Assignment of system to IP"
-  # For servers name nomenclature refer to http://wiki.t-systems.ch/x/ieMLAg
-
   # The Splunk network subnets are
   #
   #   Prod tenant tsch_rz_p_001: 10.104.146.0/24
@@ -568,7 +566,7 @@ variable "pmdns_list_map" {
       splp0hf001 : "10.104.146.66",
       splp0ix001 : "10.104.146.67",
       splp0ix003 : "10.104.146.68",
-      ########## : "10.104.146.69", # faulty vm, kept for analysis, see https://issues.sbb.ch/browse/MONITORING-1007 or SM9 IM0028676827
+      ########## : "10.104.146.69", # faulty vm, kept for analysis, see https://issues.foo.ch/browse/MONITORING-1007 or SM9 IM0028676827
       splp0sy001 : "10.104.146.70",
       splh0sy001 : "10.104.146.71",
       splp0es001 : "10.104.146.72",
